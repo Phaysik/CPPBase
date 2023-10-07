@@ -1,0 +1,7 @@
+/docs/sphinx
+/docs/xml
+/coverage
+/build
+.vscode
+*.gcno
+*.gcda
