@@ -54,7 +54,7 @@ main() {
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "create_index_rst_file" "-" "make"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "determine_index_rst_exists" "create_breathe_file, create_index_rst_file" "make"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "doxygen_complete" "change_doxygen_options" "make graphviz doxygen"
-        printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "docs" "doxygen_complete, determine_index_rst_exists" "make sphinx breathe sphinx-book-theme sphinx-copybtton sphinx-autobuild sphinx-last-updated-by-git"
+        printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "docs" "doxygen_complete, determine_index_rst_exists" "make sphinx breathe sphinx-book-theme sphinx-copybtton sphinx-autobuild sphinx-last-updated-by-git sphinx-notfound-page"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "create_folders" "-" "make"
     fi
 }
