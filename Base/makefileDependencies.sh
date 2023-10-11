@@ -24,6 +24,7 @@ main() {
         sudo cp ./lib/libgtest*.a /usr/lib
 
         echo "Installing Sphinx and it's dependencies for documentation"
+        pip3 install --upgrade pip
         pip3 install sphinx breathe sphinx-book-theme sphinx-copybutton sphinx-autobuild sphinx-last-updated-by-git sphinx-notfound-page
     else
         echo -e "\nBegin by installing make itself, and then look at the table below to find what other packages to install based on what commands you wish to run\n"
