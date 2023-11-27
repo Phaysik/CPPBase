@@ -50,37 +50,21 @@ Below is a list of all the :file:`Makefile` commands along with a breakdown of w
     |                            |                                                                                                    |
     |                            | Deletes the test output and lcov output folders.                                                   |
     +----------------------------+----------------------------------------------------------------------------------------------------+
-    | tidy_setup                 | Creates a clang tidy config file based on allowed and disallowed checks.                           |
+    | tidy                       | Runs clang tidy on the code base.                                                                  |
     +----------------------------+----------------------------------------------------------------------------------------------------+
-    | fix_tidy_warnings          | Replace certain values in the clang tidy file that are erroneously created during tidy_setup.      |
+    | format                     | Runs clang format on the code base.                                                                |
     +----------------------------+----------------------------------------------------------------------------------------------------+
-    | tidy                       | Runs the tidy_setup and fix_tidy_warnings commands.                                                |
-    |                            |                                                                                                    |
-    |                            | Runs clang tidy on the code base.                                                                  |
+    | run_doxygen                | Runs Doxygen on the Doxyfile                                                                       |
     +----------------------------+----------------------------------------------------------------------------------------------------+
-    | create_doxygen             | Creates a Doxygen config file.                                                                     |
-    +----------------------------+----------------------------------------------------------------------------------------------------+
-    | change_doxygen_options     | Runs the create_doxygen command.                                                                   |
-    |                            |                                                                                                    |
-    |                            | Changes the default values of the Doxygen config file.                                             |
-    +----------------------------+----------------------------------------------------------------------------------------------------+
-    | create_breathe_file        | Creates the breathe config file for sphinx.                                                        |
-    +----------------------------+----------------------------------------------------------------------------------------------------+
-    | create_index_rst_file      | Creates the index.rst file which displays the sphinx docs.                                         |
-    +----------------------------+----------------------------------------------------------------------------------------------------+
-    | determine_index_rst_exists | Runs the create_breathe_file command.                                                              |
-    |                            |                                                                                                    |
-    |                            | Checks if index.rst exists and if it doesn't it runs the create_index_rst_file command.            |
-    +----------------------------+----------------------------------------------------------------------------------------------------+
-    | doxygen_complete           | Runs the change_doxygen_options command.                                                           |
-    |                            |                                                                                                    |
-    |                            | Runs the doxygen config file and then deletes the .bak that is created.                            |
-    +----------------------------+----------------------------------------------------------------------------------------------------+
-    | docs                       | Runs the doxygen_complete and determine_index_rst_exists commands.                                 |
+    | docs                       | Runs the run_doxygen commands.                                                                     |
     |                            |                                                                                                    |
     |                            | Uses sphinx to build the docs from the Doxygen XML output.                                         |
     +----------------------------+----------------------------------------------------------------------------------------------------+
     | create_folders             | Creates the boilerplate folders for running other commands.                                        |
+    |                            |                                                                                                    |
+    |                            | Does not need to be executed individually.                                                         |
+    +----------------------------+----------------------------------------------------------------------------------------------------+
+    | initialize_repo            | Clones a base C++ repository structure into the current directory.                                 |
     |                            |                                                                                                    |
     |                            | Does not need to be executed individually.                                                         |
     +----------------------------+----------------------------------------------------------------------------------------------------+

@@ -1,0 +1,40 @@
+---
+Language: Cpp
+BasedOnStyle: Microsoft
+AlignArrayOfStructures: Right
+AlignConsecutiveMacros: Consecutive
+AlignEscapedNewlines: Left
+AlignOperands: AlignAfterOperator
+AlignTrailingComments:
+  Kind: Always
+AllowShortFunctionsOnASingleLine: Empty
+BraceWrapping:
+  AfterCaseLabel: true
+  AfterClass: true
+  AfterControlStatement: Always
+  AfterEnum: true
+  AfterFunction: true
+  AfterNamespace: true
+  AfterStruct: true
+  BeforeCatch: true
+  BeforeElse: true
+  BeforeLambdaBody: false
+  BeforeWhile: false
+  SplitEmptyFunction: false
+  SplitEmptyRecord: false
+  SplitEmptyNamespace: false
+BreakBeforeBinaryOperators: All
+BreakBeforeBraces: Custom
+BreakBeforeTernaryOperators: true
+IndentCaseBlocks: true
+IndentCaseLabels: true
+IndentWidth: 4
+InsertBraces: true
+LineEnding: LF
+NamespaceIndentation: All
+PointerAlignment: Right
+ReferenceAlignment: Right
+SeparateDefinitionBlocks: Always
+Standard: c++20
+UseTab: Always
+---
