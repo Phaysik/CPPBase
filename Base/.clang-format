@@ -1,7 +1,6 @@
 ---
 Language: Cpp
 BasedOnStyle: Microsoft
-AlignArrayOfStructures: Right
 AlignConsecutiveMacros: Consecutive
 AlignEscapedNewlines: Left
 AlignOperands: AlignAfterOperator
