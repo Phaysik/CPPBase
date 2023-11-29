@@ -54,7 +54,7 @@ Below is a list of all the :file:`Makefile` commands along with a breakdown of w
     +----------------------------+----------------------------------------------------------------------------------------------------+
     | format                     | Runs clang format on the code base.                                                                |
     +----------------------------+----------------------------------------------------------------------------------------------------+
-    | run_doxygen                | Runs Doxygen on the Doxyfile                                                                       |
+    | run_doxygen                | Runs Doxygen on the Doxyfile.                                                                      |
     +----------------------------+----------------------------------------------------------------------------------------------------+
     | docs                       | Runs the run_doxygen commands.                                                                     |
     |                            |                                                                                                    |

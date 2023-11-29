@@ -15,7 +15,7 @@ main() {
         sudo apt update && sudo apt upgrade -y
 
         echo "Installing all the required packages for all commands used in the Makefile"
-        sudo apt-get install -y make cmake valgrind graphviz doxygen libgtest-dev lcov
+        sudo apt-get install -y make cmake valgrind graphviz libgtest-dev lcov python3-pip flex bison
 
         echo "Setting up g++"
         sudo apt install -y software-properties-common
@@ -23,6 +23,19 @@ main() {
         sudo apt update
         sudo apt-get install -y g++-13
         sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 13
+
+        echo "Setting up Doxygen"
+        wget https://doxygen.nl/files/doxygen-1.9.8.src.tar.gz
+        tar -xzvf doxygen-1.9.8.src.tar.gz
+        cd doxygen-1.9.8
+        mkdir build
+        cd build
+        cmake -G "Unix Makefiles" ..
+        make
+        sudo make install
+        cd ..
+        cd ..
+        rm -rf doxygen-1.9.8*
 
         echo "Setting up clang-tidy and clang-format"
         wget https://apt.llvm.org/llvm.sh
@@ -62,7 +75,7 @@ main() {
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "coverage" "genhtml" "make"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "tidy" "-" "make clang-tidy"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "format" "-" "make clang-format"
-        printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "run_doxygen" "-" "make graphviz doxygen"
+        printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "run_doxygen" "-" "make graphviz doxygen flex bison"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "docs" "run_doxygen" "make sphinx breathe sphinx-book-theme sphinx-copybtton sphinx-autobuild sphinx-last-updated-by-git sphinx-notfound-page"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "create_folders" "-" "make"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "initialize_repo" "-" "make git"

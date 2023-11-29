@@ -53,6 +53,10 @@ Below is a list of all the :file:`Makefile` commands along with the other comman
     |                            |                                 | graphviz                                                                   |
     |                            |                                 |                                                                            |
     |                            |                                 | doxygen                                                                    |
+    |                            |                                 |                                                                            |
+    |                            |                                 | flex                                                                       |
+    |                            |                                 |                                                                            |
+    |                            |                                 | bison                                                                      |
     +----------------------------+---------------------------------+----------------------------------------------------------------------------+
     | docs                       | run_doxygen                     | make                                                                       |
     |                            |                                 |                                                                            |

@@ -1,0 +1,42 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "GitAddAll",
+            "type": "shell",
+            "command": "git",
+            "args": [
+                "add",
+                "."
+            ]
+        },
+        {
+            "label": "GitCommit",
+            "type": "shell",
+            "command": "git",
+            "args": [
+                "commit",
+                "-m",
+                "\"Automated commits on save\""
+            ],
+            "dependsOn": [
+                "GitAddAll"
+            ]
+        },
+        {
+            "label": "GitPush",
+            "type": "shell",
+            "command": "git",
+            "args": [
+                "push"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "dependsOn": [
+                "GitCommit"
+            ]
+        }
+    ]
+}
