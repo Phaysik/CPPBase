@@ -23,6 +23,7 @@ main() {
         sudo apt update
         sudo apt-get install -y g++-13
         sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 13
+        sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-13 13
 
         echo "Setting up Doxygen"
         wget https://doxygen.nl/files/doxygen-1.9.8.src.tar.gz
