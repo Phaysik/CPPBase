@@ -1,5 +1,48 @@
 #!/bin/bash
 
+setUpDoxygen() {
+    echo "Setting up Doxygen"
+    wget https://doxygen.nl/files/doxygen-1.9.8.src.tar.gz
+    tar -xzvf doxygen-1.9.8.src.tar.gz
+    cd doxygen-1.9.8
+    mkdir build
+    cd build
+    cmake -G "Unix Makefiles" ..
+    make
+    sudo make install
+    cd ..
+    cd ..
+    rm -rf doxygen-1.9.8*
+}
+
+setUpClangTools() {
+    echo "Setting up clang-tidy and clang-format"
+    wget https://apt.llvm.org/llvm.sh
+    chmod +x llvm.sh
+    sudo ./llvm.sh 18
+    rm -rf ./llvm.sh
+    sudo apt-get install -y clang-format clang-tidy
+}
+
+checkSphinx() {
+    packages=("sphinx" "breathe" "sphinx-book-theme" "sphinx-copybutton" "sphinx-autobuild" "sphinx-last-updated-by-git" "sphinx-notfound-page")
+
+    all_packages_installed=true
+
+    for package in "${packages[@]}"; do
+        if ! pip show "$package" >/dev/null 2>&1; then
+            echo "$package is not installed"
+            all_packages_installed=false
+        fi
+    done
+
+    if $all_packages_installed; then
+        return 0  # All packages installed
+    else
+        return 1  # Some packages missing
+    fi
+}
+
 main() {
     echo "This shell file is set up to only work on Ubuntu operating systems"
 
@@ -11,49 +54,77 @@ main() {
 
     if [ "${response,,}" = "y" ] || [ "${1,,}" = "y" ]; then
         echo "Update and upgrading your packages (will require an elevated user's password)"
-
         sudo apt update && sudo apt upgrade -y
 
         echo "Installing all the required packages for all commands used in the Makefile"
         sudo apt-get install -y make cmake valgrind graphviz libgtest-dev lcov python3-pip flex bison
 
-        echo "Setting up g++"
-        sudo apt install -y software-properties-common
-        sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
-        sudo apt update
-        sudo apt-get install -y g++-13
-        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 13
-        sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-13 13
+        if [ -x "$(command -v g++-13)" ]; then
+            echo "g++-13 exists"
+        else
+            echo "Setting up g++"
+            sudo apt install -y software-properties-common
+            sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+            sudo apt update
+            sudo apt-get install -y g++-13
+            sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 13
+            sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-13 13
+        fi
 
-        echo "Setting up Doxygen"
-        wget https://doxygen.nl/files/doxygen-1.9.8.src.tar.gz
-        tar -xzvf doxygen-1.9.8.src.tar.gz
-        cd doxygen-1.9.8
-        mkdir build
-        cd build
-        cmake -G "Unix Makefiles" ..
-        make
-        sudo make install
-        cd ..
-        cd ..
-        rm -rf doxygen-1.9.8*
+        if [ -x "$(command -v doxygen)" ]; then
+            echo "Doxygen already exists"
 
-        echo "Setting up clang-tidy and clang-format"
-        wget https://apt.llvm.org/llvm.sh
-        chmod +x llvm.sh
-        sudo ./llvm.sh 18
-        rm -rf ./llvm.sh
-        sudo apt-get install -y clang-format clang-tidy
+            version=$(doxygen --version | awk '{print $1}')
+            desired_version="1.9.8"
 
-        echo "Installing Google Test to the local machine for running the test suite"
-        cd /usr/src/gtest
-        sudo cmake CMakeLists.txt
-        sudo make
-        sudo cp ./lib/libgtest*.a /usr/lib
+            if [[ "$version" == "$desired_version" ]]; then
+                echo "Doxygen version 1.9.8 already exists"
+            else
+                setUpDoxygen
+            fi
+        else
+            setUpDoxygen
+        fi
 
-        echo "Installing Sphinx and it's dependencies for documentation"
-        pip3 install --upgrade pip
-        pip3 install sphinx breathe sphinx-book-theme sphinx-copybutton sphinx-autobuild sphinx-last-updated-by-git sphinx-notfound-page
+
+        if [ -x "$(command -v clang-tidy)" ] && [ -x "$(command -v clang-format)" ]; then
+            echo "clang-tidy and clang-format already exists"
+
+            clang_tidy_version=$(clang-tidy --version | awk '/LLVM version/ {print $4}')
+            clang_tidy_desired_version="18.0.0"
+
+            clang_format_version=$(clang-format --version | awk '{print $4}')
+            clang_format_desired_version="18.0.0"
+
+            if [[ "$clang_tidy_version" == "$clang_tidy_desired_version" ]] && [[ "$clang_format_version" == "$clang_format_desired_version" ]]; then
+                echo "clang-tidy version 18.0.0 and clang-format version 18.0.0 already exists"
+            else
+                setUpClangTools
+            fi
+        else
+            setUpClangTools
+        fi
+
+        if [ -f "/usr/lib/libgtest.a" ] && [ -f "/usr/lib/libgtest_main.a" ]; then
+            echo "Google Test already exists"
+        else
+            echo "Setting up Google Test"
+            cd /usr/src/gtest
+            sudo cmake CMakeLists.txt
+            sudo make
+            sudo cp ./lib/libgtest*.a /usr/lib
+        fi
+
+        checkSphinx
+        status=$?
+
+        if [ $status -eq 0 ]; then
+            echo "All Sphinx packages are installed"
+        else
+            echo "Installing Sphinx and it's dependencies for documentation"
+            pip3 install --upgrade pip
+            pip3 install sphinx breathe sphinx-book-theme sphinx-copybutton sphinx-autobuild sphinx-last-updated-by-git sphinx-notfound-page
+        fi
     else
         echo -e "\nBegin by installing make itself, and then look at the table below to find what other packages to install based on what commands you wish to run\n"
 
