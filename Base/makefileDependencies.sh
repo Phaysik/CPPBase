@@ -86,7 +86,6 @@ main() {
             setUpDoxygen
         fi
 
-
         if [ -x "$(command -v clang-tidy)" ] && [ -x "$(command -v clang-format)" ]; then
             echo "clang-tidy and clang-format already exists"
 
