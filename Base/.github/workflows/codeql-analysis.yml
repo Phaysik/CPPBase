@@ -57,7 +57,7 @@ jobs:
       #   uses: github/codeql-action/autobuild@v2
 
       - name: Install dependencies
-        run: ./makefileDependencies.sh y
+        run: ./makefileDependencies.sh a
 
       - name: Make project
         run: make

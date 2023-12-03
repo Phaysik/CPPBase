@@ -20,7 +20,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install dependencies
-        run: ./makefileDependencies.sh y
+        run: ./makefileDependencies.sh a
 
       - name: Make project
         run: make coverage

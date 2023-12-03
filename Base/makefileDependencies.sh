@@ -52,7 +52,8 @@ main() {
         read -p "Enter (Y/N) if you are running on Ubuntu and wish to auto install all packages required: " response
     fi
 
-    if [ "${response,,}" = "y" ] || [ "${1,,}" = "y" ]; then
+    # a or 'A' for automated running (For Github workflows ignoring long documentation, linting, and formatting installation)
+    if [ "${response,,}" = "y" ] || [ "${1,,}" = "y" ] || [ "${response,,}" = "a" ] || [ "${1,,}" = "a" ]; then
         echo "Update and upgrading your packages (will require an elevated user's password)"
         sudo apt update && sudo apt upgrade -y
 
@@ -71,40 +72,6 @@ main() {
             sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-13 13
         fi
 
-        if [ -x "$(command -v doxygen)" ]; then
-            echo "Doxygen already exists"
-
-            version=$(doxygen --version | awk '{print $1}')
-            desired_version="1.9.8"
-
-            if [[ "$version" == "$desired_version" ]]; then
-                echo "Doxygen version 1.9.8 already exists"
-            else
-                setUpDoxygen
-            fi
-        else
-            setUpDoxygen
-        fi
-
-
-        if [ -x "$(command -v clang-tidy)" ] && [ -x "$(command -v clang-format)" ]; then
-            echo "clang-tidy and clang-format already exists"
-
-            clang_tidy_version=$(clang-tidy --version | awk '/LLVM version/ {print $4}')
-            clang_tidy_desired_version="18.0.0"
-
-            clang_format_version=$(clang-format --version | awk '{print $4}')
-            clang_format_desired_version="18.0.0"
-
-            if [[ "$clang_tidy_version" == "$clang_tidy_desired_version" ]] && [[ "$clang_format_version" == "$clang_format_desired_version" ]]; then
-                echo "clang-tidy version 18.0.0 and clang-format version 18.0.0 already exists"
-            else
-                setUpClangTools
-            fi
-        else
-            setUpClangTools
-        fi
-
         if [ -f "/usr/lib/libgtest.a" ] && [ -f "/usr/lib/libgtest_main.a" ]; then
             echo "Google Test already exists"
         else
@@ -115,15 +82,52 @@ main() {
             sudo cp ./lib/libgtest*.a /usr/lib
         fi
 
-        checkSphinx
-        status=$?
+        # If not 'a' or 'A', set up documentation, formatting, and linting tools
+        if [ "${response,,}" = "y" ] || [ "${1,,}" = "y" ]; then
+            if [ -x "$(command -v doxygen)" ]; then
+                echo "Doxygen already exists"
 
-        if [ $status -eq 0 ]; then
-            echo "All Sphinx packages are installed"
-        else
-            echo "Installing Sphinx and it's dependencies for documentation"
-            pip3 install --upgrade pip
-            pip3 install sphinx breathe sphinx-book-theme sphinx-copybutton sphinx-autobuild sphinx-last-updated-by-git sphinx-notfound-page
+                version=$(doxygen --version | awk '{print $1}')
+                desired_version="1.9.8"
+
+                if [[ "$version" == "$desired_version" ]]; then
+                    echo "Doxygen version 1.9.8 already exists"
+                else
+                    setUpDoxygen
+                fi
+            else
+                setUpDoxygen
+            fi
+
+
+            if [ -x "$(command -v clang-tidy)" ] && [ -x "$(command -v clang-format)" ]; then
+                echo "clang-tidy and clang-format already exists"
+
+                clang_tidy_version=$(clang-tidy --version | awk '/LLVM version/ {print $4}')
+                clang_tidy_desired_version="18.0.0"
+
+                clang_format_version=$(clang-format --version | awk '{print $4}')
+                clang_format_desired_version="18.0.0"
+
+                if [[ "$clang_tidy_version" == "$clang_tidy_desired_version" ]] && [[ "$clang_format_version" == "$clang_format_desired_version" ]]; then
+                    echo "clang-tidy version 18.0.0 and clang-format version 18.0.0 already exists"
+                else
+                    setUpClangTools
+                fi
+            else
+                setUpClangTools
+            fi
+
+            checkSphinx
+            status=$?
+
+            if [ $status -eq 0 ]; then
+                echo "All Sphinx packages are installed"
+            else
+                echo "Installing Sphinx and it's dependencies for documentation"
+                pip3 install --upgrade pip
+                pip3 install sphinx breathe sphinx-book-theme sphinx-copybutton sphinx-autobuild sphinx-last-updated-by-git sphinx-notfound-page
+            fi
         fi
     else
         echo -e "\nBegin by installing make itself, and then look at the table below to find what other packages to install based on what commands you wish to run\n"
