@@ -90,14 +90,14 @@ main() {
                 version=$(doxygen --version | awk '{print $1}')
                 desired_version="1.9.8"
 
-                if [[ "$version" == "$desired_version" ]]; then
-                    echo "Doxygen version 1.9.8 already exists"
-                else
-                    setUpDoxygen
-                fi
+            if [[ "$version" == "$desired_version" ]]; then
+                echo "Doxygen version 1.9.8 already exists"
             else
                 setUpDoxygen
             fi
+        else
+            setUpDoxygen
+        fi
 
 
             if [ -x "$(command -v clang-tidy)" ] && [ -x "$(command -v clang-format)" ]; then
