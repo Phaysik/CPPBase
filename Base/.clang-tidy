@@ -12,7 +12,7 @@ ImplementationFileExtensions:
   - cc
   - cpp
   - cxx
-HeaderFilterRegex: ''
+HeaderFilterRegex: '^include/'
 FormatStyle: none
 User: phaysik
 CheckOptions:
