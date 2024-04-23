@@ -19,7 +19,7 @@ setUpClangTools() {
     echo "Setting up clang-tidy and clang-format"
     wget https://apt.llvm.org/llvm.sh
     chmod +x llvm.sh
-    sudo ./llvm.sh 18
+    sudo ./llvm.sh 19
     rm -rf ./llvm.sh
     sudo apt-get install -y clang-format clang-tidy
 }
@@ -104,13 +104,13 @@ main() {
                 echo "clang-tidy and clang-format already exists"
 
                 clang_tidy_version=$(clang-tidy --version | awk '/LLVM version/ {print $4}')
-                clang_tidy_desired_version="18.0.0"
+                clang_tidy_desired_version="19.0.0"
 
                 clang_format_version=$(clang-format --version | awk '{print $4}')
-                clang_format_desired_version="18.0.0"
+                clang_format_desired_version="19.0.0"
 
                 if [[ "$clang_tidy_version" == "$clang_tidy_desired_version" ]] && [[ "$clang_format_version" == "$clang_format_desired_version" ]]; then
-                    echo "clang-tidy version 18.0.0 and clang-format version 18.0.0 already exists"
+                    echo "clang-tidy version 19.0.0 and clang-format version 19.0.0 already exists"
                 else
                     setUpClangTools
                 fi
