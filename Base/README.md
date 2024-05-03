@@ -32,8 +32,9 @@ Do not change any of the variables in the Makefile as it may cause the executabl
 | analysis                   | Runs clang tidy and cppcheck on the code base. |
 | format                     | Runs clang format on the code base. |
 | run_doxygen                | Runs Doxygen on the Doxyfile. |
-| docs                       | Runs the run_doxygen commands. Uses sphinx to build the docs from the Doxygen XML output. |
-| profile                    | Creates a profiling folder that contains the annotations and flat map of gprof.                    |
+| docs                       | Runs the run_doxygen command. Uses sphinx to build the docs from the Doxygen XML output. |
+| gprof                      | Runs the dev command. Creates a profiling folder that contains the annotations and flat map of gprof.                    |
+| profile                    | Runs the gprof command. Moves the created annotations files from gprof into the profiling annotations folder.                    |
 | create_folders             | Creates the boilerplate folders for running other commands. Does not need to be executed individually. |
 | initialize_repo            | Clones a base C++ repository structure into the current directory. Does not need to be executed individually. |
 

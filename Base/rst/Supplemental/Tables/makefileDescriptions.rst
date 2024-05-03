@@ -68,11 +68,17 @@ Below is a list of all the :file:`Makefile` commands along with a breakdown of w
     +----------------------------+----------------------------------------------------------------------------------------------------+
     | run_doxygen                | Runs Doxygen on the Doxyfile.                                                                      |
     +----------------------------+----------------------------------------------------------------------------------------------------+
-    | docs                       | Runs the run_doxygen commands.                                                                     |
+    | docs                       | Runs the run_doxygen command.                                                                      |
     |                            |                                                                                                    |
     |                            | Uses sphinx to build the docs from the Doxygen XML output.                                         |
     +----------------------------+----------------------------------------------------------------------------------------------------+
-    | profile                    | Creates a profiling folder that contains the annotations and flat map of gprof.                    |
+    | gprof                      | Runs the dev command.                                                                              |
+    |                            |                                                                                                    |
+    |                            | Creates a profiling folder that contains the annotations and flat map of gprof.                    |
+    +----------------------------+----------------------------------------------------------------------------------------------------+
+    | profile                    | Runs the gprof command.                                                                            |
+    |                            |                                                                                                    |
+    |                            | Moves the created annotations files from gprof into the profiling annotations folder.              |
     +----------------------------+----------------------------------------------------------------------------------------------------+
     | create_folders             | Creates the boilerplate folders for running other commands.                                        |
     |                            |                                                                                                    |
