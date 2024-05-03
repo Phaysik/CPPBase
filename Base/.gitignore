@@ -2,6 +2,7 @@
 /docs/xml
 /coverage
 /build
+/cppcheck
 .vscode
 *.gcno
 *.gcda

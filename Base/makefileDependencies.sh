@@ -24,6 +24,21 @@ setUpClangTools() {
     sudo apt-get install -y clang-format clang-tidy
 }
 
+setUpCppCheck() {
+    git clone https://github.com/danmar/cppcheck.git
+    cd cppcheck
+    mkdir build
+    cd build
+    cmake -DHAVE_RULES=ON -DBUILD_TESTS=ON ..
+    cmake --build .
+    cd bin
+    sudo cp -r ./* /usr/bin/
+    cd ..
+    cd ..
+    cd ..
+    rm -rf cppcheck
+}
+
 checkSphinx() {
     packages=("sphinx" "breathe" "sphinx-book-theme" "sphinx-copybutton" "sphinx-autobuild" "sphinx-last-updated-by-git" "sphinx-notfound-page")
 
@@ -58,7 +73,8 @@ main() {
         sudo apt update && sudo apt upgrade -y
 
         echo "Installing all the required packages for all commands used in the Makefile"
-        sudo apt-get install -y make cmake valgrind graphviz libgtest-dev lcov python3-pip flex bison
+
+        sudo apt-get install -y make cmake valgrind graphviz libgtest-dev lcov python3-pip flex bison libpcre3 libpcre3-dev
 
         if [ -x "$(command -v g++-13)" ]; then
             echo "g++-13 exists"
@@ -91,12 +107,27 @@ main() {
                 desired_version="1.9.8"
 
                 if [[ "$version" == "$desired_version" ]]; then
-                    echo "Doxygen version 1.9.8 already exists"
+                    echo "Doxygen version $desired_version already exists"
                 else
                     setUpDoxygen
                 fi
             else
                 setUpDoxygen
+            fi
+
+            if [ -x "$(command -v cppcheck)" ]; then
+                echo "Cppcheck already exists"
+
+                version=$(cppcheck --version | awk '{print $1}')
+                desired_version="2.15 dev"
+
+                if [[ "$version" == "$desired_version" ]]; then
+                    echo "Cppcheck version $desired_version already exists"
+                else
+                    setUpCppCheck
+                fi
+            else
+                setUpCppCheck
             fi
 
 
@@ -110,7 +141,7 @@ main() {
                 clang_format_desired_version="19.0.0"
 
                 if [[ "$clang_tidy_version" == "$clang_tidy_desired_version" ]] && [[ "$clang_format_version" == "$clang_format_desired_version" ]]; then
-                    echo "clang-tidy version 19.0.0 and clang-format version 19.0.0 already exists"
+                    echo "clang-tidy version $clang_tidy_desired_version and clang-format version $clang_format_desired_version already exists"
                 else
                     setUpClangTools
                 fi
@@ -150,6 +181,8 @@ main() {
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "genhtml" "lcov" "make lcov"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "coverage" "genhtml" "make"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "tidy" "-" "make clang-tidy"
+        printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "cppcheck" "-" "make cppcheck"
+        printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "analysis" "tidy cppcheck" "make"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "format" "-" "make clang-format"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "run_doxygen" "-" "make graphviz doxygen flex bison"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "docs" "run_doxygen" "make sphinx breathe sphinx-book-theme sphinx-copybtton sphinx-autobuild sphinx-last-updated-by-git sphinx-notfound-page"
