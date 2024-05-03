@@ -10,15 +10,23 @@ Below is a list of all the :file:`Makefile` commands along with a breakdown of w
     +============================+====================================================================================================+
     | compile                    | Runs the create_folders command.                                                                   |
     |                            |                                                                                                    |
-    |                            | Creates an executable in the output folder.                                                        |
+    |                            | Creates a release executable in the output folder.                                                 |
     |                            |                                                                                                    |
     |                            | Copies resource folder to the output folder.                                                       |
     +----------------------------+----------------------------------------------------------------------------------------------------+
-    | run                        | Runs the compile command.                                                                          |
+    | release                    | Runs the compile command.                                                                          |
     |                            |                                                                                                    |
-    |                            | Runs the executable in the output folder.                                                          |
+    |                            | Runs the release executable in the output folder.                                                  |
     +----------------------------+----------------------------------------------------------------------------------------------------+
-    | debug                      | Creates an executable in the output folder with debugging information in the compiled code.        |
+    | debug                      | Runs the create_folders command.                                                                   |
+    |                            |                                                                                                    |
+    |                            | Creates a dev executable in the output folder with debugging information in the compiled code.     |
+    |                            |                                                                                                    |
+    |                            | Copies resource folder to the output folder.                                                       |
+    +----------------------------+----------------------------------------------------------------------------------------------------+
+    | dev                        | Runs the debug command.                                                                            |
+    |                            |                                                                                                    |
+    |                            | Runs the dev executable in the output folder.                                                      |
     +----------------------------+----------------------------------------------------------------------------------------------------+
     | valgrind                   | Runs the debug command.                                                                            |
     |                            |                                                                                                    |
@@ -63,6 +71,8 @@ Below is a list of all the :file:`Makefile` commands along with a breakdown of w
     | docs                       | Runs the run_doxygen commands.                                                                     |
     |                            |                                                                                                    |
     |                            | Uses sphinx to build the docs from the Doxygen XML output.                                         |
+    +----------------------------+----------------------------------------------------------------------------------------------------+
+    | profile                    | Creates a profiling folder that contains the annotations and flat map of gprof.                    |
     +----------------------------+----------------------------------------------------------------------------------------------------+
     | create_folders             | Creates the boilerplate folders for running other commands.                                        |
     |                            |                                                                                                    |

@@ -74,7 +74,7 @@ main() {
 
         echo "Installing all the required packages for all commands used in the Makefile"
 
-        sudo apt-get install -y make cmake valgrind graphviz libgtest-dev lcov python3-pip flex bison libpcre3 libpcre3-dev
+        sudo apt-get install -y make cmake valgrind graphviz libgtest-dev lcov python3-pip flex bison libpcre3 libpcre3-dev binutils
 
         if [ -x "$(command -v g++-13)" ]; then
             echo "g++-13 exists"
@@ -171,8 +171,9 @@ main() {
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "Makefile Command" "Makefile Command(s) it relies on" "Packages Required"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "----------------" "--------------------------------" "-----------------"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "compile" "-" "make g++"
-        printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "run" "compile" "make"
+        printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "build" "compile" "make"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "debug" "-" "make"
+        printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "dev" "debug" "make"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "valgrind" "debug" "make valgrind"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "delete_lcov" "-" "make"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "copy_and_run_test" "-" "make"
@@ -181,10 +182,11 @@ main() {
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "genhtml" "lcov" "make lcov"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "coverage" "genhtml" "make"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "tidy" "-" "make clang-tidy"
-        printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "cppcheck" "-" "make cppcheck"
+        printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "cppcheck" "-" "make libpcre3 libpcre3-dev cppcheck"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "analysis" "tidy cppcheck" "make"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "format" "-" "make clang-format"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "run_doxygen" "-" "make graphviz doxygen flex bison"
+        printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "profile" "debug" "make binutils"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "docs" "run_doxygen" "make sphinx breathe sphinx-book-theme sphinx-copybtton sphinx-autobuild sphinx-last-updated-by-git sphinx-notfound-page"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "create_folders" "-" "make"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "initialize_repo" "-" "make git"
