@@ -28,7 +28,7 @@ BreakTemplateDeclarations: Yes
 BreakBeforeTernaryOperators: true
 IncludeBlocks: Regroup
 IncludeCategories:
-  - Regex: '<[[:alnum:].]+>'
+  - Regex: '<[[:alnum:]._]+>'
     Priority: 1
   - Regex: '^"(llvm|llvm-c|clang|clang-c)/'
     Priority: 2
