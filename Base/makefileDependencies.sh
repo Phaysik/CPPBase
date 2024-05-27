@@ -76,16 +76,18 @@ main() {
 
         sudo apt-get install -y make cmake valgrind graphviz libgtest-dev lcov python3-pip flex bison libpcre3 libpcre3-dev binutils
 
-        if [ -x "$(command -v g++-13)" ]; then
-            echo "g++-13 exists"
+        desired_version="13"
+
+        if [ -x "$(command -v g++-${desired_version})" ]; then
+            echo "g++-${desired_version} exists"
         else
             echo "Setting up g++"
             sudo apt install -y software-properties-common
             sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
             sudo apt update
-            sudo apt-get install -y g++-13
-            sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 13
-            sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-13 13
+            sudo apt-get install -y g++-${desired_version}
+            sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-${desired_version} ${desired_version}
+            sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-${desired_version} ${desired_version}
         fi
 
         if [ -f "/usr/lib/libgtest.a" ] && [ -f "/usr/lib/libgtest_main.a" ]; then
@@ -118,8 +120,8 @@ main() {
             if [ -x "$(command -v cppcheck)" ]; then
                 echo "Cppcheck already exists"
 
-                version=$(cppcheck --version | awk '{print $1}')
-                desired_version="2.15 dev"
+                version=$(cppcheck --version | awk '{print $2}')
+                desired_version="2.15"
 
                 if [[ "$version" == "$desired_version" ]]; then
                     echo "Cppcheck version $desired_version already exists"
