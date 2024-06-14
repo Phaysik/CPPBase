@@ -4,6 +4,5 @@
 /build
 /cppcheck
 /profiling
-.vscode
 *.gcno
 *.gcda
