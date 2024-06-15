@@ -26,6 +26,7 @@ BreakBeforeBinaryOperators: All
 BreakBeforeBraces: Custom
 BreakTemplateDeclarations: Yes
 BreakBeforeTernaryOperators: true
+ColumnLimit: 130
 IncludeBlocks: Regroup
 IncludeCategories:
   - Regex: '<[[:alnum:]._]+>'
