@@ -28,7 +28,8 @@ Do not change any of the variables in the Makefile as it may cause the executabl
 | coverage                   | Runs the genhtml command. Deletes the test output and lcov output folders. |
 | tidy                       | Runs clang tidy on the code base. |
 | cppcheck                   | Runs cppcheck on the code base. |
-| analysis                   | Runs clang tidy and cppcheck on the code base. |
+| flawfinder                 | Runs flawfinder on the code base. |
+| analysis                   | Runs clang tidy, cppcheck, and flawfinder on the code base. |
 | format                     | Runs clang format on the code base. |
 | run_doxygen                | Runs Doxygen on the Doxyfile. |
 | docs                       | Runs the run_doxygen command. Uses sphinx to build the docs from the Doxygen XML output. |

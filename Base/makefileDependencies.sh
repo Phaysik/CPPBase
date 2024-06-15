@@ -161,6 +161,12 @@ main() {
                 pip3 install --upgrade pip
                 pip3 install sphinx breathe sphinx-book-theme sphinx-copybutton sphinx-autobuild sphinx-last-updated-by-git sphinx-notfound-page
             fi
+
+            if [ -x "$(command -v flawfinder)" ]; then
+                echo "Flawfinder already exists"
+            else
+                pip3 install flawfinder
+            fi
         fi
     else
         echo -e "\nBegin by installing make itself, and then look at the table below to find what other packages to install based on what commands you wish to run\n"
@@ -184,7 +190,8 @@ main() {
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "coverage" "genhtml" "make"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "tidy" "-" "make clang-tidy"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "cppcheck" "-" "make libpcre3 libpcre3-dev cppcheck"
-        printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "analysis" "tidy cppcheck" "make"
+        printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "flawfinder" "-" "make pip"
+        printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "analysis" "tidy cppcheck flawfinder" "make"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "format" "-" "make clang-format"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "run_doxygen" "-" "make graphviz doxygen flex bison"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "profile" "dev" "make binutils"

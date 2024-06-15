@@ -139,7 +139,10 @@ cppcheck: ${CLANG_SOURCES}
 	mkdir -p ${CPPCHECK_FOLDER}
 	cppcheck ${CPPCHECK_COMPILE_FLAGS} $^ -I ${INCLUDE_FOLDER}/
 
-analysis: tidy cppcheck
+flawfinder: ${CLANG_SOURCES}
+	flawfinder $^
+
+analysis: tidy cppcheck flawfinder
 
 format: ${CLANG_SOURCES} ${INCLUDE_SOURCES}
 	clang-format ${FORMAT_COMPILE_FLAGS} $^
