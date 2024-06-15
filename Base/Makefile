@@ -73,6 +73,7 @@ create_folders:
 	mkdir -p ${RESOURCES_FOLDER}
 	mkdir -p ${OUTPUT_FOLDER_RELEASE}
 	mkdir -p ${OUTPUT_FOLDER_DEV}
+	mkdir -p ${TEST_OUTPUT_FOLDER}
 
 ${OUTPUT_FOLDER_RELEASE}/%.o: ${SOURCE_FOLDER}/%.cpp
 	${COMPILER} ${COMPILER_FLAGS_RELEASE} ${WARNINGS} ${INCLUDE_ARGUMENT} -MMD -MP -c $< -o $@
@@ -113,7 +114,6 @@ copy_and_run_test:
 -include $(DEPS_TEST)
 
 build_test: create_folders $(OBJECTS_TEST)
-	mkdir -p ${TEST_OUTPUT_FOLDER}
 	${COMPILER} ${TEST_FLAGS_RELEASE} ${OBJECTS_TEST} ${TEST_LIBRARIES} -o ${TEST_OUTPUT_FOLDER}/${TEST_OUTPUT_FILE}
 	${MAKE} copy_and_run_test
 
@@ -128,9 +128,9 @@ genhtml: lcov
 	genhtml ${LCOV_OUTPUT_FOLDER}/${LCOV_OUTPUT_FILE} ${BRANCH_COVERAGE} --output-directory ${GENHTML_OUTPUT_FOLDER}
 
 coverage: genhtml
+	cp ${TEST_OUTPUT_FOLDER}/coverage.info ${GENHTML_OUTPUT_FOLDER}/lcov.info
 	rm -rf ${TEST_OUTPUT_FOLDER}
 	rm -rf ${LCOV_OUTPUT_FOLDER}
-	${MAKE} delete_lcov
 
 tidy: ${CLANG_SOURCES}
 	clang-tidy ${TIDY_COMPILE_FLAGS} $^ -- ${INCLUDE_ARGUMENT}
