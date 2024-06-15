@@ -40,7 +40,7 @@ LCOV_FILES = $(shell find . -name '*.gcno' -o -name '*.gcda' -o -name '*.info')
 LCOV_FLAGS = --no-external --capture ${BRANCH_COVERAGE} -d .
 LCOV_OUTPUT_FOLDER = ${TEST_OUTPUT_FOLDER}
 LCOV_OUTPUT_FILE = coverage.info
-LCOV_REMOVE_FILES = '*/${TEST_FOLDER}/*' '*/${INCLUDE_FOLDER}/*'
+LCOV_REMOVE_FILES = '*/${TEST_FOLDER}/*'
 
 GENHTML_FLAGS = ${BRANCH_COVERAGE}
 GENHTML_OUTPUT_FOLDER = .\/coverage
@@ -95,17 +95,12 @@ debug: create_folders $(OBJECTS_DEV)
 	${COMPILER} ${COMPILER_FLAGS_DEV} ${OBJECTS_DEV} ${LIBRARIES} -o ${OUTPUT_FOLDER_DEV}/${OUTPUT_FILE_DEV}
 	cp -r ${RESOURCES_FOLDER} ${OUTPUT_FOLDER_DEV}
 
-
 dev: debug
 	${OUTPUT_FOLDER_DEV}/${OUTPUT_FILE_DEV}
 	rm -rf gmon.out
 
 valgrind: debug
 	valgrind ${VALGRIND_FLAGS} ${OUTPUT_FOLDER_DEV}/${OUTPUT_FILE_DEV}
-
-delete_lcov: ${LCOV_FILES}
-	rm -rf $^
-	mkdir -p ${TEST_OUTPUT_FOLDER}
 
 ${TEST_OUTPUT_FOLDER}/%.o: ${TEST_FOLDER}/%.cpp
 	${COMPILER} ${TEST_COMPILER_FLAGS} ${WARNINGS} ${INCLUDE_ARGUMENT} ${TEST_INCLUDE_ARGUMENT} -MMD -MP -c $< -o $@
@@ -117,10 +112,10 @@ copy_and_run_test:
 
 -include $(DEPS_TEST)
 
-build_test: create_folders delete_lcov $(OBJECTS_TEST)
+build_test: create_folders $(OBJECTS_TEST)
+	mkdir -p ${TEST_OUTPUT_FOLDER}
 	${COMPILER} ${TEST_FLAGS_RELEASE} ${OBJECTS_TEST} ${TEST_LIBRARIES} -o ${TEST_OUTPUT_FOLDER}/${TEST_OUTPUT_FILE}
 	${MAKE} copy_and_run_test
-
 
 lcov: build_test
 	mkdir -p ${LCOV_OUTPUT_FOLDER}

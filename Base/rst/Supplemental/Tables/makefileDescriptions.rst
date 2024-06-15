@@ -32,13 +32,11 @@ Below is a list of all the :file:`Makefile` commands along with a breakdown of w
     |                            |                                                                                                    |
     |                            | Runs a memory checker on the executable in the output folder to see if there's any memory leaks.   |
     +----------------------------+----------------------------------------------------------------------------------------------------+
-    | delete_lcov                | Delete any \*.gcno, \*.gcda, and \*.info files associated with the lcov command                    |
-    +----------------------------+----------------------------------------------------------------------------------------------------+
     | copy_and_run_test          | Copies the resource folder to the output folder.                                                   |
     |                            |                                                                                                    |
     |                            | Copies and runs the test executable from the test folder to the output folder.                     |
     +----------------------------+----------------------------------------------------------------------------------------------------+
-    | build_test                 | Runs the create_folders and delete_lcov commands.                                                  |
+    | build_test                 | Runs the create_folders commands.                                                                  |
     |                            |                                                                                                    |
     |                            | Compiles a test executable with Google Test flags. Runs the copy_and_test command.                 |
     +----------------------------+----------------------------------------------------------------------------------------------------+
