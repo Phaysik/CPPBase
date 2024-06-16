@@ -72,6 +72,14 @@ Below is a list of all the :file:`Makefile` commands along with a breakdown of w
     |                            |                                                                                                    |
     |                            | Uses sphinx to build the docs from the Doxygen XML output.                                         |
     +----------------------------+----------------------------------------------------------------------------------------------------+
+    | tracy                      | Runs the create_folders command.                                                                   |
+    |                            |                                                                                                    |
+    |                            | Creates an executable with the appropriate flags for the Tracy Profile server.                     |
+    |                            |                                                                                                    |
+    |                            | This is only the client, you need to already be running the Tracy Profiler Server.                 |
+    |                            |                                                                                                    |
+    |                            | The Server also needs to be currently listening for the incoming client connection.                |
+    +----------------------------+----------------------------------------------------------------------------------------------------+
     | gprof                      | Runs the dev command.                                                                              |
     |                            |                                                                                                    |
     |                            | Creates a profiling folder that contains the annotations and flat map of gprof.                    |

@@ -11,7 +11,7 @@ LIBRARIES =
 RESOURCES_FOLDER = .\/resources
 
 SOURCE_FOLDER = src
-SOURCES = $(shell find ${SOURCE_FOLDER} -name '*.cpp')
+SOURCES = $(shell find ${SOURCE_FOLDER} -type f -not -path '*/tracy/*.cpp' -name '*.cpp')
 INCLUDE_SOURCES = $(shell find ${INCLUDE_FOLDER} -type f \( -name '*.h' -o -name '*.hpp' \))
 
 BUILD_FOLDER = build
@@ -60,12 +60,22 @@ ANNOTATION_FILES = $(shell find . -maxdepth 1 -type f -name '*-ann')
 GPROF_COMPILER_FLAGS = -A -b -p -y
 GPROF_FILE = flat.map
 
+TRACY_CLIENT_SOURCE = src/tracy/TracyClient.cpp
+TRACY_SOURCES = $(SOURCES) $(TRACY_CLIENT_SOURCE)
+TRACY_FOLDER = tracy
+TRACY_INCLUDE_ARGUMENT = -Isrc/tracy
+TRACY_FLAGS = -DTRACY_ENABLE -DTRACY_TIMER_FALLBACK
+OUTPUT_FILE_TRACY = tracy-client
+OUTPUT_FOLDER_TRACY = ${BUILD_FOLDER}/${TRACY_FOLDER}
+
 OBJECTS_RELEASE = $(SOURCES:${SOURCE_FOLDER}/%.cpp=${OUTPUT_FOLDER_RELEASE}/%.o)
 DEPS_RELEASE = $(OBJECTS_RELEASE:.o=.d)
 OBJECTS_DEV = $(SOURCES:${SOURCE_FOLDER}/%.cpp=${OUTPUT_FOLDER_DEV}/%.o)
 DEPS_DEV = $(OBJECTS_DEV:.o=.d)
 OBJECTS_TEST = $(TEST_SOURCES:${TEST_FOLDER}/%.cpp=${TEST_OUTPUT_FOLDER}/%.o)
 DEPS_TEST = $(OBJECTS_TEST:.o=.d)
+OBJECTS_TRACY = $(TRACY_SOURCES:${SOURCE_FOLDER}/%.cpp=${OUTPUT_FOLDER_TRACY}/%.o)
+DEPS_TRACY = $(OBJECTS_TRACY:.o=.d)
 
 default: compile
 
@@ -74,6 +84,7 @@ create_folders:
 	mkdir -p ${OUTPUT_FOLDER_RELEASE}
 	mkdir -p ${OUTPUT_FOLDER_DEV}
 	mkdir -p ${TEST_OUTPUT_FOLDER}
+	mkdir -p ${OUTPUT_FOLDER_TRACY}/${TRACY_FOLDER}
 
 ${OUTPUT_FOLDER_RELEASE}/%.o: ${SOURCE_FOLDER}/%.cpp
 	${COMPILER} ${COMPILER_FLAGS_RELEASE} ${WARNINGS} ${INCLUDE_ARGUMENT} -MMD -MP -c $< -o $@
@@ -153,6 +164,16 @@ run_doxygen:
 
 docs: run_doxygen
 	sphinx-autobuild -b html -Dbreathe_projects.documentation=docs/xml . docs/sphinx/
+
+${OUTPUT_FOLDER_TRACY}/%.o: ${SOURCE_FOLDER}/%.cpp
+	${COMPILER} ${TRACY_FLAGS} ${COMPILER_FLAGS_RELEASE} ${TRACY_INCLUDE_ARGUMENT} ${INCLUDE_ARGUMENT} -MMD -MP -c $< -o $@
+
+-include $(DEPS_TRACY)
+
+tracy: create_folders $(OBJECTS_TRACY)
+	${COMPILER} ${TRACY_FLAGS} ${COMPILER_FLAGS_RELEASE} ${OBJECTS_TRACY} ${LIBRARIES} -o ${OUTPUT_FOLDER_TRACY}/${OUTPUT_FILE_TRACY}
+	cp -r ${RESOURCES_FOLDER} ${OUTPUT_FOLDER_TRACY}
+	${OUTPUT_FOLDER_TRACY}/${OUTPUT_FILE_TRACY}
 
 gprof: dev
 	mkdir -p ${PROFILE_FOLDER}

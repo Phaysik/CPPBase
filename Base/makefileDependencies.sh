@@ -58,6 +58,33 @@ checkSphinx() {
     fi
 }
 
+setUpTracy() {
+    # Download the latest version of Tracy
+    url=$(curl -s https://api.github.com/repos/wolfpld/tracy/releases/latest | grep -o '"tarball_url": *"[^"]*"' | cut -d '"' -f 4)
+    curl -L -o tracy-latest.tar.gz $url
+    mkdir -p tracy-latest
+    tar -xvzf tracy-latest.tar.gz -C tracy-latest --strip-components=1
+    cd tracy-latest
+
+    # For installing the Client of Tracy
+    mkdir build
+    cd build
+    cmake ..
+    make
+    sudo make install
+    cd ..
+
+    # For installing the Server of Tracy
+    cd profiler/build/unix
+    make CXX=g++-11
+    mv Tracy-release Tracy-Server
+    sudo cp Tracy-Server /usr/bin/
+
+    # Remove Tracy files from local
+    cd ../../../../
+    sudo rm -rf tracy
+}
+
 main() {
     echo "This shell file is set up to only work on Ubuntu operating systems"
 
@@ -166,6 +193,12 @@ main() {
                 echo "Flawfinder already exists"
             else
                 pip3 install flawfinder
+            fi
+
+            if [ -x "$(command -v tracy-Server)" ]; then
+                echo "Tracy-Server already exists"
+            else
+                setUpTracy
             fi
         fi
     else

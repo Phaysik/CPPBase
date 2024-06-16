@@ -33,6 +33,7 @@ Do not change any of the variables in the Makefile as it may cause the executabl
 | format                     | Runs clang format on the code base. |
 | run_doxygen                | Runs Doxygen on the Doxyfile. |
 | docs                       | Runs the run_doxygen command. Uses sphinx to build the docs from the Doxygen XML output. |
+| tracy                      | Runs the create_folders command. Creates an executable with the appropriate flags for the Tracy Profile server. This is only the client, you need to already be running the Tracy Profiler Server and have it be listening for a connection before running this command. |
 | gprof                      | Runs the dev command. Creates a profiling folder that contains the annotations and flat map of gprof.                    |
 | profile                    | Runs the gprof command. Moves the created annotations files from gprof into the profiling annotations folder.                    |
 | create_folders             | Creates the boilerplate folders for running other commands. Does not need to be executed individually. |
@@ -73,11 +74,12 @@ Do not change any of the variables in the Makefile as it may cause the executabl
 - For checking linting
 
 ```bash
-    make (tidy|cppcheck|analysis)
+    make (tidy|cppcheck|flawfinder|analysis)
 ```
 
 - For performance profiling
 
 ```bash
-    make profile
+    make tracy # Using Tracy Profiler (Preferred)
+    make profile # Using gprof
 ```
