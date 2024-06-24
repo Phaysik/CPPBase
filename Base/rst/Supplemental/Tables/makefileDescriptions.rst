@@ -8,6 +8,10 @@ Below is a list of all the :file:`Makefile` commands along with a breakdown of w
     +----------------------------+----------------------------------------------------------------------------------------------------+
     | Makefile Command           | Action                                                                                             |
     +============================+====================================================================================================+
+    | create_folders             | Creates the boilerplate folders for running other commands.                                        |
+    |                            |                                                                                                    |
+    |                            | Does not need to be executed individually.                                                         |
+    +----------------------------+----------------------------------------------------------------------------------------------------+
     | compile                    | Runs the create_folders command.                                                                   |
     |                            |                                                                                                    |
     |                            | Creates a release executable in the output folder.                                                 |
@@ -27,6 +31,13 @@ Below is a list of all the :file:`Makefile` commands along with a breakdown of w
     | dev                        | Runs the debug command.                                                                            |
     |                            |                                                                                                    |
     |                            | Runs the dev executable in the output folder.                                                      |
+    +----------------------------+----------------------------------------------------------------------------------------------------+
+    | val                        | Runs the create_folders command.                                                                   |
+    |                            |                                                                                                    |
+    |                            | Creates a valgrind executable in the output folder with memory debugging information               |
+    |                            | in the compiled code explicitly for valgrind.                                                      |
+    |                            |                                                                                                    |
+    |                            | Copies resource folder to the output folder.                                                       |
     +----------------------------+----------------------------------------------------------------------------------------------------+
     | valgrind                   | Runs the debug command.                                                                            |
     |                            |                                                                                                    |
@@ -87,10 +98,6 @@ Below is a list of all the :file:`Makefile` commands along with a breakdown of w
     | profile                    | Runs the gprof command.                                                                            |
     |                            |                                                                                                    |
     |                            | Moves the created annotations files from gprof into the profiling annotations folder.              |
-    +----------------------------+----------------------------------------------------------------------------------------------------+
-    | create_folders             | Creates the boilerplate folders for running other commands.                                        |
-    |                            |                                                                                                    |
-    |                            | Does not need to be executed individually.                                                         |
     +----------------------------+----------------------------------------------------------------------------------------------------+
     | initialize_repo            | Clones a base C++ repository structure into the current directory.                                 |
     |                            |                                                                                                    |

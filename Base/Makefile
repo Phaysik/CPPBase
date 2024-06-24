@@ -1,7 +1,8 @@
 COMPILER = g++
-COMPILER_VERSION = -std=c++2a
+COMPILER_VERSION = -std=c++2b
 COMPILER_FLAGS_RELEASE = ${COMPILER_VERSION} -O3 -DNDEBUG
 COMPILER_FLAGS_DEV = ${COMPILER_VERSION} -O0 -g -pg
+COMPILER_FLAGS_VALGRIND = ${COMPILER_VERSION} -O0 -g
 
 WARNINGS = -pedantic -pedantic-errors -Wall -Wextra -Weffc++ -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Winit-self -Wlogical-op -Wmissing-declarations -Wmissing-include-dirs -Wnoexcept -Woverloaded-virtual -Wredundant-decls -Wshadow -Wsign-conversion -Wsign-promo -Wstrict-null-sentinel -Wswitch-default -Wundef -Wno-unused -Wfloat-equal -Wconversion -Winline -Wzero-as-null-pointer-constant -Wmissing-noreturn -Wunreachable-code -Wvariadic-macros -Wwrite-strings -Wunsafe-loop-optimizations -Werror
 
@@ -23,6 +24,9 @@ OUTPUT_FILE_RELEASE = main
 OUTPUT_FILE_DEV = dev
 
 VALGRIND_FLAGS = --leak-check=full --show-leak-kinds=all --verbose -s --track-origins=yes
+VALGRIND_FOLDER = valgrind
+OUTPUT_FOLDER_VALGRIND = ${BUILD_FOLDER}/${VALGRIND_FOLDER}
+OUTPUT_FILE_VALGRIND = valgrind
 
 TEST_FOLDER = tests
 TEST_SOURCES = $(shell find ${TEST_FOLDER} ${SOUCE_FOLDER} -type f -not -path '*/main.cpp' -name '*.cpp')
@@ -46,7 +50,7 @@ GENHTML_FLAGS = ${BRANCH_COVERAGE}
 GENHTML_OUTPUT_FOLDER = .\/coverage
 
 CLANG_SOURCES = ${SOURCES}
-TIDY_COMPILE_FLAGS = -extra-arg=-std=c++20 --config-file=.clang-tidy
+TIDY_COMPILE_FLAGS = -extra-arg=-std=c++2b --config-file=.clang-tidy
 FORMAT_COMPILE_FLAGS = -i -style=file:.clang-format
 
 CPPCHECK_FOLDER = cppcheck
@@ -83,6 +87,7 @@ create_folders:
 	mkdir -p ${RESOURCES_FOLDER}
 	mkdir -p ${OUTPUT_FOLDER_RELEASE}
 	mkdir -p ${OUTPUT_FOLDER_DEV}
+	mkdir -p ${OUTPUT_FOLDER_VALGRIND}
 	mkdir -p ${TEST_OUTPUT_FOLDER}
 	mkdir -p ${OUTPUT_FOLDER_TRACY}/${TRACY_FOLDER}
 
@@ -111,8 +116,12 @@ dev: debug
 	${OUTPUT_FOLDER_DEV}/${OUTPUT_FILE_DEV}
 	rm -rf gmon.out
 
-valgrind: debug
-	valgrind ${VALGRIND_FLAGS} ${OUTPUT_FOLDER_DEV}/${OUTPUT_FILE_DEV}
+val: create_folders $(OBJECTS_DEV)
+	${COMPILER} ${COMPILER_FLAGS_VALGRIND} ${OBJECTS_DEV} ${LIBRARIES} -o ${OUTPUT_FOLDER_VALGRIND}/${OUTPUT_FILE_VALGRIND}
+	cp -r ${RESOURCES_FOLDER} ${OUTPUT_FOLDER_VALGRIND}
+
+valgrind: val
+	valgrind ${VALGRIND_FLAGS} ${OUTPUT_FOLDER_VALGRIND}/${OUTPUT_FILE_VALGRIND}
 
 ${TEST_OUTPUT_FOLDER}/%.o: ${TEST_FOLDER}/%.cpp
 	${COMPILER} ${TEST_COMPILER_FLAGS} ${WARNINGS} ${INCLUDE_ARGUMENT} ${TEST_INCLUDE_ARGUMENT} -MMD -MP -c $< -o $@

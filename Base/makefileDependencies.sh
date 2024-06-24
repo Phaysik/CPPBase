@@ -211,11 +211,13 @@ main() {
         # Print the table header
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "Makefile Command" "Makefile Command(s) it relies on" "Packages Required"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "----------------" "--------------------------------" "-----------------"
-        printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "compile" "-" "make g++"
-        printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "build" "compile" "make"
-        printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "debug" "-" "make"
+        printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "create_folders" "-" "make"
+        printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "compile" "create_folders" "make g++"
+        printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "release" "compile" "make"
+        printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "debug" "create_folders" "make g++"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "dev" "debug" "make"
-        printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "valgrind" "debug" "make valgrind"
+        printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "val" "create_folders" "make g++"
+        printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "valgrind" "val" "make valgrind"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "copy_and_run_test" "-" "make"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "build_test" "create_folders, copy_and_run_test" "make g++ libgtest-dev (May require extra installation steps - Look at guide online)"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "lcov" "build_test" "make lcov"
@@ -229,7 +231,9 @@ main() {
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "run_doxygen" "-" "make graphviz doxygen flex bison"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "profile" "dev" "make binutils"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "docs" "run_doxygen" "make sphinx breathe sphinx-book-theme sphinx-copybtton sphinx-autobuild sphinx-last-updated-by-git sphinx-notfound-page"
-        printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "create_folders" "-" "make"
+        printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "tracy" "create_folders" "make g++-11"
+        printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "gprof" "dev" "make binutils"
+        printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "profile" "gprof" "make"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "initialize_repo" "-" "make git"
     fi
 }
