@@ -23,7 +23,7 @@ OUTPUT_FOLDER_DEV = ${BUILD_FOLDER}/${DEV_FOLDER}
 OUTPUT_FILE_RELEASE = main
 OUTPUT_FILE_DEV = dev
 
-VALGRIND_FLAGS = --leak-check=full --show-leak-kinds=all --verbose -s --track-origins=yes
+VALGRIND_FLAGS = --leak-check=full --show-leak-kinds=all -s --track-origins=yes --gen-suppressions=all
 VALGRIND_FOLDER = valgrind
 OUTPUT_FOLDER_VALGRIND = ${BUILD_FOLDER}/${VALGRIND_FOLDER}
 OUTPUT_FILE_VALGRIND = valgrind
