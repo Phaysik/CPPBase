@@ -1,9 +1,8 @@
 /*! \file main.cpp
-    \brief C++ file for creating a main.
-    \details Contains the function definitions for creating a main
-    \date --/--/----
-    \version 1.0
-    \author Matthew Moore
+	\brief Contains the function definitions for creating a main
+	\date --/--/----
+	\version 1.0
+	\author Matthew Moore
 */
 
 /*! \brief The entry point for the program

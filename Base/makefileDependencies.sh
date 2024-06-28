@@ -1,5 +1,29 @@
 #!/bin/bash
 
+setUpGCC() {
+    echo "Setting up g++"
+    curl -L -o gcc-latest.tar.gz https://ftp.gnu.org/gnu/gcc/gcc-$1/gcc-$1.tar.gz
+    mkdir -p gcc-latest
+    tar -xvzf gcc-latest.tar.gz -C gcc-latest --strip-components=1
+
+    cd gcc-latest
+    ./contrib/download_prerequisites
+    cd ..
+
+    mkdir gcc-build
+    cd gcc-build
+    ../gcc-latest/configure --prefix=/usr/local/gcc-14 --enable-languages=c,c++ --disable-multilib
+    sudo make -j$(nproc)
+    sudo make install
+
+    sudo rm -rf /usr/bin/g++
+    sudo rm -rf /usr/bin/gcc
+    sudo rm -rf /usr/bin/gcov
+    sudo ln -s /usr/local/gcc-14/bin/g++ /usr/bin/g++
+    sudo ln -s /usr/local/gcc-14/bin/gcc /usr/bin/gcc
+    sudo ln -s /usr/local/gcc-14/bin/gcov /usr/bin/gcov
+}
+
 setUpDoxygen() {
     echo "Setting up Doxygen"
     wget https://doxygen.nl/files/doxygen-1.9.8.src.tar.gz
@@ -101,20 +125,14 @@ main() {
 
         echo "Installing all the required packages for all commands used in the Makefile"
 
-        sudo apt-get install -y make cmake valgrind graphviz libgtest-dev lcov python3-pip flex bison libpcre3 libpcre3-dev binutils
+        sudo apt-get install -y build-essential libgmp3-dev libmpc-dev libmpfr-dev texinfo make cmake valgrind graphviz libgtest-dev lcov python3-pip flex bison libpcre3 libpcre3-dev binutils
 
-        desired_version="13"
+        desired_version="14.1.0"
 
-        if [ -x "$(command -v g++-${desired_version})" ]; then
+        if [ "$(command g++ --version | grep -oP '\d+\.\d+\.\d+')" = "$desired_version" ]; then
             echo "g++-${desired_version} exists"
         else
-            echo "Setting up g++"
-            sudo apt install -y software-properties-common
-            sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
-            sudo apt update
-            sudo apt-get install -y g++-${desired_version}
-            sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-${desired_version} ${desired_version}
-            sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-${desired_version} ${desired_version}
+            setUpGCC desired_version
         fi
 
         if [ -f "/usr/lib/libgtest.a" ] && [ -f "/usr/lib/libgtest_main.a" ]; then
