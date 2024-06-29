@@ -4,7 +4,11 @@ COMPILER_FLAGS_RELEASE = ${COMPILER_VERSION} -O3 -DNDEBUG
 COMPILER_FLAGS_DEV = ${COMPILER_VERSION} -O0 -g -pg
 COMPILER_FLAGS_VALGRIND = ${COMPILER_VERSION} -O0 -g
 
-WARNINGS = -pedantic -pedantic-errors -Wall -Wextra -Weffc++ -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Winit-self -Wlogical-op -Wmissing-declarations -Wmissing-include-dirs -Wnoexcept -Woverloaded-virtual -Wredundant-decls -Wshadow -Wsign-conversion -Wsign-promo -Wstrict-null-sentinel -Wswitch-default -Wundef -Wno-unused -Wfloat-equal -Wconversion -Winline -Wzero-as-null-pointer-constant -Wmissing-noreturn -Wunreachable-code -Wvariadic-macros -Wwrite-strings -Wunsafe-loop-optimizations -Werror
+WARNINGS = -fdelete-null-pointer-checks -fstrict-aliasing -fimplicit-constexpr -pedantic -pedantic-errors -Wall -Wextra -Weffc++ -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Wformat-nonliteral -Wformat-security -Wformat-signedness -Wformat-truncation=2 -Wformat-y2k -Wlogical-op -Wmissing-declarations -Wmissing-include-dirs -Wnull-dereference -Wnrvo -Wnoexcept -Woverloaded-virtual -Wredundant-decls -Wshadow -Wsign-conversion -Wsign-promo -Wstrict-null-sentinel -Wswitch-default -Wswitch-enum -Wundef -Wunused -Wunused-const-variable=2 -Wuseless-cast -Wuninitialized -Wstrict-aliasing -Wduplicated-branches -Wtrampolines -Wduplicated-cond -Wbidi-chars=any -Wfloat-equal -Wconversion -Winline -Wzero-as-null-pointer-constant -Wmissing-noreturn -Wsuggest-attribute=pure -Wsuggest-attribute=const -Wsuggest-attribute=malloc -Wsuggest-attribute=returns_nonnull -Wno-suggest-attribute=returns_nonnull -Wsuggest-attribute=cold -Wsuggest-attribute=format -Wmissing-format-attribute -Wpacked -Wunused-macros -Wno-missing-requires -Wno-missing-template-keyword -Wvariadic-macros -Wunsafe-loop-optimizations -Wno-changes-meaning -Wdouble-promotion -Wcomma-subscript -Wdangling-reference -Wsuggest-final-types -Wsuggest-override -Wsuggest-final-methods -Winvalid-constexpr -Wold-style-cast -Wextra-semi -Wenum-conversion -Werror
+
+RELEASE_WARNINGS = -fhardened -Whardened
+
+DEBUG_WARNINGS = -fsanitize=address -fsanitize=pointer-compare -fsanitize=pointer-subtract -fsanitize=leak -fsanitize=undefined -fsanitize=shift -fsanitize=shift-exponent -fsanitize=shift-base -fsanitize=integer-divide-by-zero -fsanitize=unreachable -fsanitize=vla-bound -fsanitize=null -fsanitize=return -fsanitize=signed-integer-overflow -fsanitize=bounds -fsanitize=bounds-strict -fsanitize=alignment -fsanitize=object-size -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fsanitize=nonnull-attribute -fsanitize=returns-nonnull-attribute -fsanitize=bool -fsanitize=enum -fsanitize=vptr -fsanitize=pointer-overflow -fsanitize=builtin -fsanitize-address-use-after-scope -fcheck=new
 
 INCLUDE_FOLDER = include
 INCLUDE_ARGUMENT = -I${INCLUDE_FOLDER}
@@ -92,24 +96,24 @@ create_folders:
 	mkdir -p ${OUTPUT_FOLDER_TRACY}/${TRACY_FOLDER}
 
 ${OUTPUT_FOLDER_RELEASE}/%.o: ${SOURCE_FOLDER}/%.cpp
-	${COMPILER} ${COMPILER_FLAGS_RELEASE} ${WARNINGS} ${INCLUDE_ARGUMENT} -MMD -MP -c $< -o $@
+	${COMPILER} ${COMPILER_FLAGS_RELEASE} ${WARNINGS} ${RELEASE_WARNINGS} ${INCLUDE_ARGUMENT} -MMD -MP -c $< -o $@
 
 -include $(DEPS_RELEASE)
 
 compile: create_folders $(OBJECTS_RELEASE)
-	${COMPILER} ${COMPILER_FLAGS_RELEASE} ${OBJECTS_RELEASE} ${LIBRARIES} -o ${OUTPUT_FOLDER_RELEASE}/${OUTPUT_FILE_RELEASE}
+	${COMPILER} ${COMPILER_FLAGS_RELEASE} ${OBJECTS_RELEASE} ${LIBRARIES} ${RELEASE_WARNINGS} -o ${OUTPUT_FOLDER_RELEASE}/${OUTPUT_FILE_RELEASE}
 	cp -r ${RESOURCES_FOLDER} ${OUTPUT_FOLDER_RELEASE}
 
 release: compile
 	${OUTPUT_FOLDER_RELEASE}/${OUTPUT_FILE_RELEASE}
 
 ${OUTPUT_FOLDER_DEV}/%.o: ${SOURCE_FOLDER}/%.cpp
-	${COMPILER} ${COMPILER_FLAGS_DEV} ${WARNINGS} ${INCLUDE_ARGUMENT} -MMD -MP -c $< -o $@
+	${COMPILER} ${COMPILER_FLAGS_DEV} ${WARNINGS} ${DEBUG_WARNINGS} ${INCLUDE_ARGUMENT} -MMD -MP -c $< -o $@
 
 -include $(DEPS_DEV)
 
 debug: create_folders $(OBJECTS_DEV)
-	${COMPILER} ${COMPILER_FLAGS_DEV} ${OBJECTS_DEV} ${LIBRARIES} -o ${OUTPUT_FOLDER_DEV}/${OUTPUT_FILE_DEV}
+	${COMPILER} ${COMPILER_FLAGS_DEV} ${OBJECTS_DEV} ${LIBRARIES} ${DEBUG_WARNINGS} -o ${OUTPUT_FOLDER_DEV}/${OUTPUT_FILE_DEV}
 	cp -r ${RESOURCES_FOLDER} ${OUTPUT_FOLDER_DEV}
 
 dev: debug
