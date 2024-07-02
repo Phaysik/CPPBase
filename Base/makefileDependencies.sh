@@ -129,8 +129,10 @@ main() {
 
         if [ "$(command g++ --version | grep -oP '\d+\.\d+\.\d+')" = "$desired_version" ]; then
             echo "g++-${desired_version} exists"
-        else
+        elif [ "${1,,}" != "a" || [ "${response,,}" != "a" ] ]; then
             setUpGCC desired_version
+        else
+            sudo apt-get install -y g++ # For automated running
         fi
 
         if [ -f "/usr/lib/libgtest.a" ] && [ -f "/usr/lib/libgtest_main.a" ]; then
