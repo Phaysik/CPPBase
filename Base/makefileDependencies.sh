@@ -12,16 +12,14 @@ setUpGCC() {
 
     mkdir gcc-build
     cd gcc-build
-    ../gcc-latest/configure --prefix=/usr/local/gcc-14 --enable-languages=c,c++ --disable-multilib
+    directory = /usr/local/gcc-14
+    ../gcc-latest/configure --prefix=$directory --enable-languages=c,c++ --disable-multilib
     sudo make -j$(nproc)
     sudo make install
 
-    sudo rm -rf /usr/bin/g++
-    sudo rm -rf /usr/bin/gcc
-    sudo rm -rf /usr/bin/gcov
-    sudo ln -s /usr/local/gcc-14/bin/g++ /usr/bin/g++
-    sudo ln -s /usr/local/gcc-14/bin/gcc /usr/bin/gcc
-    sudo ln -s /usr/local/gcc-14/bin/gcov /usr/bin/gcov
+    sudo update-alternatives --install /usr/bin/g++ g++ $directory/bin/g++ 14
+    sudo update-alternatives --install /usr/bin/gcc gcc $directory/bin/gcc 14
+    sudo update-alternatives --install /usr/bin/gcov gcov $directory/bin/gcov 14
 }
 
 setUpDoxygen() {
