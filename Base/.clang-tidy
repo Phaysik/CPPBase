@@ -424,3 +424,4 @@ CheckOptions:
   readability-uppercase-literal-suffix.NewSuffixes: ''
   zircon-temporary-objects.Names: ''
 SystemHeaders: false
+ExtraArgs: ['-std=c++23']

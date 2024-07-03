@@ -54,7 +54,7 @@ GENHTML_FLAGS = ${BRANCH_COVERAGE}
 GENHTML_OUTPUT_FOLDER = .\/coverage
 
 CLANG_SOURCES = ${SOURCES}
-TIDY_COMPILE_FLAGS = -extra-arg=-std=c++2b --config-file=.clang-tidy
+TIDY_COMPILE_FLAGS = --config-file=.clang-tidy
 FORMAT_COMPILE_FLAGS = -i -style=file:.clang-format
 
 CPPCHECK_FOLDER = cppcheck
@@ -173,7 +173,7 @@ cppcheck: ${CLANG_SOURCES}
 flawfinder: ${CLANG_SOURCES}
 	flawfinder $^
 
-analysis: tidy cppcheck flawfinder
+analysis: flawfinder cppcheck tidy
 
 format: ${CLANG_SOURCES} ${INCLUDE_SOURCES}
 	clang-format ${FORMAT_COMPILE_FLAGS} $^
