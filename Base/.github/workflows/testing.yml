@@ -23,4 +23,4 @@ jobs:
         run: ./makefileDependencies.sh a
 
       - name: Make project
-        run: make coverage
+        run: make coverage COMPILER_STANDARD=13
