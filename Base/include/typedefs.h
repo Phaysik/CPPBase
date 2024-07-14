@@ -1,4 +1,4 @@
-/*! \file aliases.h
+/*! \file typedefs.h
 	\brief C++ file for creating type aliases.
 	\date --/--/----
 	\version 1.0
