@@ -7,3 +7,5 @@
 *.gcno
 *.gcda
 .vscode/compile_commands.json
+.vscode/settings.json
+/src/tracy/*
