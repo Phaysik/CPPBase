@@ -1,18 +1,34 @@
 /*! \file main.cpp
 	\brief Contains the function definitions for creating a main
 	\date --/--/----
-	\version 1.0
+	\version x.x.x
+	\since x.x.x
 	\author Matthew Moore
 */
 
-/*! \brief The entry point for the program
-    \date --/--/----
-    \version 1.0
-    \author Matthew Moore
-    \return int The status code of the program
-*/
-int main()
-{
+#include <iostream>
 
-    return 0;
+/*! \brief The entry point for the program
+	\date --/--/----
+	\version x.x.x
+	\since x.x.x
+	\author Matthew Moore
+	\return int The status code of the program
+*/
+int main(int argc, char **argv)
+{
+#ifdef NDEBUG
+	try
+	{
+		-
+	}
+	catch (...)
+	{
+		std::cerr << "Abnormal termination" << '\n';
+	}
+#else
+	-
+#endif
+
+	return 0;
 }
