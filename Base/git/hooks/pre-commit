@@ -1,0 +1,23 @@
+#!/bin/sh
+
+echo "Running clang-format..."
+
+if ! make format; then
+    echo "Linting failed. Please fix the issues before committing."
+    exit 1
+fi
+
+# Check for TODO comments
+echo "Checking for TODO comments..."
+if grep -rnw . -e 'TODO'; then
+    echo "Please remove TODO comments before committing."
+    exit 1
+fi
+
+echo "Checking commit message format..."
+commit_message=$(git log -1 --pretty=%B)
+
+if ! echo "$commit_message" | grep -E '^\[(feature|bugfix)\] .+'; then
+    echo "Invalid commit message format. Commit message should start with '[feature]' or '[bugfix]'."
+    exit 1
+fi

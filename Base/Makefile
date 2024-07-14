@@ -13,7 +13,7 @@ DEBUG_WARNINGS = -fsanitize=address -fsanitize=pointer-compare -fsanitize=pointe
 
 INCLUDE_FOLDER = include
 INCLUDE_ARGUMENT = -I${INCLUDE_FOLDER}
-LIBRARIES =
+LIBRARIES = -lpqxx -lpq
 RESOURCES_FOLDER = .\/resources
 
 SOURCE_FOLDER = src
@@ -33,8 +33,16 @@ VALGRIND_FOLDER = valgrind
 OUTPUT_FOLDER_VALGRIND = ${BUILD_FOLDER}/${VALGRIND_FOLDER}
 OUTPUT_FILE_VALGRIND = valgrind
 
+TRACY_CLIENT_SOURCE = src/tracy/TracyClient.cpp
+TRACY_SOURCES = $(SOURCES) $(TRACY_CLIENT_SOURCE)
+TRACY_FOLDER = tracy
+TRACY_INCLUDE_ARGUMENT = -Isrc/tracy
+TRACY_FLAGS = -DTRACY_ENABLE -DTRACY_TIMER_FALLBACK
+OUTPUT_FILE_TRACY = tracy-client
+OUTPUT_FOLDER_TRACY = ${BUILD_FOLDER}/${TRACY_FOLDER}
+
 TEST_FOLDER = tests
-TEST_SOURCES = $(shell find ${TEST_FOLDER} ${SOUCE_FOLDER} -type f -not -path '*/main.cpp' -name '*.cpp')
+TEST_SOURCES = $(shell find ${TEST_FOLDER} ${SOURCE_FOLDER} -type f -not -path '*/main.cpp' -not -path '*/${TRACY_FOLDER}/*' -name '*.cpp')
 TEST_COMPILER_FLAGS = ${COMPILER_VERSION} --coverage -fPIC -O0
 TEST_INCLUDE_FOLDER =
 TEST_INCLUDE_ARGUMENT =
@@ -69,21 +77,15 @@ ANNOTATION_FILES = $(shell find . -maxdepth 1 -type f -name '*-ann')
 GPROF_COMPILER_FLAGS = -A -b -p -y
 GPROF_FILE = flat.map
 
-TRACY_CLIENT_SOURCE = src/tracy/TracyClient.cpp
-TRACY_SOURCES = $(SOURCES) $(TRACY_CLIENT_SOURCE)
-TRACY_FOLDER = tracy
-TRACY_INCLUDE_ARGUMENT = -Isrc/tracy
-TRACY_FLAGS = -DTRACY_ENABLE -DTRACY_TIMER_FALLBACK
-OUTPUT_FILE_TRACY = tracy-client
-OUTPUT_FOLDER_TRACY = ${BUILD_FOLDER}/${TRACY_FOLDER}
-
 OBJECTS_RELEASE = $(SOURCES:${SOURCE_FOLDER}/%.cpp=${OUTPUT_FOLDER_RELEASE}/%.o)
 DEPS_RELEASE = $(OBJECTS_RELEASE:.o=.d)
 OBJECTS_DEV = $(SOURCES:${SOURCE_FOLDER}/%.cpp=${OUTPUT_FOLDER_DEV}/%.o)
 DEPS_DEV = $(OBJECTS_DEV:.o=.d)
 OBJECTS_VALGRIND = $(SOURCES:${SOURCE_FOLDER}/%.cpp=${OUTPUT_FOLDER_VALGRIND}/%.o)
 DEPS_VALGRIND = $(OBJECTS_VALGRIND:.o=.d)
-OBJECTS_TEST = $(TEST_SOURCES:${TEST_FOLDER}/%.cpp=${TEST_OUTPUT_FOLDER}/%.o)
+OBJECTS_TEST_TEST = $(patsubst $(TEST_FOLDER)/%.cpp, $(TEST_OUTPUT_FOLDER)/%.o, $(filter $(TEST_FOLDER)/%.cpp, $(TEST_SOURCES)))
+OBJECTS_TEST_SRC = $(patsubst $(SOURCE_FOLDER)/%.cpp, $(TEST_OUTPUT_FOLDER)/%.o, $(filter $(SOURCE_FOLDER)/%.cpp, $(TEST_SOURCES)))
+OBJECTS_TEST = $(OBJECTS_TEST_TEST) $(OBJECTS_TEST_SRC)
 DEPS_TEST = $(OBJECTS_TEST:.o=.d)
 OBJECTS_TRACY = $(TRACY_SOURCES:${SOURCE_FOLDER}/%.cpp=${OUTPUT_FOLDER_TRACY}/%.o)
 DEPS_TRACY = $(OBJECTS_TRACY:.o=.d)
@@ -138,6 +140,9 @@ valgrind: val
 ${TEST_OUTPUT_FOLDER}/%.o: ${TEST_FOLDER}/%.cpp
 	${COMPILER} ${TEST_COMPILER_FLAGS} ${WARNINGS} ${INCLUDE_ARGUMENT} ${TEST_INCLUDE_ARGUMENT} -MMD -MP -c $< -o $@
 
+${TEST_OUTPUT_FOLDER}/%.o: ${SOURCE_FOLDER}/%.cpp
+	${COMPILER} ${TEST_COMPILER_FLAGS} ${WARNINGS} ${INCLUDE_ARGUMENT} ${TEST_INCLUDE_ARGUMENT} -MMD -MP -c $< -o $@
+
 copy_and_run_test:
 	cp -r ${RESOURCES_FOLDER} ${OUTPUT_FOLDER_DEV}
 	cp ${TEST_OUTPUT_FOLDER}/${TEST_OUTPUT_FILE} ${OUTPUT_FOLDER_DEV}/${TEST_OUTPUT_FILE}
@@ -161,8 +166,6 @@ genhtml: lcov
 
 coverage: genhtml
 	cp ${TEST_OUTPUT_FOLDER}/coverage.info ${GENHTML_OUTPUT_FOLDER}/lcov.info
-	rm -rf ${TEST_OUTPUT_FOLDER}
-	rm -rf ${LCOV_OUTPUT_FOLDER}
 
 tidy: ${CLANG_SOURCES}
 	clang-tidy ${TIDY_COMPILE_FLAGS} $^ -- ${INCLUDE_ARGUMENT}
@@ -210,5 +213,6 @@ initialize_repo:
 	git clone https://github.com/Phaysik/CPPBase
 	cp -ra CPPBase/Base/. .
 	rm -rf CPPBase
+	mv git .git
 
 .PHONY: tidy run_doxygen create_folders initialize_repo copy_and_run_test
