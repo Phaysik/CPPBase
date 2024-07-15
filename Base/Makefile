@@ -51,10 +51,10 @@ TEST_RESOURCES =
 TEST_OUTPUT_FOLDER = ${BUILD_FOLDER}/${TEST_FOLDER}
 TEST_OUTPUT_FILE = test
 
-BRANCH_COVERAGE = --rc lcov_branch_coverage=1
+BRANCH_COVERAGE = --rc branch_coverage=true
 
 LCOV_FILES = $(shell find . -name '*.gcno' -o -name '*.gcda' -o -name '*.info')
-LCOV_FLAGS = --no-external --capture ${BRANCH_COVERAGE} -d .
+LCOV_FLAGS = --no-external -c ${BRANCH_COVERAGE} -d .
 LCOV_OUTPUT_FOLDER = ${TEST_OUTPUT_FOLDER}
 LCOV_OUTPUT_FILE = coverage.info
 LCOV_REMOVE_FILES = '*/${TEST_FOLDER}/*'
@@ -113,7 +113,7 @@ release: compile
 	${OUTPUT_FOLDER_RELEASE}/${OUTPUT_FILE_RELEASE}
 
 ${OUTPUT_FOLDER_DEV}/%.o: ${SOURCE_FOLDER}/%.cpp
-	${COMPILER} ${COMPILER_FLAGS_DEV} ${WARNINGS} ${DEBUG_WARNINGS} ${INCLUDE_ARGUMENT} -MMD -MP -c $< -o $@
+	${COMPILER} ${COMPILER_FLAGS_DEV} ${WARNINGS} ${DEBUG_WARNINGS} ${INCLUDE_ARGUMENT} -MMD -MP -c $< -o $@ ${LIBRARIES}
 
 -include $(DEPS_DEV)
 
@@ -145,13 +145,12 @@ ${TEST_OUTPUT_FOLDER}/%.o: ${SOURCE_FOLDER}/%.cpp
 
 copy_and_run_test:
 	cp -r ${RESOURCES_FOLDER} ${OUTPUT_FOLDER_DEV}
-	cp ${TEST_OUTPUT_FOLDER}/${TEST_OUTPUT_FILE} ${OUTPUT_FOLDER_DEV}/${TEST_OUTPUT_FILE}
-	${OUTPUT_FOLDER_DEV}/${TEST_OUTPUT_FILE}
+	${TEST_OUTPUT_FOLDER}/${TEST_OUTPUT_FILE}
 
 -include $(DEPS_TEST)
 
 build_test: create_folders $(OBJECTS_TEST)
-	${COMPILER} ${TEST_FLAGS_RELEASE} ${OBJECTS_TEST} ${TEST_LIBRARIES} -o ${TEST_OUTPUT_FOLDER}/${TEST_OUTPUT_FILE}
+	${COMPILER} ${TEST_COMPILER_FLAGS} ${OBJECTS_TEST} ${TEST_LIBRARIES} -o ${TEST_OUTPUT_FOLDER}/${TEST_OUTPUT_FILE}
 	${MAKE} copy_and_run_test
 
 lcov: build_test
@@ -170,14 +169,14 @@ coverage: genhtml
 tidy: ${CLANG_SOURCES}
 	clang-tidy ${TIDY_COMPILE_FLAGS} $^ -- ${INCLUDE_ARGUMENT}
 
-cppcheck: ${CLANG_SOURCES}
+check: ${CLANG_SOURCES}
 	mkdir -p ${CPPCHECK_FOLDER}
 	cppcheck ${CPPCHECK_COMPILE_FLAGS} $^ -I ${INCLUDE_FOLDER}/
 
 flawfinder: ${CLANG_SOURCES}
 	flawfinder $^
 
-analysis: flawfinder cppcheck tidy
+analysis: flawfinder check
 
 format: ${CLANG_SOURCES} ${INCLUDE_SOURCES}
 	clang-format ${FORMAT_COMPILE_FLAGS} $^

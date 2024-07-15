@@ -27,9 +27,9 @@ Do not change any of the variables in the Makefile as it may cause the executabl
 | genhtml                    | Runs the lcov command. Deletes and recreates the genhtml output folder. Creates a set of web pages to view the code coverage of the codebase in the genhtml output folder. |
 | coverage                   | Runs the genhtml command. Deletes the test output and lcov output folders. |
 | tidy                       | Runs clang tidy on the code base. |
-| cppcheck                   | Runs cppcheck on the code base. |
+| check                      | Runs cppcheck on the code base. |
 | flawfinder                 | Runs flawfinder on the code base. |
-| analysis                   | Runs clang tidy, cppcheck, and flawfinder on the code base. |
+| analysis                   | Runs flawfinder, check, and clang-tidy on the code base. |
 | format                     | Runs clang format on the code base. |
 | run_doxygen                | Runs Doxygen on the Doxyfile. |
 | docs                       | Runs the run_doxygen command. Uses sphinx to build the docs from the Doxygen XML output. |
@@ -74,7 +74,7 @@ Do not change any of the variables in the Makefile as it may cause the executabl
 - For checking linting
 
 ```bash
-    make (tidy|cppcheck|flawfinder|analysis)
+    make (tidy|check|flawfinder|analysis)
 ```
 
 - For performance profiling

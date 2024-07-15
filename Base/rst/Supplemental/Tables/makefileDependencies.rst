@@ -46,7 +46,7 @@ Below is a list of all the :file:`Makefile` commands along with the other comman
     |                            |                                 |                                                                            |
     |                            |                                 | clang-tidy                                                                 |
     +----------------------------+---------------------------------+----------------------------------------------------------------------------+
-    | cppcheck                   | NA                              | make                                                                       |
+    | check                      | NA                              | make                                                                       |
     |                            |                                 |                                                                            |
     |                            |                                 | libpcre3                                                                   |
     |                            |                                 |                                                                            |
@@ -58,7 +58,7 @@ Below is a list of all the :file:`Makefile` commands along with the other comman
     |                            |                                 |                                                                            |
     |                            |                                 | pip                                                                        |
     +----------------------------+---------------------------------+----------------------------------------------------------------------------+
-    | analysis                   | tidy cppcheck                   | make                                                                       |
+    | analysis                   | flawfinder check tidy           | make                                                                       |
     +----------------------------+---------------------------------+----------------------------------------------------------------------------+
     | format                     | NA                              | make                                                                       |
     |                            |                                 |                                                                            |

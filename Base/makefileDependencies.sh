@@ -1,5 +1,18 @@
 #!/bin/bash
 
+setUpLibpqxx() {
+    sudo apt-get install libpq-dev -y
+    git clone https://github.com/jtv/libpqxx.git
+    cd libpqxx
+    mkdir build
+    cd build
+    cmake .. -DCMAKE_CXX_COMPILER="g++" -DCMAKE_CXX_FLAGS="-fPIC -fPIE"
+    make
+    sudo make install
+    cd ../..
+    sudo rm -rf libpqxx
+}
+
 setUpGCC() {
     curl -L -o gcc-latest.tar.gz https://ftp.gnu.org/gnu/gcc/gcc-$1/gcc-$1.tar.gz
     mkdir -p gcc-latest
@@ -13,6 +26,7 @@ setUpGCC() {
     mkdir gcc-build
     cd gcc-build
     directory = /usr/local/gcc-14
+    sudo mkdir $directory
     ../gcc-latest/configure --prefix=$directory --enable-languages=c,c++ --disable-multilib
     sudo make -j$(nproc)
     sudo make install
@@ -23,6 +37,24 @@ setUpGCC() {
 
     sudo rm -rf gcc-latest
     sudo rm -rf gcc-build
+
+    sudo mv /lib/x86_64-linux-gnu/libstdc++.so.6 /lib/x86_64-linux-gnu/libstdc++.so-copy.6
+    sudo cp /usr/local/gcc-14/lib64/libstdc++.so.6 /lib/x86_64-linux-gnu/
+}
+
+setUpDoxygen() {
+    echo "Setting up Doxygen"
+    wget https://doxygen.nl/files/doxygen-1.9.8.src.tar.gz
+    tar -xzvf doxygen-1.9.8.src.tar.gz
+    cd doxygen-1.9.8
+    mkdir build
+    cd build
+    cmake -G "Unix Makefiles" ..
+    make
+    sudo make install
+    cd ..
+    cd ..
+    rm -rf doxygen-1.9.8*
 }
 
 setUpClangTools() {
@@ -32,6 +64,21 @@ setUpClangTools() {
     sudo ./llvm.sh 19
     rm -rf ./llvm.sh
     sudo apt-get install -y clang-format clang-tidy
+}
+
+setUpCppCheck() {
+    git clone https://github.com/danmar/cppcheck.git
+    cd cppcheck
+    mkdir build
+    cd build
+    cmake -DHAVE_RULES=ON -DBUILD_TESTS=ON ..
+    cmake --build .
+    cd bin
+    sudo cp -r ./* /usr/bin/
+    cd ..
+    cd ..
+    cd ..
+    rm -rf cppcheck
 }
 
 checkSphinx() {
@@ -109,11 +156,13 @@ main() {
 
         echo "Installing all the required packages for all commands used in the Makefile"
 
-        sudo apt-get install -y build-essential libgmp3-dev libmpc-dev libmpfr-dev texinfo make cmake libgtest-dev lcov python3-pip g++-14 gcc-14
+        sudo apt-get install -y build-essential libgmp3-dev libmpc-dev libmpfr-dev texinfo make cmake libgtest-dev lcov python3-pip
 
         sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 10
         sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-14 14
         sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 10
+
+        setUpLibpqxx
 
         desired_version="14.1.0"
         echo "Setting up g++"
@@ -139,7 +188,37 @@ main() {
 
         # If not 'a' or 'A', set up documentation, formatting, and linting tools
         if [ "${response,,}" = "y" ] || [ "${1,,}" = "y" ]; then
-            sudo apt-get install doxygen cppcheck binutils valgrind graphviz flex bison libpcre3 libpcre3-dev -y
+            sudo apt-get install binutils valgrind graphviz flex bison libpcre3 libpcre3-dev -y
+
+            if [ -x "$(command -v doxygen)" ]; then
+                echo "Doxygen already exists"
+
+                version=$(doxygen --version | awk '{print $1}')
+                desired_version="1.9.8"
+
+                if [[ "$version" == "$desired_version" ]]; then
+                    echo "Doxygen version $desired_version already exists"
+                else
+                    setUpDoxygen
+                fi
+            else
+                setUpDoxygen
+            fi
+
+            if [ -x "$(command -v cppcheck)" ]; then
+                echo "Cppcheck already exists"
+
+                version=$(cppcheck --version | awk '{print $2}')
+                desired_version="2.15"
+
+                if [[ "$version" == "$desired_version" ]]; then
+                    echo "Cppcheck version $desired_version already exists"
+                else
+                    setUpCppCheck
+                fi
+            else
+                setUpCppCheck
+            fi
 
             if [ -x "$(command -v clang-tidy)" ] && [ -x "$(command -v clang-format)" ]; then
                 echo "clang-tidy and clang-format already exists"
@@ -205,9 +284,9 @@ main() {
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "genhtml" "lcov" "make lcov"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "coverage" "genhtml" "make"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "tidy" "-" "make clang-tidy"
-        printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "cppcheck" "-" "make libpcre3 libpcre3-dev cppcheck"
+        printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "check" "-" "make libpcre3 libpcre3-dev cppcheck"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "flawfinder" "-" "make pip"
-        printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "analysis" "tidy cppcheck flawfinder" "make"
+        printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "analysis" "tidy check flawfinder" "make"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "format" "-" "make clang-format"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "run_doxygen" "-" "make graphviz doxygen flex bison"
         printf "%-${col1_width}s %-${col2_width}s %-${col3_width}s\n" "profile" "dev" "make binutils"
