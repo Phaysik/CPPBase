@@ -1,7 +1,6 @@
 #!/bin/bash
 
 setUpGCC() {
-    echo "Setting up g++"
     curl -L -o gcc-latest.tar.gz https://ftp.gnu.org/gnu/gcc/gcc-$1/gcc-$1.tar.gz
     mkdir -p gcc-latest
     tar -xvzf gcc-latest.tar.gz -C gcc-latest --strip-components=1
@@ -126,10 +125,11 @@ main() {
         sudo apt-get install -y build-essential libgmp3-dev libmpc-dev libmpfr-dev texinfo make cmake valgrind graphviz libgtest-dev lcov python3-pip flex bison libpcre3 libpcre3-dev binutils
 
         desired_version="14.1.0"
+        echo "Setting up g++"
 
         if [ "$(command g++ --version | grep -oP '\d+\.\d+\.\d+')" = "$desired_version" ]; then
             echo "g++-${desired_version} exists"
-        elif [ "${1,,}" != "a" || [ "${response,,}" != "a" ] ]; then
+        elif [ "${1,,}" != "a" ] || ([ "${response,,}" != "a" ] && [ "${response,,}" != "n" ]); then
             setUpGCC desired_version
         else
             sudo apt-get install -y g++-13 # For automated running
