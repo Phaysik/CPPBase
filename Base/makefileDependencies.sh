@@ -9,7 +9,7 @@ setUpLibpqxx() {
     cmake .. -DCMAKE_CXX_COMPILER="g++" -DCMAKE_CXX_FLAGS="-fPIC -fPIE"
     make
     sudo make install
-    cd ../..
+    cd ../
     sudo rm -rf libpqxx
 }
 

@@ -13,7 +13,7 @@ DEBUG_WARNINGS = -fsanitize=address -fsanitize=pointer-compare -fsanitize=pointe
 
 INCLUDE_FOLDER = include
 INCLUDE_ARGUMENT = -I${INCLUDE_FOLDER}
-LIBRARIES =
+LIBRARIES = -lpqxx -lpq
 RESOURCES_FOLDER = .\/resources
 
 SOURCE_FOLDER = src
@@ -113,7 +113,7 @@ release: compile
 	${OUTPUT_FOLDER_RELEASE}/${OUTPUT_FILE_RELEASE}
 
 ${OUTPUT_FOLDER_DEV}/%.o: ${SOURCE_FOLDER}/%.cpp
-	${COMPILER} ${COMPILER_FLAGS_DEV} ${WARNINGS} ${DEBUG_WARNINGS} ${INCLUDE_ARGUMENT} -MMD -MP -c $< -o $@ ${LIBRARIES}
+	${COMPILER} ${COMPILER_FLAGS_DEV} ${WARNINGS} ${DEBUG_WARNINGS} ${INCLUDE_ARGUMENT} -MMD -MP -c $< -o $@
 
 -include $(DEPS_DEV)
 
