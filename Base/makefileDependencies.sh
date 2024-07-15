@@ -5,6 +5,7 @@ setUpGCC() {
     mkdir -p gcc-latest
     tar -xvzf gcc-latest.tar.gz -C gcc-latest --strip-components=1
 
+    sudo rm -rf gcc-latest
     cd gcc-latest
     ./contrib/download_prerequisites
     cd ..
@@ -19,6 +20,9 @@ setUpGCC() {
     sudo update-alternatives --install /usr/bin/g++ g++ $directory/bin/g++ 14
     sudo update-alternatives --install /usr/bin/gcc gcc $directory/bin/gcc 14
     sudo update-alternatives --install /usr/bin/gcov gcov $directory/bin/gcov 14
+
+    sudo rm -rf gcc-latest
+    sudo rm -rf gcc-build
 }
 
 setUpClangTools() {
