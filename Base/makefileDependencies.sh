@@ -132,7 +132,8 @@ main() {
         elif [ "${1,,}" != "a" || [ "${response,,}" != "a" ] ]; then
             setUpGCC desired_version
         else
-            sudo apt-get install -y g++ # For automated running
+            sudo apt-get install -y g++-13 # For automated running
+            sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 13
         fi
 
         if [ -f "/usr/lib/libgtest.a" ] && [ -f "/usr/lib/libgtest_main.a" ]; then
