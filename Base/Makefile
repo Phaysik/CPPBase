@@ -176,7 +176,7 @@ check: ${CLANG_SOURCES}
 flawfinder: ${CLANG_SOURCES}
 	flawfinder $^
 
-analysis: flawfinder check
+analysis: flawfinder check tidy
 
 format: ${CLANG_SOURCES} ${INCLUDE_SOURCES}
 	clang-format ${FORMAT_COMPILE_FLAGS} $^
