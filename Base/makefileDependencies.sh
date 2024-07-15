@@ -21,43 +21,13 @@ setUpGCC() {
     sudo update-alternatives --install /usr/bin/gcov gcov $directory/bin/gcov 14
 }
 
-setUpDoxygen() {
-    echo "Setting up Doxygen"
-    wget https://doxygen.nl/files/doxygen-1.9.8.src.tar.gz
-    tar -xzvf doxygen-1.9.8.src.tar.gz
-    cd doxygen-1.9.8
-    mkdir build
-    cd build
-    cmake -G "Unix Makefiles" ..
-    make
-    sudo make install
-    cd ..
-    cd ..
-    rm -rf doxygen-1.9.8*
-}
-
 setUpClangTools() {
     echo "Setting up clang-tidy and clang-format"
     wget https://apt.llvm.org/llvm.sh
-    chmod +x llvm.sh
+    sudo chmod +x llvm.sh
     sudo ./llvm.sh 19
     rm -rf ./llvm.sh
     sudo apt-get install -y clang-format clang-tidy
-}
-
-setUpCppCheck() {
-    git clone https://github.com/danmar/cppcheck.git
-    cd cppcheck
-    mkdir build
-    cd build
-    cmake -DHAVE_RULES=ON -DBUILD_TESTS=ON ..
-    cmake --build .
-    cd bin
-    sudo cp -r ./* /usr/bin/
-    cd ..
-    cd ..
-    cd ..
-    rm -rf cppcheck
 }
 
 checkSphinx() {
@@ -85,7 +55,16 @@ setUpTracy() {
     curl -L -o tracy-latest.tar.gz $url
     mkdir -p tracy-latest
     tar -xvzf tracy-latest.tar.gz -C tracy-latest --strip-components=1
+    sudo rm -rf tracy-latest.tar.gz
+
     cd tracy-latest
+
+    sudo apt-get install g++-11 gcc-11 libfreetype6-dev libcapstone-dev libegl1-mesa-dev libxkbcommon-dev libwayland-dev libdbus-1-dev libglfw3 libglfw3-dev -y
+    sudo cp -r /usr/include/freetype2/* /usr/include/
+    sudo cp -r /usr/include/capstone/* /usr/include/
+    sudo cp -r /usr/include/dbus-1.0/* /usr/include/
+    sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-11 11
+    sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 11
 
     # For installing the Client of Tracy
     mkdir build
@@ -97,13 +76,17 @@ setUpTracy() {
 
     # For installing the Server of Tracy
     cd profiler/build/unix
-    make CXX=g++-11
+    make CXX=g++-11 LEGACY=1
     mv Tracy-release Tracy-Server
     sudo cp Tracy-Server /usr/bin/
 
     # Remove Tracy files from local
     cd ../../../../
-    sudo rm -rf tracy
+    sudo rm -rf tracy-latest
+
+    sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 14
+    sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 14
+
 }
 
 main() {
@@ -122,7 +105,11 @@ main() {
 
         echo "Installing all the required packages for all commands used in the Makefile"
 
-        sudo apt-get install -y build-essential libgmp3-dev libmpc-dev libmpfr-dev texinfo make cmake valgrind graphviz libgtest-dev lcov python3-pip flex bison libpcre3 libpcre3-dev binutils
+        sudo apt-get install -y build-essential libgmp3-dev libmpc-dev libmpfr-dev texinfo make cmake libgtest-dev lcov python3-pip g++-14 gcc-14
+
+        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 10
+        sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-14 14
+        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 10
 
         desired_version="14.1.0"
         echo "Setting up g++"
@@ -148,36 +135,7 @@ main() {
 
         # If not 'a' or 'A', set up documentation, formatting, and linting tools
         if [ "${response,,}" = "y" ] || [ "${1,,}" = "y" ]; then
-            if [ -x "$(command -v doxygen)" ]; then
-                echo "Doxygen already exists"
-
-                version=$(doxygen --version | awk '{print $1}')
-                desired_version="1.9.8"
-
-                if [[ "$version" == "$desired_version" ]]; then
-                    echo "Doxygen version $desired_version already exists"
-                else
-                    setUpDoxygen
-                fi
-            else
-                setUpDoxygen
-            fi
-
-            if [ -x "$(command -v cppcheck)" ]; then
-                echo "Cppcheck already exists"
-
-                version=$(cppcheck --version | awk '{print $2}')
-                desired_version="2.15"
-
-                if [[ "$version" == "$desired_version" ]]; then
-                    echo "Cppcheck version $desired_version already exists"
-                else
-                    setUpCppCheck
-                fi
-            else
-                setUpCppCheck
-            fi
-
+            sudo apt-get install doxygen cppcheck binutils valgrind graphviz flex bison libpcre3 libpcre3-dev -y
 
             if [ -x "$(command -v clang-tidy)" ] && [ -x "$(command -v clang-format)" ]; then
                 echo "clang-tidy and clang-format already exists"
@@ -205,13 +163,13 @@ main() {
             else
                 echo "Installing Sphinx and it's dependencies for documentation"
                 pip3 install --upgrade pip
-                pip3 install sphinx breathe sphinx-book-theme sphinx-copybutton sphinx-autobuild sphinx-last-updated-by-git sphinx-notfound-page
+                pip3 install sphinx breathe sphinx-book-theme sphinx-copybutton sphinx-autobuild sphinx-last-updated-by-git sphinx-notfound-page --break-system-packages
             fi
 
             if [ -x "$(command -v flawfinder)" ]; then
                 echo "Flawfinder already exists"
             else
-                pip3 install flawfinder
+                pip3 install flawfinder --break-system-packages
             fi
 
             if [ -x "$(command -v tracy-Server)" ]; then
