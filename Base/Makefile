@@ -43,7 +43,7 @@ OUTPUT_FOLDER_TRACY = ${BUILD_FOLDER}/${TRACY_FOLDER}
 
 TEST_FOLDER = tests
 TEST_SOURCES = $(shell find ${TEST_FOLDER} ${SOURCE_FOLDER} -type f -not -path '*/main.cpp' -not -path '*/${TRACY_FOLDER}/*' -name '*.cpp')
-TEST_COMPILER_FLAGS = ${COMPILER_VERSION} --coverage -fPIC -O0
+TEST_COMPILER_FLAGS = ${COMPILER_VERSION} --coverage -fPIC -O0 -g -fprofile-arcs -ftest-coverage
 TEST_INCLUDE_FOLDER =
 TEST_INCLUDE_ARGUMENT =
 TEST_LIBRARIES = ${LIBRARIES} -lgcov -lgtest -lpthread
@@ -54,7 +54,7 @@ TEST_OUTPUT_FILE = test
 BRANCH_COVERAGE = --rc branch_coverage=true
 
 LCOV_FILES = $(shell find . -name '*.gcno' -o -name '*.gcda' -o -name '*.info')
-LCOV_FLAGS = --no-external -c ${BRANCH_COVERAGE} -d .
+LCOV_FLAGS = --no-external -c ${BRANCH_COVERAGE} -d . --ignore-errors inconsistent
 LCOV_OUTPUT_FOLDER = ${TEST_OUTPUT_FOLDER}
 LCOV_OUTPUT_FILE = coverage.info
 LCOV_REMOVE_FILES = '*/${TEST_FOLDER}/*'

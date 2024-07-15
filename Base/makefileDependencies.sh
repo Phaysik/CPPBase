@@ -81,6 +81,25 @@ setUpCppCheck() {
     rm -rf cppcheck
 }
 
+setUpLCOV() {
+    # Download the latest version of LCOV
+    url=$(curl -s https://api.github.com/repos/linux-test-project/lcov/releases/latest | grep -o '"tarball_url": *"[^"]*"' | cut -d '"' -f 4)
+    curl -L -o lcov-latest.tar.gz $url
+    mkdir -p lcov-latest
+    tar -xvzf lcov-latest.tar.gz -C lcov-latest --strip-components=1
+    sudo rm -rf lcov-latest.tar.gz
+
+    cd lcov-latest
+
+    sudo apt-get install -y cpanminus
+    sudo cpan Capture::Tiny
+
+    make install
+
+    cd ..
+    sudo rm -rf lcov-latest
+}
+
 checkSphinx() {
     packages=("sphinx" "breathe" "sphinx-book-theme" "sphinx-copybutton" "sphinx-autobuild" "sphinx-last-updated-by-git" "sphinx-notfound-page")
 
@@ -156,13 +175,14 @@ main() {
 
         echo "Installing all the required packages for all commands used in the Makefile"
 
-        sudo apt-get install -y build-essential libgmp3-dev libmpc-dev libmpfr-dev texinfo make cmake libgtest-dev lcov python3-pip
+        sudo apt-get install -y build-essential libgmp3-dev libmpc-dev libmpfr-dev texinfo make cmake libgtest-dev python3-pip g++-14 gcc-14
 
         sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 10
         sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-14 14
         sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 10
 
         setUpLibpqxx
+        setUpLCOV
 
         desired_version="14.1.0"
         echo "Setting up g++"
