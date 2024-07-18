@@ -29,7 +29,7 @@ main() {
     if [ "$file_count" -gt 1 ]; then
         # Run unit tests
         echo "Running unit tests..."
-        if ! make coverage; then
+        if ! make build_tests; then
             echo "Unit tests failed. Please fix the issues before committing."
             exit 1
         fi

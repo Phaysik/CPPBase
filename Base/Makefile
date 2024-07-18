@@ -151,7 +151,7 @@ copy_and_run_tests:
 
 build_tests: create_folders $(OBJECTS_TEST)
 	${COMPILER} ${TEST_COMPILER_FLAGS} ${OBJECTS_TEST} ${TEST_LIBRARIES} -o ${TEST_OUTPUT_FOLDER}/${TEST_OUTPUT_FILE}
-	${MAKE} copy_and_run_test
+	${MAKE} copy_and_run_tests
 
 lcov: build_tests
 	mkdir -p ${LCOV_OUTPUT_FOLDER}
