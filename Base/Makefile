@@ -54,7 +54,7 @@ TEST_OUTPUT_FILE = test
 BRANCH_COVERAGE = --rc branch_coverage=true
 
 LCOV_FILES = $(shell find . -name '*.gcno' -o -name '*.gcda' -o -name '*.info')
-LCOV_FLAGS = --no-external -c ${BRANCH_COVERAGE} -d . --ignore-errors inconsistent
+LCOV_FLAGS = --no-external -c ${BRANCH_COVERAGE} -d . --ignore-errors mismatch
 LCOV_OUTPUT_FOLDER = ${TEST_OUTPUT_FOLDER}
 LCOV_OUTPUT_FILE = coverage.info
 LCOV_REMOVE_FILES = '*/${TEST_FOLDER}/*'
