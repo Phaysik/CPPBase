@@ -1,18 +1,5 @@
 #!/bin/bash
 
-setUpLibpqxx() {
-    sudo apt-get install libpq-dev -y
-    git clone https://github.com/jtv/libpqxx.git
-    cd libpqxx
-    mkdir build
-    cd build
-    cmake .. -DCMAKE_CXX_COMPILER="g++" -DCMAKE_CXX_FLAGS="-fPIC -fPIE"
-    make
-    sudo make install
-    cd ../
-    sudo rm -rf libpqxx
-}
-
 setUpGCC() {
     curl -L -o gcc-latest.tar.gz https://ftp.gnu.org/gnu/gcc/gcc-$1/gcc-$1.tar.gz
     mkdir -p gcc-latest
@@ -42,21 +29,6 @@ setUpGCC() {
     sudo cp /usr/local/gcc-14/lib64/libstdc++.so.6 /lib/x86_64-linux-gnu/
 }
 
-setUpDoxygen() {
-    echo "Setting up Doxygen"
-    wget https://doxygen.nl/files/doxygen-1.9.8.src.tar.gz
-    tar -xzvf doxygen-1.9.8.src.tar.gz
-    cd doxygen-1.9.8
-    mkdir build
-    cd build
-    cmake -G "Unix Makefiles" ..
-    make
-    sudo make install
-    cd ..
-    cd ..
-    rm -rf doxygen-1.9.8*
-}
-
 setUpClangTools() {
     echo "Setting up clang-tidy and clang-format"
     wget https://apt.llvm.org/llvm.sh
@@ -64,40 +36,6 @@ setUpClangTools() {
     sudo ./llvm.sh 19
     rm -rf ./llvm.sh
     sudo apt-get install -y clang-format clang-tidy
-}
-
-setUpCppCheck() {
-    git clone https://github.com/danmar/cppcheck.git
-    cd cppcheck
-    mkdir build
-    cd build
-    cmake -DHAVE_RULES=ON -DBUILD_TESTS=ON ..
-    cmake --build .
-    cd bin
-    sudo cp -r ./* /usr/bin/
-    cd ..
-    cd ..
-    cd ..
-    rm -rf cppcheck
-}
-
-setUpLCOV() {
-    # Download the latest version of LCOV
-    url=$(curl -s https://api.github.com/repos/linux-test-project/lcov/releases/latest | grep -o '"tarball_url": *"[^"]*"' | cut -d '"' -f 4)
-    curl -L -o lcov-latest.tar.gz $url
-    mkdir -p lcov-latest
-    tar -xvzf lcov-latest.tar.gz -C lcov-latest --strip-components=1
-    sudo rm -rf lcov-latest.tar.gz
-
-    cd lcov-latest
-
-    sudo apt-get install -y cpanminus
-    sudo cpan Capture::Tiny
-
-    make install
-
-    cd ..
-    sudo rm -rf lcov-latest
 }
 
 checkSphinx() {
@@ -181,8 +119,6 @@ main() {
         sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-14 14
         sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 10
 
-        setUpLibpqxx
-
         desired_version="14.1.0"
         echo "Setting up g++"
 
@@ -207,39 +143,7 @@ main() {
 
         # If not 'a' or 'A', set up documentation, formatting, and linting tools
         if [ "${response,,}" = "y" ] || [ "${1,,}" = "y" ]; then
-            setUpLCOV
-
-            sudo apt-get install binutils valgrind graphviz flex bison libpcre3 libpcre3-dev -y
-
-            if [ -x "$(command -v doxygen)" ]; then
-                echo "Doxygen already exists"
-
-                version=$(doxygen --version | awk '{print $1}')
-                desired_version="1.9.8"
-
-                if [[ "$version" == "$desired_version" ]]; then
-                    echo "Doxygen version $desired_version already exists"
-                else
-                    setUpDoxygen
-                fi
-            else
-                setUpDoxygen
-            fi
-
-            if [ -x "$(command -v cppcheck)" ]; then
-                echo "Cppcheck already exists"
-
-                version=$(cppcheck --version | awk '{print $2}')
-                desired_version="2.15"
-
-                if [[ "$version" == "$desired_version" ]]; then
-                    echo "Cppcheck version $desired_version already exists"
-                else
-                    setUpCppCheck
-                fi
-            else
-                setUpCppCheck
-            fi
+            sudo apt-get install binutils valgrind graphviz flex bison libpcre3 libpcre3-dev lcov doxygen cppcheck -y
 
             if [ -x "$(command -v clang-tidy)" ] && [ -x "$(command -v clang-format)" ]; then
                 echo "clang-tidy and clang-format already exists"
