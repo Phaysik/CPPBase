@@ -44,8 +44,8 @@ OUTPUT_FOLDER_TRACY = ${BUILD_FOLDER}/${TRACY_FOLDER}
 TEST_FOLDER = tests
 TEST_SOURCES = $(shell find ${TEST_FOLDER} ${SOURCE_FOLDER} -type f -not -path '*/main.cpp' -not -path '*/${TRACY_FOLDER}/*' -name '*.cpp')
 TEST_COMPILER_FLAGS = ${COMPILER_VERSION} --coverage -fPIC -O0 -g -fprofile-arcs -ftest-coverage
-TEST_INCLUDE_FOLDER =
-TEST_INCLUDE_ARGUMENT =
+TEST_INCLUDE_FOLDER = includeTests
+TEST_INCLUDE_ARGUMENT = -I${TEST_INCLUDE_FOLDER}
 TEST_LIBRARIES = ${LIBRARIES} -lgcov -lgtest -lpthread
 TEST_RESOURCES =
 TEST_OUTPUT_FOLDER = ${BUILD_FOLDER}/${TEST_FOLDER}
@@ -143,17 +143,17 @@ ${TEST_OUTPUT_FOLDER}/%.o: ${TEST_FOLDER}/%.cpp
 ${TEST_OUTPUT_FOLDER}/%.o: ${SOURCE_FOLDER}/%.cpp
 	${COMPILER} ${TEST_COMPILER_FLAGS} ${WARNINGS} ${INCLUDE_ARGUMENT} ${TEST_INCLUDE_ARGUMENT} -MMD -MP -c $< -o $@
 
-copy_and_run_test:
+copy_and_run_tests:
 	cp -r ${RESOURCES_FOLDER} ${OUTPUT_FOLDER_DEV}
 	${TEST_OUTPUT_FOLDER}/${TEST_OUTPUT_FILE}
 
 -include $(DEPS_TEST)
 
-build_test: create_folders $(OBJECTS_TEST)
+build_tests: create_folders $(OBJECTS_TEST)
 	${COMPILER} ${TEST_COMPILER_FLAGS} ${OBJECTS_TEST} ${TEST_LIBRARIES} -o ${TEST_OUTPUT_FOLDER}/${TEST_OUTPUT_FILE}
 	${MAKE} copy_and_run_test
 
-lcov: build_test
+lcov: build_tests
 	mkdir -p ${LCOV_OUTPUT_FOLDER}
 	lcov ${LCOV_FLAGS} -o ${LCOV_OUTPUT_FOLDER}/${LCOV_OUTPUT_FILE}
 	lcov --remove ${LCOV_OUTPUT_FOLDER}/${LCOV_OUTPUT_FILE} ${LCOV_REMOVE_FILES} ${BRANCH_COVERAGE} -o ${LCOV_OUTPUT_FOLDER}/${LCOV_OUTPUT_FILE}

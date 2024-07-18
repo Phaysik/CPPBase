@@ -1,23 +1,58 @@
 #!/bin/sh
 
-echo "Running clang-format..."
+main() {
+    echo "Running clang-format..."
 
-if ! make format; then
-    echo "Linting failed. Please fix the issues before committing."
-    exit 1
-fi
+    if ! make format; then
+        echo "Linting failed. Please fix the issues before committing."
+        exit 1
+    fi
 
-# Check for TODO comments
-echo "Checking for TODO comments..."
-if grep -rnw . -e 'TODO'; then
-    echo "Please remove TODO comments before committing."
-    exit 1
-fi
+    echo "Running static code analysis tools..."
 
-echo "Checking commit message format..."
-commit_message=$(git log -1 --pretty=%B)
+    if ! make analysis; then
+        echo "Static code analysis failed. Please fix the issues before committing."
+        exit 1
+    fi
 
-if ! echo "$commit_message" | grep -E '^\[(feature|bugfix)\] .+'; then
-    echo "Invalid commit message format. Commit message should start with '[feature]' or '[bugfix]'."
-    exit 1
-fi
+    echo "Running release build..."
+
+    if ! make release; then
+        echo "Release build failed. Please fix the issues before committing."
+        exit 1
+    fi
+
+    # Count the number of files in the include/ directory
+    file_count=$(find include/ -type f | wc -l)
+
+    # Check if there is more than one file
+    if [ "$file_count" -gt 1 ]; then
+        # Run unit tests
+        echo "Running unit tests..."
+        if ! make coverage; then
+            echo "Unit tests failed. Please fix the issues before committing."
+            exit 1
+        fi
+    fi
+
+    # Check for TODO comments
+    echo "Checking for TODO comments..."
+    if find . -path ./src/tracy -prune -o -type f -name '*.cpp' -print | xargs grep -n 'TODO'; then
+        echo "Please remove TODO comments before committing."
+        exit 1
+    fi
+
+    # Check for sensitive keywords
+    if git grep -q -i "api_key" -- .; then
+        echo "Sensitive information detected. Please remove it before committing."
+        exit 1
+    fi
+
+    # Ensure scripts have the executable bit set
+    if [ -n "$(find . -name '*.sh' ! -perm -u+x)" ]; then
+        echo "Script files must have execute permissions."
+        exit 1
+    fi
+}
+
+main "$@"
