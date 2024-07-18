@@ -23,4 +23,4 @@ jobs:
         run: ./makefileDependencies.sh a
 
       - name: Make project
-        run: make coverage COMPILER_STANDARD=13
+        run: make build_test COMPILER_STANDARD=13
