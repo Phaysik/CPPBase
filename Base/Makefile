@@ -212,6 +212,6 @@ initialize_repo:
 	git clone https://github.com/Phaysik/CPPBase
 	cp -ra CPPBase/Base/. .
 	rm -rf CPPBase
-	mv git .git
+	mv hooks .git
 
 .PHONY: tidy run_doxygen create_folders initialize_repo copy_and_run_test
