@@ -113,7 +113,7 @@ main() {
 
         echo "Installing all the required packages for all commands used in the Makefile"
 
-        sudo apt-get install build-essential libgmp3-dev libmpc-dev libmpfr-dev texinfo make cmake libgtest-dev python3-pip docker-compose -y
+        sudo apt-get install build-essential libgmp3-dev libmpc-dev libmpfr-dev texinfo make cmake libgtest-dev python3-pip docker-compose xterm -y
 
         sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 10
         sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-14 14
