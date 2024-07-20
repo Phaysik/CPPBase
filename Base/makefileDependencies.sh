@@ -113,7 +113,7 @@ main() {
 
         echo "Installing all the required packages for all commands used in the Makefile"
 
-        sudo apt-get install build-essential libgmp3-dev libmpc-dev libmpfr-dev texinfo make cmake libgtest-dev python3-pip -y
+        sudo apt-get install make cmake libgtest-dev python3-pip docker-compose -y
 
         sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 10
         sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-14 14
@@ -143,7 +143,7 @@ main() {
 
         # If not 'a' or 'A', set up documentation, formatting, and linting tools
         if [ "${response,,}" = "y" ] || [ "${1,,}" = "y" ]; then
-            sudo apt-get install binutils valgrind graphviz flex bison libpcre3 libpcre3-dev lcov doxygen cppcheck xterm docker-compose -y
+            sudo apt-get install binutils valgrind graphviz flex bison libpcre3 libpcre3-dev lcov cppcheck doxygen xterm -y
 
             if [ -x "$(command -v clang-tidy)" ] && [ -x "$(command -v clang-format)" ]; then
                 echo "clang-tidy and clang-format already exists"
