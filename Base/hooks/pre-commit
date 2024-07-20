@@ -43,7 +43,7 @@ main() {
     fi
 
     # Check for sensitive keywords
-    if git grep -q -i "secrets/|api_key" -- . ':!.github/**' ':!git/**'; then
+    if git grep -q -i "secrets/|api_key" -- . ':!.github/**' ':!hooks/**'; then
         echo "Sensitive information detected. Please remove it before committing."
         exit 1
     fi
