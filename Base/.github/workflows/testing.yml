@@ -19,8 +19,81 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Set up Cache Site
+        run: mkdir -p ./cache
+
+      - name: Set up Apt Cache Site
+        run: |
+          mkdir -p ./cache/apt-packages
+          mkdir -p ./cache/apt-lists
+
+      - name: Set up Google Test Cache Site
+        run: |
+          mkdir -p ./cache/gtest/lib
+          mkdir -p ./cache/gtest/include
+
+      - name: Cache Apt Packages
+        id: cache-apt-packages
+        uses: actions/cache@v3
+        with:
+          path: ./cache/apt-packages
+          key: ${{ runner.os }}-apt-packages-please-test-me-please-${{ hashFiles('makefileDependencies.sh') }}
+          restore-keys: |
+            ${{ runner.os }}-apt-packages-please-test-me-please-
+
+      - name: Cache Apt Package Lists
+        id: cache-apt-lists
+        uses: actions/cache@v3
+        with:
+          path: ./cache/apt-lists
+          key: ${{ runner.os }}-apt-lists-please-test-me-please-${{ hashFiles('makefileDependencies.sh') }}
+          restore-keys: |
+            ${{ runner.os }}-apt-lists-please-test-me-please-
+
+      - name: Cache Google Test
+        id: cache-google-tests-please-test
+        uses: actions/cache@v3
+        with:
+          path: |
+            ./cache/gtest
+          key: ${{ runner.os }}-google-tests-please-test-test-test-${{ hashFiles('makefileDependencies.sh') }}
+          restore-keys: |
+            ${{ runner.os }}-google-tests-please-test-test-test-
+
+      - name: Install Apt Packages From Cache
+        if: steps.cache-apt-packages.outputs.cache-hit == 'true'
+        run: sudo cp -r ./cache/apt-packages/* /var/cache/apt
+
+      - name: Install Apt Lists From Cache
+        if: steps.cache-apt-lists.outputs.cache-hit == 'true'
+        run: sudo cp -r ./cache/apt-lists/* /var/lib/apt/lists
+
+      - name: Install Google Test From Cache
+        if: steps.cache-google-tests-please-test.outputs.cache-hit == 'true'
+        run: |
+          sudo cp -r ./cache/gtest/lib/* /usr/lib
+          sudo mkdir -p /usr/include/gtest
+          sudo cp -r ./cache/gtest/include/* /usr/include/gtest
+
       - name: Install dependencies
+        if: steps.cache-apt-packages.outputs.cache-hit != 'true' || steps.cache-apt-lists.outputs.cache-hit != 'true' || steps.cache-google-tests-please-test.outputs.cache-hit != 'true'
         run: ./makefileDependencies.sh a
 
       - name: Make project
         run: make build_tests COMPILER_STANDARD=13
+
+      - name: Save Apt Packages Cache
+        run: |
+          sudo cp -r /var/cache/apt ./cache/apt-packages
+
+      - name: Save Apt Lists Cache
+        run: |
+          sudo cp -r /var/lib/apt/lists ./cache/apt-lists
+
+      - name: Save Google Test Cache
+        run: |
+          sudo cp -r /usr/lib/libgtest* ./cache/gtest/lib
+          sudo cp -r /usr/include/gtest/* ./cache/gtest/include
+
+      - name: Give Read Access For Apt Folder
+        run: sudo chown -R $USER:$USER ./cache/apt-packages/apt/archives/lock ./cache/apt-packages/apt/archives/partial ./cache/apt-lists/lists/lock ./cache/apt-lists/lists/partial
