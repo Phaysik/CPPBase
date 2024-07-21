@@ -8,13 +8,7 @@ Below is a list of all the :file:`Makefile` commands along with a breakdown of w
     +----------------------------+----------------------------------------------------------------------------------------------------+
     | Makefile Command           | Action                                                                                             |
     +============================+====================================================================================================+
-    | create_folders             | Creates the boilerplate folders for running other commands.                                        |
-    |                            |                                                                                                    |
-    |                            | Does not need to be executed individually.                                                         |
-    +----------------------------+----------------------------------------------------------------------------------------------------+
-    | compile                    | Runs the create_folders command.                                                                   |
-    |                            |                                                                                                    |
-    |                            | Creates a release executable in the output folder.                                                 |
+    | compile                    | Creates a release executable in the output folder.                                                 |
     |                            |                                                                                                    |
     |                            | Copies resource folder to the output folder.                                                       |
     +----------------------------+----------------------------------------------------------------------------------------------------+
@@ -22,8 +16,7 @@ Below is a list of all the :file:`Makefile` commands along with a breakdown of w
     |                            |                                                                                                    |
     |                            | Runs the release executable in the output folder.                                                  |
     +----------------------------+----------------------------------------------------------------------------------------------------+
-    | debug                      | Runs the create_folders command.                                                                   |
-    |                            |                                                                                                    |
+    | debug                      |                                                                    |
     |                            | Creates a dev executable in the output folder with debugging information in the compiled code.     |
     |                            |                                                                                                    |
     |                            | Copies resource folder to the output folder.                                                       |
@@ -32,9 +25,7 @@ Below is a list of all the :file:`Makefile` commands along with a breakdown of w
     |                            |                                                                                                    |
     |                            | Runs the dev executable in the output folder.                                                      |
     +----------------------------+----------------------------------------------------------------------------------------------------+
-    | val                        | Runs the create_folders command.                                                                   |
-    |                            |                                                                                                    |
-    |                            | Creates a valgrind executable in the output folder with memory debugging information               |
+    | val                        | Creates a valgrind executable in the output folder with memory debugging information               |
     |                            | in the compiled code explicitly for valgrind.                                                      |
     |                            |                                                                                                    |
     |                            | Copies resource folder to the output folder.                                                       |
@@ -43,13 +34,11 @@ Below is a list of all the :file:`Makefile` commands along with a breakdown of w
     |                            |                                                                                                    |
     |                            | Runs a memory checker on the executable in the output folder to see if there's any memory leaks.   |
     +----------------------------+----------------------------------------------------------------------------------------------------+
-    | copy_and_run_test          | Copies the resource folder to the output folder.                                                   |
+    | copy_and_run_tests         | Copies the resource folder to the output folder.                                                   |
     |                            |                                                                                                    |
     |                            | Copies and runs the test executable from the test folder to the output folder.                     |
     +----------------------------+----------------------------------------------------------------------------------------------------+
-    | build_test                 | Runs the create_folders commands.                                                                  |
-    |                            |                                                                                                    |
-    |                            | Compiles a test executable with Google Test flags. Runs the copy_and_test command.                 |
+    | build_tests                | Compiles a test executable with Google Test flags. Runs the copy_and_run_tests command.            |
     +----------------------------+----------------------------------------------------------------------------------------------------+
     | lcov                       | Runs the build_test command.                                                                       |
     |                            |                                                                                                    |
@@ -83,9 +72,7 @@ Below is a list of all the :file:`Makefile` commands along with a breakdown of w
     |                            |                                                                                                    |
     |                            | Uses sphinx to build the docs from the Doxygen XML output.                                         |
     +----------------------------+----------------------------------------------------------------------------------------------------+
-    | tracy                      | Runs the create_folders command.                                                                   |
-    |                            |                                                                                                    |
-    |                            | Creates an executable with the appropriate flags for the Tracy Profile server.                     |
+    | tracy                      | Creates an executable with the appropriate flags for the Tracy Profile server.                     |
     |                            |                                                                                                    |
     |                            | This is only the client, you need to already be running the Tracy Profiler Server.                 |
     |                            |                                                                                                    |

@@ -44,17 +44,26 @@ OUTPUT_FOLDER_TRACY = ${BUILD_FOLDER}/${TRACY_FOLDER}
 TEST_FOLDER = tests
 TEST_SOURCES = $(shell find ${TEST_FOLDER} ${SOURCE_FOLDER} -type f -not -path '*/main.cpp' -not -path '*/${TRACY_FOLDER}/*' -name '*.cpp')
 TEST_COMPILER_FLAGS = ${COMPILER_VERSION} --coverage -fPIC -O0 -g -fprofile-arcs -ftest-coverage
-TEST_INCLUDE_FOLDER =
-TEST_INCLUDE_ARGUMENT =
-TEST_LIBRARIES = ${LIBRARIES} -lgcov -lgtest -lpthread
-TEST_RESOURCES =
+TEST_INCLUDE_FOLDER = includeTests
+TEST_INCLUDE_ARGUMENT = -I${TEST_INCLUDE_FOLDER}
+TEST_INTEGRATIONS_FOLDER = ${TEST_FOLDER}/integrations
+TEST_INTEGRATIONS_INCLUDE_ARUGMENT = ${TEST_INCLUDE_ARGUMENT}
+TEST_INTEGRATIONS_SOURCES = $(shell find ${TEST_INTEGRATIONS_FOLDER} ${SOURCE_FOLDER} -type f -not -path '*/main.cpp' -not -path '*/${TRACY_FOLDER}/*' -name '*.cpp')
+TEST_MOCKS_FOLDER = ${TEST_FOLDER}/mocks
+TEST_MOCKS_INCLUDE_ARUGMENT = ${TEST_INCLUDE_ARGUMENT}
+TEST_MOCKS_SOURCES = $(shell find ${TEST_MOCKS_FOLDER} ${SOURCE_FOLDER} -type f -not -path '*/main.cpp' -not -path '*/${TRACY_FOLDER}/*' -name '*.cpp')
+TEST_MAIN_FOLDER = ${TEST_FOLDER}/main
+TEST_MAIN_INCLUDE_ARUGMENT = ${TEST_INCLUDE_ARGUMENT}
+TEST_MAIN_SOURCES = $(shell find ${TEST_MAIN_FOLDER} ${SOURCE_FOLDER} -type f -not -path '*/main.cpp' -not -path '*/${TRACY_FOLDER}/*' -name '*.cpp')
+TEST_LIBRARIES = ${LIBRARIES} -lgcov -lgtest -lgmock -lpthread
+TEST_RESOURCES = ${RESOURCES_FOLDER}
 TEST_OUTPUT_FOLDER = ${BUILD_FOLDER}/${TEST_FOLDER}
 TEST_OUTPUT_FILE = test
 
 BRANCH_COVERAGE = --rc branch_coverage=true
 
 LCOV_FILES = $(shell find . -name '*.gcno' -o -name '*.gcda' -o -name '*.info')
-LCOV_FLAGS = --no-external -c ${BRANCH_COVERAGE} -d . --ignore-errors mismatch
+LCOV_FLAGS = --no-external -c ${BRANCH_COVERAGE} -d . --ignore-errors mismatch,mismatch
 LCOV_OUTPUT_FOLDER = ${TEST_OUTPUT_FOLDER}
 LCOV_OUTPUT_FILE = coverage.info
 LCOV_REMOVE_FILES = '*/${TEST_FOLDER}/*'
@@ -83,29 +92,42 @@ OBJECTS_DEV = $(SOURCES:${SOURCE_FOLDER}/%.cpp=${OUTPUT_FOLDER_DEV}/%.o)
 DEPS_DEV = $(OBJECTS_DEV:.o=.d)
 OBJECTS_VALGRIND = $(SOURCES:${SOURCE_FOLDER}/%.cpp=${OUTPUT_FOLDER_VALGRIND}/%.o)
 DEPS_VALGRIND = $(OBJECTS_VALGRIND:.o=.d)
-OBJECTS_TEST_TEST = $(patsubst $(TEST_FOLDER)/%.cpp, $(TEST_OUTPUT_FOLDER)/%.o, $(filter $(TEST_FOLDER)/%.cpp, $(TEST_SOURCES)))
+OBJECTS_TEST_INTEGRATIONS = $(patsubst $(TEST_INTEGRATIONS_FOLDER)/%.cpp, $(TEST_OUTPUT_FOLDER)/%.o, $(filter $(TEST_INTEGRATIONS_FOLDER)/%.cpp, $(TEST_INTEGRATIONS_SOURCES)))
+OBJECTS_TEST_MOCKS = $(patsubst $(TEST_MOCKS_FOLDER)/%.cpp, $(TEST_OUTPUT_FOLDER)/%.o, $(filter $(TEST_MOCKS_FOLDER)/%.cpp, $(TEST_MOCKS_SOURCES)))
+OBJECTS_TEST_MAIN = $(patsubst $(TEST_MAIN_FOLDER)/%.cpp, $(TEST_OUTPUT_FOLDER)/%.o, $(filter $(TEST_MAIN_FOLDER)/%.cpp, $(TEST_MAIN_SOURCES)))
+OBJECTS_TEST_FULL = $(patsubst $(TEST_FOLDER)/%.cpp, $(TEST_OUTPUT_FOLDER)/%.o, $(filter $(TEST_FOLDER)/%.cpp, $(TEST_SOURCES)))
 OBJECTS_TEST_SRC = $(patsubst $(SOURCE_FOLDER)/%.cpp, $(TEST_OUTPUT_FOLDER)/%.o, $(filter $(SOURCE_FOLDER)/%.cpp, $(TEST_SOURCES)))
-OBJECTS_TEST = $(OBJECTS_TEST_TEST) $(OBJECTS_TEST_SRC)
-DEPS_TEST = $(OBJECTS_TEST:.o=.d)
+OBJECTS_TEST_INTEGRATIONS_ALL = $(OBJECTS_TEST_INTEGRATIONS) $(OBJECTS_TEST_MAIN) $(OBJECTS_TEST_SRC)
+OBJECTS_TEST_MOCKS_ALL = $(OBJECTS_TEST_MOCKS) $(OBJECTS_TEST_MAIN) $(OBJECTS_TEST_SRC)
+OBJECTS_TEST_ALL = $(OBJECTS_TEST_FULL) $(OBJECTS_TEST_SRC)
+DEPS_TEST_INTEGRATIONS = $(OBJECTS_TEST_INTEGRATIONS_ALL:.o=.d)
+DEPS_TEST_MOCKS = $(OBJECTS_TEST_MOCKS_ALL:.o=.d)
+DEPS_TEST_MAIN = $(OBJECTS_TEST_MAIN:.o=.d)
+DEPS_TEST_ALL = $(OBJECTS_TEST_ALL:.o=.d)
 OBJECTS_TRACY = $(TRACY_SOURCES:${SOURCE_FOLDER}/%.cpp=${OUTPUT_FOLDER_TRACY}/%.o)
 DEPS_TRACY = $(OBJECTS_TRACY:.o=.d)
 
+TEST_OPTIONS = full
+# Conditionally set flags based on TEST_OPTIONS
+ifeq ($(TEST_OPTIONS), full)
+	OBJECTS_TEST_USING = $(OBJECTS_TEST_ALL)
+else ifeq ($(TEST_OPTIONS), integrations)
+	OBJECTS_TEST_USING = $(OBJECTS_TEST_INTEGRATIONS_ALL)
+else ifeq ($(TEST_OPTIONS), mocks)
+	OBJECTS_TEST_USING = $(OBJECTS_TEST_MOCKS_ALL)
+endif
+
+
 default: compile
 
-create_folders:
-	mkdir -p ${RESOURCES_FOLDER}
-	mkdir -p ${OUTPUT_FOLDER_RELEASE}
-	mkdir -p ${OUTPUT_FOLDER_DEV}
-	mkdir -p ${OUTPUT_FOLDER_VALGRIND}
-	mkdir -p ${TEST_OUTPUT_FOLDER}
-	mkdir -p ${OUTPUT_FOLDER_TRACY}/${TRACY_FOLDER}
-
 ${OUTPUT_FOLDER_RELEASE}/%.o: ${SOURCE_FOLDER}/%.cpp
+	@dir=$(dir $@); \
+	mkdir -p $$dir;
 	${COMPILER} ${COMPILER_FLAGS_RELEASE} ${WARNINGS} ${RELEASE_WARNINGS} ${INCLUDE_ARGUMENT} -MMD -MP -c $< -o $@
 
 -include $(DEPS_RELEASE)
 
-compile: create_folders $(OBJECTS_RELEASE)
+compile: $(OBJECTS_RELEASE)
 	${COMPILER} ${COMPILER_FLAGS_RELEASE} ${OBJECTS_RELEASE} ${LIBRARIES} ${RELEASE_WARNINGS} -o ${OUTPUT_FOLDER_RELEASE}/${OUTPUT_FILE_RELEASE}
 	cp -r ${RESOURCES_FOLDER} ${OUTPUT_FOLDER_RELEASE}
 
@@ -113,11 +135,13 @@ release: compile
 	${OUTPUT_FOLDER_RELEASE}/${OUTPUT_FILE_RELEASE}
 
 ${OUTPUT_FOLDER_DEV}/%.o: ${SOURCE_FOLDER}/%.cpp
+	@dir=$(dir $@); \
+	mkdir -p $$dir;
 	${COMPILER} ${COMPILER_FLAGS_DEV} ${WARNINGS} ${DEBUG_WARNINGS} ${INCLUDE_ARGUMENT} -MMD -MP -c $< -o $@
 
 -include $(DEPS_DEV)
 
-debug: create_folders $(OBJECTS_DEV)
+debug: $(OBJECTS_DEV)
 	${COMPILER} ${COMPILER_FLAGS_DEV} ${OBJECTS_DEV} ${LIBRARIES} ${DEBUG_WARNINGS} -o ${OUTPUT_FOLDER_DEV}/${OUTPUT_FILE_DEV}
 	cp -r ${RESOURCES_FOLDER} ${OUTPUT_FOLDER_DEV}
 
@@ -126,11 +150,13 @@ dev: debug
 	rm -rf gmon.out
 
 ${OUTPUT_FOLDER_VALGRIND}/%.o: ${SOURCE_FOLDER}/%.cpp
+	@dir=$(dir $@); \
+	mkdir -p $$dir;
 	${COMPILER} ${COMPILER_FLAGS_VALGRIND} ${WARNINGS} ${INCLUDE_ARGUMENT} -MMD -MP -c $< -o $@
 
 -include $(DEPS_VALGRIND)
 
-val: create_folders $(OBJECTS_VALGRIND)
+val: $(OBJECTS_VALGRIND)
 	${COMPILER} ${COMPILER_FLAGS_VALGRIND} ${OBJECTS_VALGRIND} ${LIBRARIES} -o ${OUTPUT_FOLDER_VALGRIND}/${OUTPUT_FILE_VALGRIND}
 	cp -r ${RESOURCES_FOLDER} ${OUTPUT_FOLDER_VALGRIND}
 
@@ -138,19 +164,41 @@ valgrind: val
 	valgrind ${VALGRIND_FLAGS} ${OUTPUT_FOLDER_VALGRIND}/${OUTPUT_FILE_VALGRIND}
 
 ${TEST_OUTPUT_FOLDER}/%.o: ${TEST_FOLDER}/%.cpp
+	@dir=$(dir $@); \
+	mkdir -p $$dir;
 	${COMPILER} ${TEST_COMPILER_FLAGS} ${WARNINGS} ${INCLUDE_ARGUMENT} ${TEST_INCLUDE_ARGUMENT} -MMD -MP -c $< -o $@
 
+${TEST_OUTPUT_FOLDER}/%.o: ${TEST_INTEGRATIONS_FOLDER}/%.cpp
+	@dir=$(dir $@); \
+	mkdir -p $$dir;
+	${COMPILER} ${TEST_COMPILER_FLAGS} ${WARNINGS} ${INCLUDE_ARGUMENT} ${TEST_INTEGRATIONS_INCLUDE_ARUGMENT} -MMD -MP -c $< -o $@
+
+${TEST_OUTPUT_FOLDER}/%.o: ${TEST_MOCKS_FOLDER}/%.cpp
+	@dir=$(dir $@); \
+	mkdir -p $$dir;
+	${COMPILER} ${TEST_COMPILER_FLAGS} ${WARNINGS} ${INCLUDE_ARGUMENT} ${TEST_MOCKS_INCLUDE_ARUGMENT} -MMD -MP -c $< -o $@
+
+${TEST_OUTPUT_FOLDER}/%.o: ${TEST_MAIN_FOLDER}/%.cpp
+	@dir=$(dir $@); \
+	mkdir -p $$dir;
+	${COMPILER} ${TEST_COMPILER_FLAGS} ${WARNINGS} ${INCLUDE_ARGUMENT} ${TEST_MAIN_INCLUDE_ARUGMENT} -MMD -MP -c $< -o $@
+
 ${TEST_OUTPUT_FOLDER}/%.o: ${SOURCE_FOLDER}/%.cpp
+	@dir=$(dir $@); \
+	mkdir -p $$dir;
 	${COMPILER} ${TEST_COMPILER_FLAGS} ${WARNINGS} ${INCLUDE_ARGUMENT} ${TEST_INCLUDE_ARGUMENT} -MMD -MP -c $< -o $@
 
 copy_and_run_tests:
-	cp -r ${RESOURCES_FOLDER} ${OUTPUT_FOLDER_DEV}
+	cp -r ${TEST_RESOURCES} ${OUTPUT_FOLDER_DEV}
 	${TEST_OUTPUT_FOLDER}/${TEST_OUTPUT_FILE}
 
--include $(DEPS_TEST)
+-include $(DEPS_TEST_INTEGRATIONS)
+-include $(DEPS_TEST_MOCKS)
+-include $(DEPS_TEST_MAIN)
+-include $(DEPS_TEST_ALL)
 
-build_tests: create_folders $(OBJECTS_TEST)
-	${COMPILER} ${TEST_COMPILER_FLAGS} ${OBJECTS_TEST} ${TEST_LIBRARIES} -o ${TEST_OUTPUT_FOLDER}/${TEST_OUTPUT_FILE}
+build_tests: $(OBJECTS_TEST_USING)
+	${COMPILER} ${TEST_COMPILER_FLAGS} ${OBJECTS_TEST_USING} ${TEST_LIBRARIES} -o ${TEST_OUTPUT_FOLDER}/${TEST_OUTPUT_FILE}
 	${MAKE} copy_and_run_tests
 
 lcov: build_tests
@@ -189,11 +237,13 @@ docs: run_doxygen
 	sphinx-autobuild -b html -Dbreathe_projects.documentation=docs/xml . docs/sphinx/
 
 ${OUTPUT_FOLDER_TRACY}/%.o: ${SOURCE_FOLDER}/%.cpp
+	@dir=$(dir $@); \
+	mkdir -p $$dir;
 	${COMPILER} ${TRACY_FLAGS} ${COMPILER_FLAGS_RELEASE} ${TRACY_INCLUDE_ARGUMENT} ${INCLUDE_ARGUMENT} -MMD -MP -c $< -o $@
 
 -include $(DEPS_TRACY)
 
-tracy: create_folders $(OBJECTS_TRACY)
+tracy: $(OBJECTS_TRACY)
 	${COMPILER} ${TRACY_FLAGS} ${COMPILER_FLAGS_RELEASE} ${OBJECTS_TRACY} ${LIBRARIES} -o ${OUTPUT_FOLDER_TRACY}/${OUTPUT_FILE_TRACY}
 	cp -r ${RESOURCES_FOLDER} ${OUTPUT_FOLDER_TRACY}
 	${OUTPUT_FOLDER_TRACY}/${OUTPUT_FILE_TRACY}
@@ -214,4 +264,4 @@ initialize_repo:
 	rm -rf CPPBase
 	mv hooks .git
 
-.PHONY: tidy run_doxygen create_folders initialize_repo copy_and_run_test
+.PHONY: tidy run_doxygen initialize_repo copy_and_run_test
