@@ -8,10 +8,10 @@
 			"name": "Debug C++ File",
 			"type": "cppdbg",
 			"request": "launch",
-			"program": "${workspaceRoot}/build/dev/dev", // Replace with the path to your compiled executable
+			"program": "${workspaceFolder}/build/dev/dev", // Replace with the path to your compiled executable
 			"args": [], // Arguments to pass to your program
 			"stopAtEntry": false,
-			"cwd": "${workspaceRoot}",
+			"cwd": "${workspaceFolder}",
 			"environment": [],
 			"externalConsole": true,
 			"MIMode": "gdb",
