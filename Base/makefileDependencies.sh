@@ -33,7 +33,7 @@ setUpClangTools() {
     echo "Setting up clang-tidy and clang-format"
     wget https://apt.llvm.org/llvm.sh
     sudo chmod +x llvm.sh
-    sudo ./llvm.sh 19
+    sudo ./llvm.sh 20
     rm -rf ./llvm.sh
     sudo apt-get install -y clang-format clang-tidy
 }
@@ -94,7 +94,6 @@ setUpTracy() {
 
     sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 14
     sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 14
-
 }
 
 main() {
@@ -119,13 +118,13 @@ main() {
         sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-14 14
         sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 10
 
-        desired_version="14.1.0"
+        desired_version="14.2.0"
         echo "Setting up g++"
 
         if [ "$(command g++ --version | grep -oP '\d+\.\d+\.\d+')" = "$desired_version" ]; then
             echo "g++-${desired_version} exists"
         elif [ "${1,,}" != "a" ] || ([ "${response,,}" != "a" ] && [ "${response,,}" != "n" ]); then
-            setUpGCC desired_version
+            setUpGCC $desired_version
         else
             sudo apt-get install -y g++-13 # For automated running
             sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 13
