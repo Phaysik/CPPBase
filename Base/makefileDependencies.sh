@@ -22,6 +22,8 @@ setUpGCC() {
     sudo update-alternatives --install /usr/bin/gcc gcc $directory/bin/gcc 14
     sudo update-alternatives --install /usr/bin/gcov gcov $directory/bin/gcov 14
 
+    cd ..
+
     sudo rm -rf gcc-latest
     sudo rm -rf gcc-build
 
