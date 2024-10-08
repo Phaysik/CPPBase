@@ -5,7 +5,7 @@ setUpGCC() {
     mkdir -p gcc-latest
     tar -xvzf gcc-latest.tar.gz -C gcc-latest --strip-components=1
 
-    sudo rm -rf gcc-latest
+    sudo rm -rf gcc-latest.tar.gz
     cd gcc-latest
     ./contrib/download_prerequisites
     cd ..
