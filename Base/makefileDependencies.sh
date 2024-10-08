@@ -148,10 +148,10 @@ main() {
                 echo "clang-tidy and clang-format already exists"
 
                 clang_tidy_version=$(clang-tidy --version | awk '/LLVM version/ {print $4}')
-                clang_tidy_desired_version="19.0.0"
+                clang_tidy_desired_version="20.0.0"
 
                 clang_format_version=$(clang-format --version | awk '{print $4}')
-                clang_format_desired_version="19.0.0"
+                clang_format_desired_version="20.0.0"
 
                 if [[ "$clang_tidy_version" == "$clang_tidy_desired_version" ]] && [[ "$clang_format_version" == "$clang_format_desired_version" ]]; then
                     echo "clang-tidy version $clang_tidy_desired_version and clang-format version $clang_format_desired_version already exists"
