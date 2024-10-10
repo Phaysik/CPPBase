@@ -13,7 +13,7 @@ DEBUG_WARNINGS = -fsanitize=address -fsanitize=pointer-compare -fsanitize=pointe
 
 INCLUDE_FOLDER = include
 INCLUDE_ARGUMENT = -I${INCLUDE_FOLDER}
-LIBRARIES = -lpqxx -lpq
+LIBRARIES =
 RESOURCES_FOLDER = .\/resources
 
 SOURCE_FOLDER = src
