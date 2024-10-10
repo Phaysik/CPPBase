@@ -44,8 +44,8 @@ OUTPUT_FOLDER_TRACY = ${BUILD_FOLDER}/${TRACY_FOLDER}
 TEST_FOLDER = tests
 TEST_SOURCES = $(shell find ${TEST_FOLDER} ${SOURCE_FOLDER} -type f -not -path '*/main.cpp' -not -path '*/${TRACY_FOLDER}/*' -name '*.cpp')
 TEST_COMPILER_FLAGS = ${COMPILER_VERSION} --coverage -fPIC -O0 -g -fprofile-arcs -ftest-coverage
-TEST_INCLUDE_FOLDER = includeTests
-TEST_INCLUDE_ARGUMENT = -I${TEST_INCLUDE_FOLDER}
+TEST_INCLUDE_FOLDER =
+TEST_INCLUDE_ARGUMENT =
 TEST_INTEGRATIONS_FOLDER = ${TEST_FOLDER}/integrations
 TEST_INTEGRATIONS_INCLUDE_ARUGMENT = ${TEST_INCLUDE_ARGUMENT}
 TEST_INTEGRATIONS_SOURCES = $(shell find ${TEST_INTEGRATIONS_FOLDER} ${SOURCE_FOLDER} -type f -not -path '*/main.cpp' -not -path '*/${TRACY_FOLDER}/*' -name '*.cpp')
@@ -129,7 +129,7 @@ default: compile
 
 ${OUTPUT_FOLDER_RELEASE}/%.o: ${SOURCE_FOLDER}/%.cpp
 	@dir=$(dir $@); \
-	mkdir -p $$dir;
+	mkdir -p $dir;
 	${COMPILER} ${COMPILER_FLAGS_RELEASE} ${WARNINGS} ${RELEASE_WARNINGS} ${INCLUDE_ARGUMENT} -MMD -MP -c $< -o $@
 
 -include $(DEPS_RELEASE)
@@ -145,7 +145,7 @@ release: compile
 
 ${OUTPUT_FOLDER_DEV}/%.o: ${SOURCE_FOLDER}/%.cpp
 	@dir=$(dir $@); \
-	mkdir -p $$dir;
+	mkdir -p $dir;
 	${COMPILER} ${COMPILER_FLAGS_DEV} ${WARNINGS} ${DEBUG_WARNINGS} ${INCLUDE_ARGUMENT} -MMD -MP -c $< -o $@
 
 -include $(DEPS_DEV)
@@ -162,7 +162,7 @@ dev: debug
 
 ${OUTPUT_FOLDER_VALGRIND}/%.o: ${SOURCE_FOLDER}/%.cpp
 	@dir=$(dir $@); \
-	mkdir -p $$dir;
+	mkdir -p $dir;
 	${COMPILER} ${COMPILER_FLAGS_VALGRIND} ${WARNINGS} ${INCLUDE_ARGUMENT} -MMD -MP -c $< -o $@
 
 -include $(DEPS_VALGRIND)
@@ -178,32 +178,32 @@ valgrind: val
 
 ${TEST_OUTPUT_FOLDER}/%.o: ${TEST_FOLDER}/%.cpp
 	@dir=$(dir $@); \
-	mkdir -p $$dir;
+	mkdir -p $dir;
 	${COMPILER} ${TEST_COMPILER_FLAGS} ${WARNINGS} ${INCLUDE_ARGUMENT} ${TEST_INCLUDE_ARGUMENT} -MMD -MP -c $< -o $@
 
 ${TEST_OUTPUT_FOLDER}/%.o: ${TEST_INTEGRATIONS_FOLDER}/%.cpp
 	@dir=$(dir $@); \
-	mkdir -p $$dir;
+	mkdir -p $dir;
 	${COMPILER} ${TEST_COMPILER_FLAGS} ${WARNINGS} ${INCLUDE_ARGUMENT} ${TEST_INTEGRATIONS_INCLUDE_ARUGMENT} -MMD -MP -c $< -o $@
 
 ${TEST_OUTPUT_FOLDER}/%.o: ${TEST_MOCKS_FOLDER}/%.cpp
 	@dir=$(dir $@); \
-	mkdir -p $$dir;
+	mkdir -p $dir;
 	${COMPILER} ${TEST_COMPILER_FLAGS} ${WARNINGS} ${INCLUDE_ARGUMENT} ${TEST_MOCKS_INCLUDE_ARUGMENT} -MMD -MP -c $< -o $@
 
 ${TEST_OUTPUT_FOLDER}/%.o: ${TEST_UNITS_FOLDER}/%.cpp
 	@dir=$(dir $@); \
-	mkdir -p $$dir;
+	mkdir -p $dir;
 	${COMPILER} ${TEST_COMPILER_FLAGS} ${WARNINGS} ${INCLUDE_ARGUMENT} ${TEST_UNITS_INCLUDE_ARUGMENT} -MMD -MP -c $< -o $@
 
 ${TEST_OUTPUT_FOLDER}/%.o: ${TEST_MAIN_FOLDER}/%.cpp
 	@dir=$(dir $@); \
-	mkdir -p $$dir;
+	mkdir -p $dir;
 	${COMPILER} ${TEST_COMPILER_FLAGS} ${WARNINGS} ${INCLUDE_ARGUMENT} ${TEST_MAIN_INCLUDE_ARUGMENT} -MMD -MP -c $< -o $@
 
 ${TEST_OUTPUT_FOLDER}/%.o: ${SOURCE_FOLDER}/%.cpp
 	@dir=$(dir $@); \
-	mkdir -p $$dir;
+	mkdir -p $dir;
 	${COMPILER} ${TEST_COMPILER_FLAGS} ${WARNINGS} ${INCLUDE_ARGUMENT} ${TEST_INCLUDE_ARGUMENT} -MMD -MP -c $< -o $@
 
 copy_and_run_tests:
@@ -259,14 +259,16 @@ docs: run_doxygen
 
 ${OUTPUT_FOLDER_TRACY}/%.o: ${SOURCE_FOLDER}/%.cpp
 	@dir=$(dir $@); \
-	mkdir -p $$dir;
+	mkdir -p $dir;
 	${COMPILER} ${TRACY_FLAGS} ${COMPILER_FLAGS_RELEASE} ${TRACY_INCLUDE_ARGUMENT} ${INCLUDE_ARGUMENT} -MMD -MP -c $< -o $@
 
 -include $(DEPS_TRACY)
 
 tracy: $(OBJECTS_TRACY)
 	${COMPILER} ${TRACY_FLAGS} ${COMPILER_FLAGS_RELEASE} ${OBJECTS_TRACY} ${LIBRARIES} -o ${OUTPUT_FOLDER_TRACY}/${OUTPUT_FILE_TRACY}
-	cp -r ${RESOURCES_FOLDER} ${OUTPUT_FOLDER_TRACY}
+	if [ -d ${RESOURCES_FOLDER} ]; then \
+		cp -r ${RESOURCES_FOLDER} ${OUTPUT_FOLDER_TRACY}; \
+	fi
 	${OUTPUT_FOLDER_TRACY}/${OUTPUT_FILE_TRACY}
 
 gprof: dev
