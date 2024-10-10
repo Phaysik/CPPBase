@@ -69,7 +69,7 @@ setUpTracy() {
 
     cd tracy-latest
 
-    sudo apt-get install g++-11 gcc-11 libfreetype6-dev libcapstone-dev libegl1-mesa-dev libxkbcommon-dev libwayland-dev libdbus-1-dev libglfw3 libglfw3-dev -y
+    sudo apt-get install g++-11 gcc-11 libfreetype6-dev libcapstone-dev libegl1-mesa-dev libxkbcommon-dev libwayland-dev libdbus-1-dev libglfw3 libglfw3-dev wayland-protocols -y
     sudo cp -r /usr/include/freetype2/* /usr/include/
     sudo cp -r /usr/include/capstone/* /usr/include/
     sudo cp -r /usr/include/dbus-1.0/* /usr/include/
@@ -85,7 +85,10 @@ setUpTracy() {
     cd ..
 
     # For installing the Server of Tracy
-    cd profiler/build/unix
+    cd profiler
+    mkdir build
+    cd build
+    cmake ..
     make CXX=g++-11 LEGACY=1
     mv Tracy-release Tracy-Server
     sudo cp Tracy-Server /usr/bin/
@@ -181,7 +184,7 @@ main() {
                 pip3 install flawfinder --break-system-packages
             fi
 
-            if [ -x "$(command -v tracy-Server)" ]; then
+            if [ -x "$(command -v Tracy-Server)" ]; then
                 echo "Tracy-Server already exists"
             else
                 setUpTracy
