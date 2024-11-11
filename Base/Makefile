@@ -286,5 +286,8 @@ initialize_repo:
 	cp -ra CPPBase/Base/. .
 	rm -rf CPPBase
 	mv hooks .git
+	rm -rf hooks
+	chmod +x .git/hooks/pre-commit
+	chmod +x .git/hooks/commit-msg
 
 .PHONY: tidy run_doxygen initialize_repo copy_and_run_test
