@@ -68,6 +68,7 @@ jobs:
         run: |
           mkdir -p ./cache/gtest/lib
           mkdir -p ./cache/gtest/include
+          mkdir -p ./cache/gmock
 
       - name: Cache Apt Packages
         id: cache-apt-packages
@@ -133,7 +134,7 @@ jobs:
         run: |
           sudo cp -r /usr/lib/libgtest* ./cache/gtest/lib
           sudo cp -r /usr/include/gtest/* ./cache/gtest/include
-          sudo cp -r /usr/include/gmock/* ./cache/gmock/include
+          sudo cp -r /usr/include/gmock/* ./cache/gmock
 
       - name: Give Read Access For Apt Folder
         run: sudo chown -R $USER:$USER ./cache/apt-packages/apt/archives/lock ./cache/apt-packages/apt/archives/partial ./cache/apt-lists/lists/lock ./cache/apt-lists/lists/partial
