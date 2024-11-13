@@ -31,7 +31,6 @@ jobs:
         run: |
           mkdir -p ./cache/gtest/lib
           mkdir -p ./cache/gtest/include
-          mkdir -p ./cache/gmock
 
       - name: Cache Apt Packages
         id: cache-apt-packages
@@ -74,13 +73,15 @@ jobs:
         run: |
           sudo cp -r ./cache/gtest/lib/* /usr/lib
           sudo mkdir -p /usr/include/gtest
-          sudo mkdir -p /usr/include/gmock
           sudo cp -r ./cache/gtest/include/* /usr/include/gtest
-          sudo cp -r ./cache/gmock/* /usr/include/gmock
 
       - name: Install dependencies
         if: steps.cache-apt-packages.outputs.cache-hit != 'true' || steps.cache-apt-lists.outputs.cache-hit != 'true' || steps.cache-google-tests.outputs.cache-hit != 'true'
         run: ./makefileDependencies.sh a
+
+      - name: Install Google Mock
+        if: steps.cache-apt-packages.outputs.cache-hit == 'true' || steps.cache-apt-lists.outputs.cache-hit == 'true' || steps.cache-google-tests.outputs.cache-hit == 'true'
+        run: sudo apt-get install libgmock-dev -y
 
       - name: Make project
         run: make build_tests COMPILER_STANDARD=13
@@ -97,7 +98,6 @@ jobs:
         run: |
           sudo cp -r /usr/lib/libgtest* ./cache/gtest/lib
           sudo cp -r /usr/include/gtest/* ./cache/gtest/include
-          sudo cp -r /usr/include/gmock/* ./cache/gmock
 
       - name: Give Read Access For Apt Folder
         run: sudo chown -R $USER:$USER ./cache/apt-packages/apt/archives/lock ./cache/apt-packages/apt/archives/partial ./cache/apt-lists/lists/lock ./cache/apt-lists/lists/partial
