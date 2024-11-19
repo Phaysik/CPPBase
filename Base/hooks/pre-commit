@@ -8,12 +8,38 @@ main() {
         exit 1
     fi
 
-    echo "Running static code analysis tools..."
+    echo "Running clang-tidy..."
 
-    if ! make analysis; then
-        echo "Static code analysis failed. Please fix the issues before committing."
+    tidy_frag_file="clang_tidy.frag"
+
+    if ! make tidy > "$tidy_frag_file"; then
+        echo "Clang-tidy failed. Please fix the issues found in "$tidy_frag_file" before committing."
         exit 1
     fi
+
+    rm -rf "$tidy_frag_file"
+
+    echo "Running flawfinder..."
+
+    flawfinder_frag_file="flawfinder_tidy.frag"
+
+    if ! make flawfinder > "$flawfinder_frag_file"; then
+        echo "Flawfinder failed. Please fix the issues found in "$flawfinder_frag_file" before committing."
+        exit 1
+    fi
+
+    rm -rf "$flawfinder_frag_file"
+
+    echo "Running cppcheck..."
+
+    cppcheck_frag_file="cppcheck.frag"
+
+    if ! make check > "$cppcheck_frag_file"; then
+        echo "Cppcheck failed. Please fix the issues found in "$cppcheck_frag_file" before committing."
+        exit 1
+    fi
+
+    rm -rf "$cppcheck_frag_file"
 
     echo "Running release build..."
 
@@ -43,7 +69,7 @@ main() {
     fi
 
     # Check for sensitive keywords
-    if git diff --cached --name-only | grep -vE "^(\\.github|git)/" | xargs grep -qiE "api_key|secret"; then
+    if git diff --cached --name-only | grep -vE "^(\\.github|git|hooks)/" | xargs grep -qiE "api_key|secret"; then
         echo "Sensitive information detected. Please remove it before committing."
         exit 1
     fi
