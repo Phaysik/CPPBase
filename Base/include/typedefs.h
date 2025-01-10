@@ -1,7 +1,8 @@
 /*! \file typedefs.h
 	\brief C++ file for creating type aliases.
 	\date --/--/----
-	\version 1.0
+	\version x.x.x
+	\since x.x.x
 	\author Matthew Moore
 */
 
