@@ -1,6 +1,6 @@
 /*! \file timer.h
     \brief Contains the function declarations for creating a class to time code execution.
-    \date --/--/----
+    \date 01/28/2025
     \version x.x.x
     \since x.x.x
     \author Matthew Moore
@@ -12,25 +12,20 @@
 #include <chrono>
 #include <fstream>
 #include <iostream>
+#include <memory>
 #include <ratio>
 #include <string_view>
 #include <utility>
 
 #include "typedefs.h"
 
-/*! \namespace Utility Holds any useful functionality that doesn't fit anywhere else
-    \date --/--/----
-    \version x.x.x
-    \since x.x.x
-    \author Matthew Moore
-*/
-namespace Utility
+namespace Clock
 {
     template <typename T>
     concept Ratio = std::is_same_v<T, std::ratio<T::num, T::den>>; /*!< A concept to check if a type is a std::ratio */
 
     /*! \enum TimeUnit A collection of named units of time
-        \date --/--/----
+        \date 01/28/2025
         \version x.x.x
         \since x.x.x
         \author Matthew Moore
@@ -45,7 +40,7 @@ namespace Utility
 
     /*! \class Timer timer.h "include/timer.h"
         \brief A class to time code execution
-        \date --/--/----
+        \date 01/28/2025
         \version x.x.x
         \since x.x.x
         \author Matthew Moore
@@ -55,9 +50,11 @@ namespace Utility
         public:
             // MARK: Constructors & Destructor
 
-            /*! \brief Closes #mLogFile if it is open
-                \post #mLogFile is closed if it is open
-                \date --/--/----
+            Timer() = default;
+
+            /*! \brief Closes the instance logfile if it is open
+                \post The instance logfile is closed if it is open
+                \date 01/28/2025
                 \version x.x.x
                 \since x.x.x
                 \author Matthew Moore
@@ -83,13 +80,13 @@ namespace Utility
                 \pre The template parameter \p T must be a std::ratio type
                 \tparam T A parameter of type std::ratio defaulted to std::ratio<1L> or per second
                 \retval std::string_view The unit of time for the template parameter \p T
-                \date --/--/----
+                \date 01/28/2025
                 \version x.x.x
                 \since x.x.x
                 \author Matthew Moore
             */
             template <Ratio T = std::ratio<1L>>
-            [[nodiscard]] static constexpr std::string_view getUnit() noexcept
+            [[nodiscard]] constexpr std::string_view getUnit() const noexcept
             {
                 if constexpr (T::num == 1) // This check is to make sure that the unit is <=1s
                 {
@@ -120,24 +117,29 @@ namespace Utility
             /*! \brief Creates and opens a log file with the name \p filename
                 \post A log file with the name \p filename is created and opened
                 \param[in] filename The name of the log file to create
-                \date --/--/----
+                \date 01/28/2025
                 \version x.x.x
                 \since x.x.x
                 \author Matthew Moore
             */
-            static void createLogFile(const std::string &filename) noexcept
+            void createLogFile(const std::string &filename) noexcept
             {
-                mLogFile.open(filename, std::ios_base::app);
+                if (mLogFile.is_open())
+                {
+                    mLogFile.close();
+                }
+
+                mLogFile.open(filename);
             }
 
             /*! \brief Sets #mStart to the current time
                 \post #mStart is set to Clock::now()
-                \date --/--/----
+                \date 01/28/2025
                 \version x.x.x
                 \since x.x.x
                 \author Matthew Moore
             */
-            static void start() noexcept
+            void start() noexcept
             {
                 mStart = Clock::now();
             }
@@ -146,13 +148,13 @@ namespace Utility
                 \pre The template parameter \p T must be a std::ratio type
                 \tparam T A parameter of type std::ratio, defaulted to std::ratio<1L> or per second
                 \retval double The amount of time passed since the start of #mStart
-                \date --/--/----
+                \date 01/28/2025
                 \version x.x.x
                 \since x.x.x
                 \author Matthew Moore
             */
             template <Ratio T = std::ratio<1L>>
-            [[nodiscard]] static double stop() noexcept
+            [[nodiscard]] double stop() noexcept
             {
                 using Duration = std::chrono::duration<double, T>;
                 mUnit = getUnit<T>();
@@ -168,34 +170,31 @@ namespace Utility
                 \param[in] iterations The number of times to run \p function
                 \param[in] function The function to time
                 \param[in] args The arguments to pass to \p function
-                \date --/--/----
+                \date 01/28/2025
                 \version x.x.x
                 \since x.x.x
                 \author Matthew Moore
             */
             template <Ratio T = std::ratio<1L>, typename Callable, typename... Args>
                 requires(std::is_invocable_v<Callable, Args...>)
-            static void timeFunction(std::string_view identifier, const ul iterations, Callable &&function, Args &&...args)
+            void timeFunction(std::string_view identifier, ul iterations, Callable &&function, Args &&...args)
             {
                 std::ostream &output = mLogFile.is_open() ? mLogFile : std::cout;
 
                 output << "Timing function: " << identifier << '\n';
-
                 double average{0.0};
+                const std::string_view unit = getUnit<T>();
 
-                constexpr std::string_view unit = getUnit<T>();
-
-                const Callable copyFunction(std::forward<Callable>(function));
-                const auto copyArgs = std::make_tuple(std::forward<Args>(args)...);
+                auto callableCopy = std::forward<Callable>(function);
+                auto argsCopy = std::make_tuple(std::forward<Args>(args)...);
 
                 for (ul i = 0; i < iterations; ++i)
                 {
                     functionStart();
-                    std::apply(copyFunction, copyArgs);
+                    std::apply(callableCopy, argsCopy);
                     const double duration = functionStop<T>();
 
                     average += duration;
-
                     output << "\tIteration " << i + 1 << ": " << duration << unit << '\n';
                 }
 
@@ -206,16 +205,16 @@ namespace Utility
             }
 
         private:
-            // MARK: Private Utility
+            using Clock = std::chrono::high_resolution_clock;
 
             /*! \brief Sets #mFunctionStart to the current time
                 \post #mFunctionStart is set to Clock::now()
-                \date --/--/----
+                \date 01/28/2025
                 \version x.x.x
                 \since x.x.x
                 \author Matthew Moore
             */
-            static void functionStart() noexcept
+            void functionStart() noexcept
             {
                 mFunctionStart = Clock::now();
             }
@@ -224,25 +223,23 @@ namespace Utility
                 \pre The template parameter \p T must be a std::ratio type
                 \tparam T A parameter of type std::ratio, defaulted to std::ratio<1L> or per second
                 \retval double The amount of time passed since the start of #mFunctionStart
-                \date --/--/----
+                \date 01/28/2025
                 \version x.x.x
                 \since x.x.x
                 \author Matthew Moore
             */
             template <Ratio T = std::ratio<1L>>
-            [[nodiscard]] static double functionStop() noexcept
+            [[nodiscard]] double functionStop() const noexcept
             {
                 using Duration = std::chrono::duration<double, T>;
                 return std::chrono::duration_cast<Duration>(Clock::now() - mFunctionStart).count();
             }
 
         private:
-            using Clock = std::chrono::steady_clock;
-
-            static inline std::chrono::time_point<Clock> mStart{Clock::now()}; /*!< The starting time for the classes internal timer */
-            static inline std::chrono::time_point<Clock> mFunctionStart{Clock::now()}; /*!< The starting time for timing a function */
-            static inline std::string_view mUnit{"s"};								   /*!< The unit of time for what is being timed */
-            static inline std::ofstream mLogFile{};									   /*!< An optional log file to write to */
+            std::chrono::time_point<Clock> mStart{Clock::now()};		 /*!< The starting time for the classes internal timer */
+            std::chrono::time_point<Clock> mFunctionStart{Clock::now()}; /*!< The starting time for timing a function */
+            std::string_view mUnit{"s"};								 /*!< The unit of time for what is being timed */
+            std::ofstream mLogFile{nullptr};							 /*!< The log file for the timer */
     };
 } // namespace Clock
 
