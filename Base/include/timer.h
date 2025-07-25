@@ -207,7 +207,7 @@ namespace Clock
 
 				if (iterations > 1)
 				{
-					output << "\tAverage: " << average / static_cast<double>(iterations) << unit << '\n';
+					output << "\tAverage: " << average / sc<double>(iterations) << unit << '\n';
 				}
 			}
 
