@@ -20,6 +20,8 @@
 #include <type_traits>
 #include <vector>
 
+#include "cconcepts.h" // for Integral, String
+
 /*! \namespace Utility Holds any useful functionality that doesn't fit anywhere else
 	\date --/--/----
 	\version x.x.x
@@ -28,12 +30,6 @@
 */
 namespace Utility
 {
-	template <typename T>
-	concept Integral = std::is_integral_v<T>; /*!< Type trait to check if T is an integral type */
-
-	template <typename T>
-	concept String = std::is_same_v<std::string, std::remove_cvref_t<T>>; /*!< Type trait to check if T is a string type */
-
 	template <typename T>
 	concept IsArrayLike = requires {
 		typename T::value_type; // Requires the type to have a nested `value_type`
@@ -121,7 +117,7 @@ namespace Utility
 				\since x.x.x
 				\author Matthew Moore
 			*/
-			template <String T>
+			template <Concepts::String T>
 			static T getInput(std::string_view inputMessage = mInputMessage, std::string_view errorMessage = mErrorMessage,
 							  [[maybe_unused]] const bool ignoreExtraneous = true, std::istream &input = std::cin,
 							  const bool afterFailureOnly = false)
@@ -165,7 +161,7 @@ namespace Utility
 				\since x.x.x
 				\author Matthew Moore
 			*/
-			template <Integral T>
+			template <Concepts::Integral T>
 			static T getInput(const T min, const T max, std::string_view inputMessage = mInputMessage,
 							  std::string_view errorMessage = mErrorMessage, const bool ignoreExtraneous = true,
 							  std::istream &input = std::cin, const bool afterFailureOnly = false)
@@ -214,7 +210,7 @@ namespace Utility
 
 				while (true)
 				{
-					if (std::ranges::find(array.begin(), array.end(), userInput) == array.end())
+					if (std::ranges::find(array, userInput) == array.end())
 					{
 						std::cout << userInput << " was not within the provided array-like object." << '\n';
 						userInput = getInput<TValueType>(inputMessage, errorMessage, ignoreExtraneous, input, !afterFailureOnly);

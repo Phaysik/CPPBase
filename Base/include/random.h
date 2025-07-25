@@ -12,6 +12,8 @@
 #include <chrono>
 #include <random>
 
+#include "cconcepts.h" // for Integral
+
 /*! \namespace Utility Holds any useful functionality that doesn't fit anywhere else
 	\date --/--/----
 	\version x.x.x
@@ -55,7 +57,7 @@ namespace Utility
 				\since x.x.x
 				\author Matthew Moore
 			*/
-			template <typename T>
+			template <Concepts::Integral T>
 			[[nodiscard]] static T get(T min, T max) noexcept
 			{
 				return std::uniform_int_distribution<T>{min, max}(mTwister);
