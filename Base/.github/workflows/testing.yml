@@ -77,7 +77,7 @@ jobs:
 
       - name: Install dependencies
         if: steps.cache-apt-packages.outputs.cache-hit != 'true' || steps.cache-apt-lists.outputs.cache-hit != 'true' || steps.cache-google-tests.outputs.cache-hit != 'true'
-        run: sudo ./makefileDependencies.sh a
+        run: sudo bash $GITHUB_WORKSPACE/makefileDependencies.sh a
 
       - name: Install Google Mock
         if: steps.cache-apt-packages.outputs.cache-hit == 'true' || steps.cache-apt-lists.outputs.cache-hit == 'true' || steps.cache-google-tests.outputs.cache-hit == 'true'
