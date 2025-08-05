@@ -10,6 +10,7 @@
 #define INCLUDE_TYPEDEFS_H
 
 #include <cstdint>
+#include <utility>
 
 using ub = uint8_t;	 /*!< Shorthand for unsigned byte/char */
 using us = uint16_t; /*!< Shorthand for unsigned short */
