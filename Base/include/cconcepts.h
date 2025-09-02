@@ -28,7 +28,7 @@ namespace Concepts
 	concept FloatingPoint = std::is_floating_point_v<T>; /*!< Type trait to check if T is a floating point type */
 
 	template <typename T>
-	concept RationalNumber = std::is
+	concept RationalNumber = Integral<T> || FloatingPoint<T>; /*!< Type trait to check if T is a rational number type */
 
 	template <typename T>
 	concept String = std::is_same_v<std::string, std::remove_cvref_t<T>>; /*!< Type trait to check if T is a string type */
