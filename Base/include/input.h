@@ -15,6 +15,7 @@
 #include <functional>
 #include <iostream>
 #include <limits> // for std::numeric_limits
+#include <print>
 #include <ranges>
 #include <string>
 #include <type_traits>
@@ -172,7 +173,7 @@ namespace Utility
 				{
 					if (userInput < min || userInput > max)
 					{
-						std::cout << userInput << " was not in the range of " << "[" << min << ", " << max << "]." << '\n';
+						std::println("{} was not in the range of [{}, {}].", userInput, min, max);
 						userInput = getInput<T>(inputMessage, errorMessage, ignoreExtraneous, input, !afterFailureOnly);
 					}
 					else
@@ -212,7 +213,7 @@ namespace Utility
 				{
 					if (std::ranges::find(array, userInput) == array.end())
 					{
-						std::cout << userInput << " was not within the provided array-like object." << '\n';
+						std::println("{} within the provided array-like object.", userInput);
 						userInput = getInput<TValueType>(inputMessage, errorMessage, ignoreExtraneous, input, !afterFailureOnly);
 					}
 					else
@@ -250,7 +251,7 @@ namespace Utility
 				{
 					if (!func(userInput))
 					{
-						std::cout << userInput << " did not meet the conditions laid out by the provided function." << '\n';
+						std::println("{} did not meet the conditions laid out by the provided function.", userInput);
 						userInput = getInput<T>(inputMessage, errorMessage, ignoreExtraneous, input, !afterFailureOnly);
 					}
 					else
@@ -319,15 +320,15 @@ namespace Utility
 				\since x.x.x
 				\author Matthew Moore
 			*/
-			static void printIfNotEmpty(std::string_view message, const bool newLine = false) noexcept
+			static void printIfNotEmpty(std::string_view message, const bool newLine = false)
 			{
 				if (!message.empty())
 				{
-					std::cout << message;
+					std::print("{}", message);
 
 					if (newLine)
 					{
-						std::cout << '\n';
+						std::println();
 					}
 				}
 			}
