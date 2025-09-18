@@ -11,6 +11,7 @@
 
 #include <chrono>
 #include <concepts>
+#include <format>
 #include <fstream>
 #include <iostream>
 #include <mutex>
@@ -179,13 +180,13 @@ namespace Clock
 			*/
 			template <Ratio T = std::ratio<1L>, typename Callable, typename... Args>
 				requires(std::is_invocable_v<Callable, Args...>)
-			static void timeFunction(std::string_view identifier, const ul iterations, Callable &&function, Args &&...args) noexcept
+			static void timeFunction(std::string_view identifier, const ub iterations, Callable &&function, Args &&...args) noexcept
 			{
 				std::ofstream &logFile = getLogFile();
 
 				std::ostream &output = logFile.is_open() ? logFile : std::cout;
 
-				output << "Timing function: " << identifier << '\n';
+				output << std::format("Timing function: {}\n", identifier);
 
 				double average{0.0};
 
@@ -194,7 +195,7 @@ namespace Clock
 				const Callable copyFunction(std::forward<Callable>(function));
 				const auto copyArgs = std::make_tuple(std::forward<Args>(args)...);
 
-				for (ul i = 0; i < iterations; ++i)
+				for (ub i = 0; i < iterations; ++i)
 				{
 					functionStart();
 					std::apply(copyFunction, copyArgs);
@@ -202,12 +203,12 @@ namespace Clock
 
 					average += duration;
 
-					output << "\tIteration " << i + 1 << ": " << duration << unit << '\n';
+					output << std::format("\tIteration {}: {}{}\n", i + 1, duration, unit);
 				}
 
 				if (iterations > 1)
 				{
-					output << "\tAverage: " << average / sc<double>(iterations) << unit << '\n';
+					output << std::format("\tAverage: {}{}\n", average / sc<double>(iterations), unit);
 				}
 			}
 
