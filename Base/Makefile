@@ -61,7 +61,8 @@ TEST_MAIN_SOURCES = $(shell find ${TEST_MAIN_FOLDER} ${SOURCE_FOLDER} -type f -n
 TEST_LIBRARIES = ${LIBRARIES} -lgcov -lgtest -lgmock -lpthread
 TEST_RESOURCES = ${RESOURCES_FOLDER}
 TEST_REPEAT_COUNT = 1
-TEST_EXECUTION_FLAGS = --gtest_repeat=${TEST_REPEAT_COUNT} --gtest_break_on_failure
+TEST_BREAK =
+TEST_EXECUTION_FLAGS = --gtest_repeat=${TEST_REPEAT_COUNT} --gtest_brief=1 $(if $(TEST_BREAK),--gtest_break_on_failure)
 OUTPUT_FOLDER_TEST = ${BUILD_FOLDER}/${TEST_FOLDER}
 OUTPUT_FILE_TEST = test
 
