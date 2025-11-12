@@ -60,6 +60,8 @@ TEST_MAIN_INCLUDE_ARUGMENT = ${TEST_INCLUDE_ARGUMENT}
 TEST_MAIN_SOURCES = $(shell find ${TEST_MAIN_FOLDER} ${SOURCE_FOLDER} -type f -not -path '*/main.cpp' -not -path '*/${TRACY_FOLDER}/*' -name '*.cpp')
 TEST_LIBRARIES = ${LIBRARIES} -lgcov -lgtest -lgmock -lpthread
 TEST_RESOURCES = ${RESOURCES_FOLDER}
+TEST_REPEAT_COUNT = 1
+TEST_EXECUTION_FLAGS = --gtest_repeat=${TEST_REPEAT_COUNT} --gtest_break_on_failure
 OUTPUT_FOLDER_TEST = ${BUILD_FOLDER}/${TEST_FOLDER}
 OUTPUT_FILE_TEST = test
 
@@ -210,7 +212,7 @@ copy_and_run_tests:
 	if [ -d ${RESOURCES_FOLDER} ]; then \
 		cp -r ${RESOURCES_FOLDER} ${OUTPUT_FOLDER_TEST}; \
 	fi
-	${OUTPUT_FOLDER_TEST}/${OUTPUT_FILE_TEST}
+	${OUTPUT_FOLDER_TEST}/${OUTPUT_FILE_TEST} ${TEST_EXECUTION_FLAGS}
 
 -include $(DEPS_TEST_INTEGRATIONS)
 -include $(DEPS_TEST_MOCKS)

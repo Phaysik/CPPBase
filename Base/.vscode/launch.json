@@ -5,7 +5,7 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-			"name": "Debug C++ File",
+			"name": "Debug C++",
 			"type": "cppdbg",
 			"request": "launch",
 			"program": "${workspaceFolder}/build/dev/dev", // Replace with the path to your compiled executable
@@ -22,6 +22,32 @@
 				}
 			],
 			"preLaunchTask": "Debug build", // Task to run before launching the debugger
+			"miDebuggerPath": "/usr/bin/gdb", // Path to your debugger
+			"logging": {
+				"trace": true,
+				"traceResponse": true,
+				"engineLogging": true
+			},
+			"internalConsoleOptions": "openOnSessionStart"
+		},
+		{
+			"name": "Debug C++ Tests",
+			"type": "cppdbg",
+			"request": "launch",
+			"program": "${workspaceFolder}/build/tests/test", // Replace with the path to your compiled executable
+			"args": [], // Arguments to pass to your program
+			"stopAtEntry": false,
+			"cwd": "${workspaceFolder}",
+			"environment": [],
+			"externalConsole": true,
+			"MIMode": "gdb",
+			"setupCommands": [
+				{
+					"description": "Enable pretty-printing for gdb",
+					"text": "-enable-pretty-printing"
+				}
+			],
+			"preLaunchTask": "Debug tests", // Task to run before launching the debugger
 			"miDebuggerPath": "/usr/bin/gdb", // Path to your debugger
 			"logging": {
 				"trace": true,
