@@ -239,11 +239,11 @@ coverage: genhtml
 	cp ${OUTPUT_FOLDER_TEST}/coverage.info ${GENHTML_OUTPUT_FOLDER}/lcov.info
 
 tidy: ${CLANG_SOURCES}
-	clang-tidy ${TIDY_COMPILE_FLAGS} $^ -- ${INCLUDE_ARGUMENT}
+	clang-tidy ${TIDY_COMPILE_FLAGS} $^ -- ${INCLUDE_ARGUMENT} ${TEST_INCLUDE_ARGUMENT}
 
 check: ${CLANG_SOURCES}
 	mkdir -p ${CPPCHECK_FOLDER}
-	cppcheck ${CPPCHECK_COMPILE_FLAGS} $^ -I ${INCLUDE_FOLDER}/
+	cppcheck ${CPPCHECK_COMPILE_FLAGS} $^ -I ${INCLUDE_FOLDER}/ -I ${TEST_INCLUDE_FOLDER}/
 
 flawfinder: ${CLANG_SOURCES}
 	flawfinder $^

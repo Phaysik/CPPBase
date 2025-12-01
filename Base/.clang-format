@@ -31,14 +31,21 @@ IncludeBlocks: Regroup
 IncludeCategories:
   - Regex: '<[[:alnum:]._]+>'
     Priority: 1
+  - Regex: '^"[^"]+/.+"'
+    Priority: 2
+    SortPriority: 2
+    CaseSensitive: true
   - Regex: '^"(llvm|llvm-c|clang|clang-c)/'
     Priority: 2
     SortPriority: 2
     CaseSensitive: true
-  - Regex: '^((<|")(gtest|gmock|isl|json)/)'
+  - Regex: '^((<|\")(gtest|gmock|isl|json)/)'
     Priority: 3
-  - Regex: '.*'
+  - Regex: '^"[^"]+"'
     Priority: 4
+    SortPriority: 0
+  - Regex: '.*'
+    Priority: 5
     SortPriority: 0
 IndentAccessModifiers: true
 IndentCaseBlocks: true
