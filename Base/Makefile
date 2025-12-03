@@ -66,15 +66,14 @@ TEST_EXECUTION_FLAGS = --gtest_repeat=${TEST_REPEAT_COUNT} --gtest_brief=1 $(if 
 OUTPUT_FOLDER_TEST = ${BUILD_FOLDER}/${TEST_FOLDER}
 OUTPUT_FILE_TEST = test
 
-BRANCH_COVERAGE = --rc branch_coverage=true
+BRANCH_COVERAGE = --rc lcov_branch_coverage=1
 
 LCOV_FILES = $(shell find . -name '*.gcno' -o -name '*.gcda' -o -name '*.info')
-LCOV_FLAGS = --no-external -c ${BRANCH_COVERAGE} -d . --ignore-errors mismatch,mismatch
+LCOV_FLAGS = -d . --no-external -c ${BRANCH_COVERAGE} --ignore-errors mismatch,mismatch
 OUTPUT_FOLDER_LCOV = ${OUTPUT_FOLDER_TEST}
 OUTPUT_FILE_LCOV = coverage.info
 LCOV_REMOVE_FILES = '*/${TEST_FOLDER}/*'
 
-GENHTML_FLAGS = ${BRANCH_COVERAGE}
 GENHTML_OUTPUT_FOLDER = .\/coverage
 
 CLANG_SOURCES = ${SOURCES} ${TEST_SOURCES}
