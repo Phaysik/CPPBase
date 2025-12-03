@@ -44,8 +44,8 @@ OUTPUT_FOLDER_TRACY = ${BUILD_FOLDER}/${TRACY_FOLDER}
 TEST_FOLDER = tests
 TEST_SOURCES = $(shell find ${TEST_FOLDER} ${SOURCE_FOLDER} -type f -not -path '*/main.cpp' -not -path '*/${TRACY_FOLDER}/*' -name '*.cpp')
 TEST_COMPILER_FLAGS = ${COMPILER_VERSION} --coverage -fPIC -O0 -g -fprofile-arcs -ftest-coverage
-TEST_INCLUDE_FOLDER =
-TEST_INCLUDE_ARGUMENT =
+TEST_INCLUDE_FOLDER = testIncludes
+TEST_INCLUDE_ARGUMENT = -I${TEST_INCLUDE_FOLDER}
 TEST_INTEGRATIONS_FOLDER = ${TEST_FOLDER}/integrations
 TEST_INTEGRATIONS_INCLUDE_ARUGMENT = ${TEST_INCLUDE_ARGUMENT}
 TEST_INTEGRATIONS_SOURCES = $(shell find ${TEST_INTEGRATIONS_FOLDER} ${SOURCE_FOLDER} -type f -not -path '*/main.cpp' -not -path '*/${TRACY_FOLDER}/*' -name '*.cpp')
@@ -66,10 +66,10 @@ TEST_EXECUTION_FLAGS = --gtest_repeat=${TEST_REPEAT_COUNT} --gtest_brief=1 $(if 
 OUTPUT_FOLDER_TEST = ${BUILD_FOLDER}/${TEST_FOLDER}
 OUTPUT_FILE_TEST = test
 
-BRANCH_COVERAGE = --rc lcov_branch_coverage=1
+BRANCH_COVERAGE = --rc branch_coverage=true
 
 LCOV_FILES = $(shell find . -name '*.gcno' -o -name '*.gcda' -o -name '*.info')
-LCOV_FLAGS = -d . --no-external -c ${BRANCH_COVERAGE} --ignore-errors mismatch,mismatch
+LCOV_FLAGS = --no-external -c ${BRANCH_COVERAGE} -d . --ignore-errors mismatch,mismatch
 OUTPUT_FOLDER_LCOV = ${OUTPUT_FOLDER_TEST}
 OUTPUT_FILE_LCOV = coverage.info
 LCOV_REMOVE_FILES = '*/${TEST_FOLDER}/*'
