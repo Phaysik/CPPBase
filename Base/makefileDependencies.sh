@@ -101,6 +101,36 @@ setUpTracy() {
     sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 14
 }
 
+setUpConfigCat() {
+    git clone https://github.com/microsoft/vcpkg
+    sudo ./vcpkg/bootstrap-vcpkg.sh
+    sudo ./vcpkg/vcpkg install configcat
+
+    cd vcpkg
+    cd packages
+    cd configcat_x64-linux
+
+    sudo cp ./lib/* /usr/lib/
+    sudo cp -r ./include/* /usr/include/
+
+    cd ..
+    cd curl_x64-linux
+
+    sudo cp -r ./lib/* /usr/lib/
+    sudo cp -r ./include/* /usr/include/
+
+    cd ..
+    cd hash-library_x64-linux
+
+    sudo cp ./lib/* /usr/lib/
+    sudo cp -r ./include/* /usr/include/
+
+    cd ..
+    cd ..
+    cd ..
+    sudo rm -rf vcpkg
+}
+
 main() {
     echo "This shell file is set up to only work on Ubuntu operating systems"
 
@@ -122,6 +152,8 @@ main() {
         sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 10
         sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-14 14
         sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 10
+
+        setUpConfigCat
 
         desired_version="14.2.0"
         echo "Setting up g++"
