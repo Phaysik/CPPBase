@@ -10,7 +10,6 @@
 #define INCLUDE_CLOCK_H
 
 #include <chrono>
-#include <concepts>
 #include <format>
 #include <fstream>
 #include <iostream>
