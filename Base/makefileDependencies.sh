@@ -40,6 +40,25 @@ setUpClangTools() {
     sudo apt-get install -y clang-format clang-tidy
 }
 
+installDoxygen() {
+    sudo wget https://www.doxygen.nl/files/doxygen-$1.linux.bin.tar.gz
+
+    mkdir -p doxygen
+
+    sudo tar -xvzf doxygen-$1.linux.bin.tar.gz -C doxygen --strip-components=1
+
+    sudo rm -rf doxygen-$1.linux.bin.tar.gz
+
+    cd doxygen
+    cd bin
+
+    sudo mv -f doxy* /usr/bin
+
+    cd ..
+    cd ..
+    sudo rm -rf doxygen
+}
+
 checkSphinx() {
     packages=("sphinx" "breathe" "sphinx-book-theme" "sphinx-copybutton" "sphinx-autobuild" "sphinx-last-updated-by-git" "sphinx-notfound-page")
 
@@ -179,7 +198,7 @@ main() {
 
         # If not 'a' or 'A', set up documentation, formatting, and linting tools
         if [ "${response,,}" = "y" ] || [ "${1,,}" = "y" ]; then
-            sudo apt-get install binutils valgrind graphviz flex bison libpcre3 libpcre3-dev lcov cppcheck doxygen xterm -y
+            sudo apt-get install binutils valgrind graphviz flex bison libpcre3 libpcre3-dev lcov cppcheck xterm -y
 
             if [ -x "$(command -v clang-tidy)" ] && [ -x "$(command -v clang-format)" ]; then
                 echo "clang-tidy and clang-format already exists"
@@ -197,6 +216,21 @@ main() {
                 fi
             else
                 setUpClangTools
+            fi
+
+            doxygen_desired_version="1.16.1"
+            if [ -x "$(command -v doxygen)" ]; then
+                echo "doxygen already exists"
+
+                doxygen_version=$(doxygen --version | awk '{print $1}')
+
+                if [[ "$doxygen_version" == "$doxygen_desired_version" ]]; then
+                    echo "doxygen version $doxygen_desired_version already exists"
+                else
+                    installDoxygen $doxygen_desired_version
+                fi
+            else
+                installDoxygen $doxygen_desired_version
             fi
 
             checkSphinx
