@@ -12,15 +12,15 @@ setUpGCC() {
 
     mkdir gcc-build
     cd gcc-build
-    directory = /usr/local/gcc-14
+    directory = /usr/local/gcc-$2
     sudo mkdir $directory
     ../gcc-latest/configure --prefix=$directory --enable-languages=c,c++ --disable-multilib
     sudo make -j$(nproc)
     sudo make install
 
-    sudo update-alternatives --install /usr/bin/g++ g++ $directory/bin/g++ 14
-    sudo update-alternatives --install /usr/bin/gcc gcc $directory/bin/gcc 14
-    sudo update-alternatives --install /usr/bin/gcov gcov $directory/bin/gcov 14
+    sudo update-alternatives --install /usr/bin/g++ g++ $directory/bin/g++ $2
+    sudo update-alternatives --install /usr/bin/gcc gcc $directory/bin/gcc $2
+    sudo update-alternatives --install /usr/bin/gcov gcov $directory/bin/gcov $2
 
     cd ..
 
@@ -174,13 +174,14 @@ main() {
 
         setUpConfigCat
 
-        desired_version="14.2.0"
+        desired_version="15.2.0"
+        gpp_priortiy=15
         echo "Setting up g++"
 
         if [ "$(command g++ --version | grep -oP '\d+\.\d+\.\d+')" = "$desired_version" ]; then
             echo "g++-${desired_version} exists"
         elif [ "${1,,}" != "a" ] || ([ "${response,,}" != "a" ] && [ "${response,,}" != "n" ]); then
-            setUpGCC $desired_version
+            setUpGCC $desired_version $gpp_priortiy
         else
             sudo apt-get install -y g++-13 # For automated running
             sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 13
