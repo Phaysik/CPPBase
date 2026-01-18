@@ -10,13 +10,22 @@ setUpGCC() {
     ./contrib/download_prerequisites
     cd ..
 
-    mkdir gcc-build
+    directory="/usr/local/gcc-$2"
+    sudo mkdir -p $directory
+
+    # clean any previous incomplete build
+    if [ -d gcc-build ]; then
+        rm -rf gcc-build
+    fi
+
+    mkdir -p gcc-build
     cd gcc-build
-    directory = /usr/local/gcc-$2
-    sudo mkdir $directory
-    ../gcc-latest/configure --prefix=$directory --enable-languages=c,c++ --disable-multilib
-    sudo make -j$(nproc)
+
+    ../gcc-latest/configure --prefix=$directory --enable-languages=c,c++ --disable-multilib --enable-bootstrap
+    make -j$(nproc)
     sudo make install
+
+    sudo ldconfig
 
     sudo update-alternatives --install /usr/bin/g++ g++ $directory/bin/g++ $2
     sudo update-alternatives --install /usr/bin/gcc gcc $directory/bin/gcc $2
@@ -28,7 +37,11 @@ setUpGCC() {
     sudo rm -rf gcc-build
 
     sudo mv /lib/x86_64-linux-gnu/libstdc++.so.6 /lib/x86_64-linux-gnu/libstdc++.so-copy.6
-    sudo cp /usr/local/gcc-14/lib64/libstdc++.so.6 /lib/x86_64-linux-gnu/
+    sudo mv /lib/x86_64-linux-gnu/libstdc++.so.6.0.32 /lib/x86_64-linux-gnu/libstdc++.so-copy.6.0.32
+
+    sudo cp /usr/local/gcc-$2/lib64/libstdc++.so.6.0.34 /lib/x86_64-linux-gnu
+    sudo ln -s libstdc++.so.6.0.32 /lib/x86_64-linux-gnu/libstdc++.so.6
+    sudo ldconfig
 }
 
 setUpClangTools() {
@@ -116,8 +129,8 @@ setUpTracy() {
     cd ../../../../
     sudo rm -rf tracy-latest
 
-    sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 14
-    sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 14
+    sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-$2 $2
+    sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-$2 $2
 }
 
 setUpConfigCat() {
@@ -175,7 +188,7 @@ main() {
         setUpConfigCat
 
         desired_version="15.2.0"
-        gpp_priortiy=15
+        gpp_priortiy="15"
         echo "Setting up g++"
 
         if [ "$(command g++ --version | grep -oP '\d+\.\d+\.\d+')" = "$desired_version" ]; then
@@ -254,7 +267,7 @@ main() {
             if [ -x "$(command -v Tracy-Server)" ]; then
                 echo "Tracy-Server already exists"
             else
-                setUpTracy
+                setUpTracy $gpp_priortiy
             fi
         fi
     else
