@@ -1,5 +1,6 @@
 /docs/sphinx
 /docs/xml
+/docs/html
 /coverage
 /build
 /cppcheck

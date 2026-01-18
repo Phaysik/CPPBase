@@ -73,7 +73,7 @@ installDoxygen() {
 }
 
 checkSphinx() {
-    packages=("sphinx" "breathe" "sphinx-book-theme" "sphinx-copybutton" "sphinx-autobuild" "sphinx-last-updated-by-git" "sphinx-notfound-page")
+    packages=("sphinx" "breathe" "sphinx-book-theme" "sphinx-copybutton" "sphinx-autobuild" "sphinx-last-updated-by-git" "sphinx-notfound-page" "sphinxcontrib-spelling" "furo")
 
     all_packages_installed=true
 
