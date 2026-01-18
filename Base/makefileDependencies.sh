@@ -241,7 +241,7 @@ main() {
             else
                 echo "Installing Sphinx and it's dependencies for documentation"
                 pip3 install --upgrade pip
-                pip3 install sphinx breathe sphinx-book-theme sphinx-copybutton sphinx-autobuild sphinx-last-updated-by-git sphinx-notfound-page --break-system-packages
+                pip3 install sphinx breathe sphinx-book-theme sphinx-copybutton sphinx-autobuild sphinx-last-updated-by-git sphinx-notfound-page sphinxcontrib-spelling furo --break-system-packages
             fi
 
             if [ -x "$(command -v flawfinder)" ]; then
