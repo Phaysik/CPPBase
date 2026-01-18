@@ -1,6 +1,11 @@
 from cgitb import html
 
-extensions = ["breathe"]
+extensions = [
+    "breathe",
+    "sphinx_copybutton",
+    "sphinx_last_updated_by_git",
+    "notfound.extension",
+]
 
 master_doc = "rst/index"
 html_title = "{project_name}"
@@ -14,12 +19,6 @@ html_theme_options = {
     "use_repository_button": True,
     "home_page_in_toc": True,
 }
-
-extensions = [
-    "sphinx_copybutton",
-    "sphinx_last_updated_by_git",
-    "notfound.extension",
-]
 
 copybutton_prompt_text = "Copy to clipboard"
 
