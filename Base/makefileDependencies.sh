@@ -254,7 +254,7 @@ main() {
                 echo "All Sphinx packages are installed"
             else
                 echo "Installing Sphinx and it's dependencies for documentation"
-                pip3 install --upgrade pip
+                pip3 install --upgrade pip --break-system-packages
                 pip3 install sphinx breathe sphinx-book-theme sphinx-copybutton sphinx-autobuild sphinx-last-updated-by-git sphinx-notfound-page sphinxcontrib-spelling furo --break-system-packages
             fi
 
