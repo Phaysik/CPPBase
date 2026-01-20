@@ -1,6 +1,8 @@
 #!/bin/bash
 
 setUpGCC() {
+    echo "Setting up gcc, g++, and gcov"
+
     curl -L -o gcc-latest.tar.gz https://ftp.gnu.org/gnu/gcc/gcc-$1/gcc-$1.tar.gz
     mkdir -p gcc-latest
     tar -xvzf gcc-latest.tar.gz -C gcc-latest --strip-components=1
@@ -45,15 +47,22 @@ setUpGCC() {
 }
 
 setUpClangTools() {
-    echo "Setting up clang-tidy and clang-format"
+    echo "Setting up clang-tidy, clang-format, and clangd"
+
     wget https://apt.llvm.org/llvm.sh
     sudo chmod +x llvm.sh
-    sudo ./llvm.sh 20
+    sudo ./llvm.sh $1
     rm -rf ./llvm.sh
     sudo apt-get install -y clang-format clang-tidy
+
+    sudo update-alternatives --install /usr/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-$1
+    sudo update-alternatives --install /usr/bin/clang-format clang-format /usr/bin/clang-format-$1
+    sudo update-alternatives --install /usr/bin/clangd clangd /usr/bin/clangd-$1
 }
 
 installDoxygen() {
+    echo "Setting up doxygen"
+
     sudo wget https://www.doxygen.nl/files/doxygen-$1.linux.bin.tar.gz
 
     mkdir -p doxygen
@@ -92,6 +101,8 @@ checkSphinx() {
 }
 
 setUpTracy() {
+    echo "Setting up Tracy Profiler"
+
     # Download the latest version of Tracy
     url=$(curl -s https://api.github.com/repos/wolfpld/tracy/releases/latest | grep -o '"tarball_url": *"[^"]*"' | cut -d '"' -f 4)
     curl -L -o tracy-latest.tar.gz $url
@@ -134,6 +145,8 @@ setUpTracy() {
 }
 
 setUpConfigCat() {
+    echo "Setting up Config Cat Feature Flags"
+
     git clone https://github.com/microsoft/vcpkg
     sudo ./vcpkg/bootstrap-vcpkg.sh
     sudo ./vcpkg/vcpkg install configcat
@@ -214,22 +227,25 @@ main() {
         if [ "${response,,}" = "y" ] || [ "${1,,}" = "y" ]; then
             sudo apt-get install binutils valgrind graphviz flex bison libpcre3 libpcre3-dev lcov cppcheck xterm -y
 
+            llvmVersionToDownload="22"
+
             if [ -x "$(command -v clang-tidy)" ] && [ -x "$(command -v clang-format)" ]; then
                 echo "clang-tidy and clang-format already exists"
 
                 clang_tidy_version=$(clang-tidy --version | awk '/LLVM version/ {print $4}')
-                clang_tidy_desired_version="20.0.0"
+                clang_tidy_desired_version="22.0.0"
 
                 clang_format_version=$(clang-format --version | awk '{print $4}')
-                clang_format_desired_version="20.0.0"
+                clang_format_desired_version="22.0.0"
+
 
                 if [[ "$clang_tidy_version" == "$clang_tidy_desired_version" ]] && [[ "$clang_format_version" == "$clang_format_desired_version" ]]; then
                     echo "clang-tidy version $clang_tidy_desired_version and clang-format version $clang_format_desired_version already exists"
                 else
-                    setUpClangTools
+                    setUpClangTools $llvmVersionToDownload
                 fi
             else
-                setUpClangTools
+                setUpClangTools $llvmVersionToDownload
             fi
 
             doxygen_desired_version="1.16.1"
