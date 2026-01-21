@@ -40,6 +40,8 @@ It supplements, but does not override, `benchmarks.instructions.md`.
    - Measure behavior after warm-up
    - Avoid one-time initialization unless explicitly measuring it
 
+4. **Do NOT constrain yourself to only 80 characters per line. You may use up to 180 characters per line to improve code clarity and maintainability.**
+
 ## Allocation Control
 
 ### Allocator Awareness

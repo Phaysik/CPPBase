@@ -31,6 +31,20 @@ Security and correctness take precedence over convenience.
    - Clearly document where data becomes trusted
    - Validate all data crossing trust boundaries
 
+4. **Minimize attack surface**
+   - Limit exposed interfaces
+   - Avoid unnecessary features or complexity
+5. **Keep dependencies secure**
+   - Use well-maintained libraries
+   - Regularly update dependencies
+   - Avoid deprecated or insecure APIs
+
+6. **Least privilege principle**
+   - Limit access rights for code modules
+   - Avoid global mutable state
+
+7. **Do NOT constrain yourself to only 80 characters per line. You may use up to 180 characters per line to improve code clarity and maintainability.**
+
 ## Input Validation
 
 - Validate all external inputs:

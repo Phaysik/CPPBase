@@ -38,6 +38,8 @@ The tests must be **correct, isolated, readable, deterministic**, and follow mod
    - Do NOT use non-deterministic randomness
    - If randomness is required, fix the seed explicitly and document it
 
+5. **Do NOT constrain yourself to only 80 characters per line. You may use up to 180 characters per line to improve code clarity and maintainability.**
+
 ## Test File Structure
 
 Every test file MUST follow this structure:

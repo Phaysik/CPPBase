@@ -39,7 +39,7 @@ Use **standard Doxygen tags** and clear, concise descriptions. Assume the codeba
 5. **Write in third person, present tense**
    - Example: “Computes the hash of the input buffer” (not “Compute” or “This function computes…” unless it improves clarity)
 
----
+6. **Do NOT constrain yourself to only 80 characters per line. You may use up to 180 characters per line to improve code clarity and maintainability.**
 
 ## Doxygen Tag Usage
 

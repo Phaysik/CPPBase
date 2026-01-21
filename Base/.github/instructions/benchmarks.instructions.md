@@ -33,6 +33,8 @@ Benchmarks exist to **measure behavior**, not to validate correctness.
    - Avoid `consteval` and compile-time-only evaluation
    - Prevent dead-code elimination
 
+4. **Do NOT constrain yourself to only 80 characters per line. You may use up to 180 characters per line to improve code clarity and maintainability.**
+
 ## File Structure
 
 Every benchmark file MUST follow this structure:

@@ -30,6 +30,8 @@ Assume the code may run in:
    - Avoid algorithmic surprises
    - Avoid reliance on unspecified evaluation order
 
+4. **Do NOT constrain yourself to only 80 characters per line. You may use up to 180 characters per line to improve code clarity and maintainability.**
+
 ## Algorithmic Complexity
 
 - Always consider **time and space complexity**
