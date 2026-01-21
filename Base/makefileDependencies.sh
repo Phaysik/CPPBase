@@ -53,7 +53,7 @@ setUpClangTools() {
     sudo chmod +x llvm.sh
     sudo ./llvm.sh $1
     rm -rf ./llvm.sh
-    sudo apt-get install -y clang-format clang-tidy
+    sudo apt-get install -y clang-format clang-tidy clangd
 
     sudo update-alternatives --install /usr/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-$1
     sudo update-alternatives --install /usr/bin/clang-format clang-format /usr/bin/clang-format-$1
