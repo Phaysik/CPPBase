@@ -1,9 +1,9 @@
-/*! \file input.h
-	\brief Contains the function declarations for getting user input.
-	\date --/--/----
-	\version x.x.x
-	\since x.x.x
-	\author Matthew Moore
+/*! @file input.h
+	@brief Contains the function declarations for getting user input.
+	@date --/--/----
+	@version x.x.x
+	@since x.x.x
+	@author Matthew Moore
 */
 
 #ifndef INCLUDE_INPUT_H
@@ -22,11 +22,11 @@
 
 #include "cconcepts.h" // for Integral, String
 
-/*! \namespace Utility Holds any useful functionality that doesn't fit anywhere else
-	\date --/--/----
-	\version x.x.x
-	\since x.x.x
-	\author Matthew Moore
+/*! @namespace Utility Holds any useful functionality that doesn't fit anywhere else
+	@date --/--/----
+	@version x.x.x
+	@since x.x.x
+	@author Matthew Moore
 */
 namespace Utility
 {
@@ -38,31 +38,31 @@ namespace Utility
 						|| (std::same_as<std::remove_cvref_t<T>, std::array<typename T::value_type, std::tuple_size_v<T>>>) );
 	}; /*!< Type trait to check if T is an array-like type */
 
-	/*! \class Input input.h "include/input.h"
-		\brief Will try and extract valid user input and clean up the input buffer as needed
-		\date --/--/----
-		\version x.x.x
-		\since x.x.x
-		\author Matthew Moore
+	/*! @class Input input.h "include/input.h"
+		@brief Will try and extract valid user input and clean up the input buffer as needed
+		@date --/--/----
+		@version x.x.x
+		@since x.x.x
+		@author Matthew Moore
 	*/
 	class Input
 	{
 		public:
-			/*! \brief Will try to extract a value of type T from the user until it succeeds
-				\pre \p T must have an overloaded operator>> operator.
-				\post The input stream will be empty
-				\tparam T The type of the input desired
-				\param[in] inputMessage The message to print to the user. The default value is #mInputMessage
-				\param[in] errorMessage If the input extraction fails, this message will be printed to the user. The default value is
+			/*! @brief Will try to extract a value of type T from the user until it succeeds
+				@pre @p T must have an overloaded operator>> operator.
+				@post The input stream will be empty
+				@tparam T The type of the input desired
+				@param[in] inputMessage The message to print to the user. The default value is #mInputMessage
+				@param[in] errorMessage If the input extraction fails, this message will be printed to the user. The default value is
 			   #mErrorMessage
-				\param[in] ignoreExtraneous Determines whether to ignore extraneous input in the input buffer. The default value is true
-				\param[in, out] input The input stream to use. The default value is std::cin
-				\param[in] afterFailureOnly If you need to re-print the input message after a condition has failed. The default value is
+				@param[in] ignoreExtraneous Determines whether to ignore extraneous input in the input buffer. The default value is true
+				@param[in, out] input The input stream to use. The default value is std::cin
+				@param[in] afterFailureOnly If you need to re-print the input message after a condition has failed. The default value is
 			   false
-				\date --/--/----
-				\version x.x.x
-				\since x.x.x
-				\author Matthew Moore
+				@date --/--/----
+				@version x.x.x
+				@since x.x.x
+				@author Matthew Moore
 			*/
 			template <typename T>
 			static T getInput(std::string_view inputMessage = mInputMessage, std::string_view errorMessage = mErrorMessage,
@@ -102,20 +102,20 @@ namespace Utility
 				}
 			}
 
-			/*! \brief Will try to extract a value of type std::string from the user until it succeeds
-				\post The input stream will be empty
-				\tparam T std::string
-				\param[in] inputMessage The message to print to the user. The default value is #mInputMessage
-				\param[in] errorMessage If the input extraction fails, this message will be printed to the user. The default value is
+			/*! @brief Will try to extract a value of type std::string from the user until it succeeds
+				@post The input stream will be empty
+				@tparam T std::string
+				@param[in] inputMessage The message to print to the user. The default value is #mInputMessage
+				@param[in] errorMessage If the input extraction fails, this message will be printed to the user. The default value is
 			   #mErrorMessage
-				\param[in] ignoreExtraneous Not really applicable in this situation as we use std::getline to grab the input
-				\param[in, out] input The input stream to use. The default value is std::cin
-				\param[in] afterFailureOnly If you need to re-print the input message after a condition has failed. The default value is
+				@param[in] ignoreExtraneous Not really applicable in this situation as we use std::getline to grab the input
+				@param[in, out] input The input stream to use. The default value is std::cin
+				@param[in] afterFailureOnly If you need to re-print the input message after a condition has failed. The default value is
 			   false
-				\date --/--/----
-				\version x.x.x
-				\since x.x.x
-				\author Matthew Moore
+				@date --/--/----
+				@version x.x.x
+				@since x.x.x
+				@author Matthew Moore
 			*/
 			template <Concepts::String T>
 			static T getInput(std::string_view inputMessage = mInputMessage, std::string_view errorMessage = mErrorMessage,
@@ -143,23 +143,23 @@ namespace Utility
 				}
 			}
 
-			/*! \brief A generic function for getting user input with a bounded min and max specifically for integral types
-				\pre The template type \p T must be an integral type
-				\tparam T The integral type
-				\param[in] min The minimum value that is acceptable
-				\param[in] max The maximum value that is acceptable
-				\param[in] inputMessage The message to print to the user. The default value is #mInputMessage
-				\param[in] errorMessage If the input extraction fails, this message will be printed to the user. The default value is
+			/*! @brief A generic function for getting user input with a bounded min and max specifically for integral types
+				@pre The template type @p T must be an integral type
+				@tparam T The integral type
+				@param[in] min The minimum value that is acceptable
+				@param[in] max The maximum value that is acceptable
+				@param[in] inputMessage The message to print to the user. The default value is #mInputMessage
+				@param[in] errorMessage If the input extraction fails, this message will be printed to the user. The default value is
 			   #mErrorMessage
-				\param[in] ignoreExtraneous Determines whether to ignore extraneous input in the input buffer. The default value is true
-				\param[in, out] input The input stream to use. The default value is std::cin
-				\param[in] afterFailureOnly If you need to re-print the input message after a condition has failed. The default value is
+				@param[in] ignoreExtraneous Determines whether to ignore extraneous input in the input buffer. The default value is true
+				@param[in, out] input The input stream to use. The default value is std::cin
+				@param[in] afterFailureOnly If you need to re-print the input message after a condition has failed. The default value is
 			   false
-				\retval T The value that was extracted
-				\date --/--/----
-				\version x.x.x
-				\since x.x.x
-				\author Matthew Moore
+				@retval T The value that was extracted
+				@date --/--/----
+				@version x.x.x
+				@since x.x.x
+				@author Matthew Moore
 			*/
 			template <Concepts::Integral T>
 			static T getInput(const T min, const T max, std::string_view inputMessage = mInputMessage,
@@ -184,28 +184,28 @@ namespace Utility
 				return userInput;
 			}
 
-			/*! \brief A generic function for getting user input that is within some array-like object
-				\pre The template type \p T must be either a std::array or std::vector
-				\tparam T An array-like object
-				\param[in] inputMessage The message to print to the user. The default value is #mInputMessage
-				\param[in] errorMessage If the input extraction fails, this message will be printed to the user. The default value is
+			/*! @brief A generic function for getting user input that is within some array-like object
+				@pre The template type @p T must be either a std::array or std::vector
+				@tparam T An array-like object
+				@param[in] inputMessage The message to print to the user. The default value is #mInputMessage
+				@param[in] errorMessage If the input extraction fails, this message will be printed to the user. The default value is
 			   #mErrorMessage
-				\param[in] ignoreExtraneous Determines whether to ignore extraneous input in the input buffer. The default value is true
-				\param[in, out] input The input stream to use. The default value is std::cin
-				\param[in] afterFailureOnly If you need to re-print the input message after a condition has failed. The default value is
+				@param[in] ignoreExtraneous Determines whether to ignore extraneous input in the input buffer. The default value is true
+				@param[in, out] input The input stream to use. The default value is std::cin
+				@param[in] afterFailureOnly If you need to re-print the input message after a condition has failed. The default value is
 			   false
-				\retval T::value_type The value type of the array-like object
-				\date --/--/----
-				\version x.x.x
-				\since x.x.x
-				\author Matthew Moore
+				@retval T::value_type The value type of the array-like object
+				@date --/--/----
+				@version x.x.x
+				@since x.x.x
+				@author Matthew Moore
 			*/
 			template <IsArrayLike T>
 			static T::value_type getInput(const T &array, std::string_view inputMessage = mInputMessage,
 										  std::string_view errorMessage = mErrorMessage, const bool ignoreExtraneous = true,
 										  std::istream &input = std::cin, const bool afterFailureOnly = false)
 			{
-				using TValueType = typename T::value_type;
+				using TValueType = T::value_type;
 				TValueType userInput{getInput<TValueType>(inputMessage, errorMessage, ignoreExtraneous, input, afterFailureOnly)};
 
 				while (true)
@@ -224,20 +224,20 @@ namespace Utility
 				return userInput;
 			}
 
-			/*! \brief A generic function for getting user input that is validated by some function that returns a boolean
-				\tparam T The type of the input desired
-				\param[in] inputMessage The message to print to the user. The default value is #mInputMessage
-				\param[in] errorMessage If the input extraction fails, this message will be printed to the user. The default value is
+			/*! @brief A generic function for getting user input that is validated by some function that returns a boolean
+				@tparam T The type of the input desired
+				@param[in] inputMessage The message to print to the user. The default value is #mInputMessage
+				@param[in] errorMessage If the input extraction fails, this message will be printed to the user. The default value is
 			   #mErrorMessage
-				\param[in] ignoreExtraneous Determines whether to ignore extraneous input in the input buffer. The default value is true
-				\param[in, out] input The input stream to use. The default value is std::cin
-				\param[in] afterFailureOnly If you need to re-print the input message after a condition has failed. The default value is
+				@param[in] ignoreExtraneous Determines whether to ignore extraneous input in the input buffer. The default value is true
+				@param[in, out] input The input stream to use. The default value is std::cin
+				@param[in] afterFailureOnly If you need to re-print the input message after a condition has failed. The default value is
 			   false
-				\retval T The value that was extracted
-				\date --/--/----
-				\version x.x.x
-				\since x.x.x
-				\author Matthew Moore
+				@retval T The value that was extracted
+				@date --/--/----
+				@version x.x.x
+				@since x.x.x
+				@author Matthew Moore
 			*/
 			template <typename T>
 			static T getInput(const std::function<bool(T)> &func, std::string_view inputMessage = mInputMessage,
@@ -266,29 +266,29 @@ namespace Utility
 			static constexpr std::string_view mInputMessage{"Please enter a value: "};			 /*!< A generic input requesting message */
 			static constexpr std::string_view mErrorMessage{"Invalid input. Please try again."}; /*!< A generic error message */
 
-			/*! \brief This function will clear any extraneous input in the input buffer
-				\post The input buffer will be empty
-				\param[in] input The input stream to use.
-				\date --/--/----
-				\version x.x.x
-				\since x.x.x
-				\author Matthew Moore
+			/*! @brief This function will clear any extraneous input in the input buffer
+				@post The input buffer will be empty
+				@param[in] input The input stream to use.
+				@date --/--/----
+				@version x.x.x
+				@since x.x.x
+				@author Matthew Moore
 			*/
 			static void ignoreLine(std::istream &input) noexcept
 			{
 				input.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 			}
 
-			/*! \brief Tests for extraction failed, input stream closing, and will handle those by putting the input stream back into normal
+			/*! @brief Tests for extraction failed, input stream closing, and will handle those by putting the input stream back into normal
 			   operation mode and removing the bad input
-				\post Potentially ends the program if the input stream was closed, otherwise puts the input stream back into
+				@post Potentially ends the program if the input stream was closed, otherwise puts the input stream back into
 			   normal operation mode
-				\param[in] input The input stream to use.
-				\retval bool If the extraction failed
-				\date --/--/----
-				\version x.x.x
-				\since x.x.x
-				\author Matthew Moore
+				@param[in] input The input stream to use.
+				@retval bool If the extraction failed
+				@date --/--/----
+				@version x.x.x
+				@since x.x.x
+				@author Matthew Moore
 			*/
 			static bool clearFailedExtraction(std::istream &input)
 			{
@@ -311,13 +311,13 @@ namespace Utility
 				return false;
 			}
 
-			/*! \brief Will print out \p message provided that it is not empty
-				\param[in] message The message to print
-				\param[in] newLine If a new line should be printed
-				\date --/--/----
-				\version x.x.x
-				\since x.x.x
-				\author Matthew Moore
+			/*! @brief Will print out @p message provided that it is not empty
+				@param[in] message The message to print
+				@param[in] newLine If a new line should be printed
+				@date --/--/----
+				@version x.x.x
+				@since x.x.x
+				@author Matthew Moore
 			*/
 			static void printIfNotEmpty(std::string_view message, const bool newLine = false)
 			{

@@ -1,9 +1,9 @@
-/*! \file cconcepts.h
-	\brief Contains the declarations of common concepts that might be used in multiple files.
-	\date 07/24/2025
-	\version x.x.x
-	\since x.x.x
-	\author Matthew Moore
+/*! @file cconcepts.h
+	@brief Contains the declarations of common concepts that might be used in multiple files.
+	@date 07/24/2025
+	@version x.x.x
+	@since x.x.x
+	@author Matthew Moore
 */
 
 #ifndef BASE_INCLUDE_CCONCEPTS_H

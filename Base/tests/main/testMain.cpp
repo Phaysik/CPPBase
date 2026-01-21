@@ -1,8 +1,8 @@
-/*! \file testMain.cpp
-    \brief C++ file for running all tests.
-    \date --/--/----
-    \version 1.0
-    \author Matthew Moore
+/*! @file testMain.cpp
+    @brief C++ file for running all tests.
+    @date --/--/----
+    @version 1.0
+    @author Matthew Moore
 */
 
 #include "gtest/gtest.h"

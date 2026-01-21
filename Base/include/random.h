@@ -1,9 +1,9 @@
-/*! \file random.h
-	\brief Contains the function declarations for creating a random number generator
-	\date --/--/----
-	\version x.x.x
-	\since x.x.x
-	\author Matthew Moore
+/*! @file random.h
+	@brief Contains the function declarations for creating a random number generator
+	@date --/--/----
+	@version x.x.x
+	@since x.x.x
+	@author Matthew Moore
 */
 
 #ifndef INCLUDE_RANDOM_H
@@ -15,48 +15,48 @@
 #include "cconcepts.h" // for Integral
 #include "typedefs.h"
 
-/*! \namespace Utility Holds any useful functionality that doesn't fit anywhere else
-	\date --/--/----
-	\version x.x.x
-	\since x.x.x
-	\author Matthew Moore
+/*! @namespace Utility Holds any useful functionality that doesn't fit anywhere else
+	@date --/--/----
+	@version x.x.x
+	@since x.x.x
+	@author Matthew Moore
 */
 namespace Utility
 {
-	/*! \class Random random.h "include/random.h"
-		\brief Class for creating a random number generator
-		\date --/--/----
-		\version x.x.x
-		\since x.x.x
-		\author Matthew Moore
+	/*! @class Random random.h "include/random.h"
+		@brief Class for creating a random number generator
+		@date --/--/----
+		@version x.x.x
+		@since x.x.x
+		@author Matthew Moore
 	*/
 	class Random
 	{
 		public:
-			/*! \brief Gets a random number in the range [min, max]
-				\param[in] min The minimum value (inclusive)
-				\param[in] max The maximum value (inclusive)
-				\retval int The random number in the range
-				\date --/--/----
-				\version x.x.x
-				\since x.x.x
-				\author Matthew Moore
+			/*! @brief Gets a random number in the range [min, max]
+				@param[in] min The minimum value (inclusive)
+				@param[in] max The maximum value (inclusive)
+				@retval int The random number in the range
+				@date --/--/----
+				@version x.x.x
+				@since x.x.x
+				@author Matthew Moore
 			*/
 			[[nodiscard]] static int get(int min, int max) noexcept
 			{
 				return std::uniform_int_distribution{min, max}(mTwister);
 			}
 
-			/*! \brief Gets a random number in the range [min, max] wtih a templated return type in case you need to cast the uniform
+			/*! @brief Gets a random number in the range [min, max] wtih a templated return type in case you need to cast the uniform
 			   distribution result to a different type
-				\tparam T The type to cast the uniform distribution result to
-				\param[in] min The minimum value (inclusive)
-				\param[in] max The maximum value (inclusive)
-				\retval T The typecasted random number
-				\date --/--/----
-				\version x.x.x
-				\since x.x.x
-				\author Matthew Moore
+				@tparam T The type to cast the uniform distribution result to
+				@param[in] min The minimum value (inclusive)
+				@param[in] max The maximum value (inclusive)
+				@retval T The typecasted random number
+				@date --/--/----
+				@version x.x.x
+				@since x.x.x
+				@author Matthew Moore
 			*/
 			template <Concepts::Integral T>
 			[[nodiscard]] static T get(T min, T max) noexcept
@@ -64,12 +64,12 @@ namespace Utility
 				return std::uniform_int_distribution<T>{min, max}(mTwister);
 			}
 
-			/*! \brief Gets #mTwister
-				\retval std::mt19937 The global random number generator
-				\date --/--/----
-				\version x.x.x
-				\since x.x.x
-				\author Matthew Moore
+			/*! @brief Gets #mTwister
+				@retval std::mt19937 The global random number generator
+				@date --/--/----
+				@version x.x.x
+				@since x.x.x
+				@author Matthew Moore
 			*/
 			[[nodiscard]] static std::mt19937 &getTwister() noexcept
 			{
@@ -77,12 +77,12 @@ namespace Utility
 			}
 
 		private:
-			/*! \brief Creates the global random number generator
-				\retval std::mt19937 The global random number generator
-				\date --/--/----
-				\version x.x.x
-				\since x.x.x
-				\author Matthew Moore
+			/*! @brief Creates the global random number generator
+				@retval std::mt19937 The global random number generator
+				@date --/--/----
+				@version x.x.x
+				@since x.x.x
+				@author Matthew Moore
 			*/
 			[[nodiscard]] static std::mt19937 generate() noexcept
 			{

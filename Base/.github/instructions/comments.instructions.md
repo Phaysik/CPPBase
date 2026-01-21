@@ -25,16 +25,16 @@ Use **standard Doxygen tags** and clear, concise descriptions. Assume the codeba
    - Avoid restating the identifier’s name as the only description
 
 4. **Be consistent and complete**:
-   - Every template parameter → `\tparam <template parameter type> <template parameter description>` line
-   - Every parameter → `\param[] <parameter name> <parameter description>` line
-     - Pointers or output parameters → document if they are input, output, or in/out (`\param[in]`, `\param[out]`, `\param[in,out]`)
-   - Non-void returns → `\return <description>` line
-   - Possible errors/exceptions → `\throws` or `\exception`
+   - Every template parameter → `@tparam <template parameter type> <template parameter description>` line
+   - Every parameter → `@param[] <parameter name> <parameter description>` line
+     - Pointers or output parameters → document if they are input, output, or in/out (`@param[in]`, `@param[out]`, `@param[in,out]`)
+   - Non-void returns → `@return <description>` line
+   - Possible errors/exceptions → `@throws` or `@exception`
      - When relevant, document exception guarantees using standard terminology:
        - “No-throw”
        - “Strong exception guarantee”
        - “Basic exception guarantee”
-   - If a function/class/variable is referencing another entity, use `\see <related entity>` to link them
+   - If a function/class/variable is referencing another entity, use `@see <related entity>` to link them
 
 5. **Write in third person, present tense**
    - Example: “Computes the hash of the input buffer” (not “Compute” or “This function computes…” unless it improves clarity)
@@ -50,56 +50,56 @@ When generating comments, prefer the following tags:
 Place at the top of source/header files:
 
 ```cpp
-/*! \file MyFileName.h
-    \brief Short description of the file's purpose.
-    \date The date in MM/DD/YYYY format.
-    \version The current version of the file.
-    \since The version or date since this file has been present.
-    \author The author of the file.
+/*! @file MyFileName.h
+    @brief Short description of the file's purpose.
+    @date The date in MM/DD/YYYY format.
+    @version The current version of the file.
+    @since The version or date since this file has been present.
+    @author The author of the file.
  */
 ```
 
 #### Other considerations for Files / Modules:
 
-- Always include '\file', '\brief', '\date', '\version', '\since', and '\author' tags
-- Use `\ingroup` for logical modules or groups
-- Use `\copyright` for licensing info if needed
+- Always include '@file', '@brief', '@date', '@version', '@since', and '@author' tags
+- Use `@ingroup` for logical modules or groups
+- Use `@copyright` for licensing info if needed
 
 ### For Functions / Methods
 
 ```cpp
-/*! \brief Short, one-line summary in sentence form.
-    \details Optional longer description that explains behavior, algorithms,
+/*! @brief Short, one-line summary in sentence form.
+    @details Optional longer description that explains behavior, algorithms,
     constraints, and important usage notes.
-    \pre Preconditions that must hold before calling.
-    \post Postconditions guaranteed after successful return.
-    \warning Important warnings about misuse or edge cases.
-    \tparam T Description of the template parameter T.
-    \param[in]  paramName  Description of the parameter (role, units, valid range).
-    \param[out] result     Description of output parameter if any.
-    \param[in,out] state   Description of in/out parameter behavior.
-    \note Additional notes or remarks.
-    \return Description of the return value. If the function is `void`
-    \throws SomeExceptionType Description of condition(s) that cause this.
-    \throws AnotherException  Optional additional thrown types.
-    \see RelatedFunction(), RelatedClass
-    \date The date in MM/DD/YYYY format.
-    \version The current version of the file.
-    \since The version or date since this file has been present.
-    \author The author of the file.
+    @pre Preconditions that must hold before calling.
+    @post Postconditions guaranteed after successful return.
+    @warning Important warnings about misuse or edge cases.
+    @tparam T Description of the template parameter T.
+    @param[in]  paramName  Description of the parameter (role, units, valid range).
+    @param[out] result     Description of output parameter if any.
+    @param[in,out] state   Description of in/out parameter behavior.
+    @note Additional notes or remarks.
+    @return Description of the return value. If the function is `void`
+    @throws SomeExceptionType Description of condition(s) that cause this.
+    @throws AnotherException  Optional additional thrown types.
+    @see RelatedFunction(), RelatedClass
+    @date The date in MM/DD/YYYY format.
+    @version The current version of the file.
+    @since The version or date since this file has been present.
+    @author The author of the file.
  */
 ```
 
 #### Other considerations for Functions / Methods:
 
-- Only include '\brief', '\date', '\version', '\since', and '\author' if the function represents a public API boundary
-- Include `\param` for every parameter in the function signature
+- Only include '@brief', '@date', '@version', '@since', and '@author' if the function represents a public API boundary
+- Include `@param` for every parameter in the function signature
   - If direction is clear (like const references or pointers), tag as @param[in], @param[out], or @param[in,out].
-- Include `\return` for non-void functions, even if obvious.
-- If exceptions are thrown, use `\throws` / `\exception`.
-- If **any** methods or functions have test within the name, include `\qualifier test` to indicate it's a test function.
-- Use `\overload <function declaration>` for overloaded functions to link them
-- Use `\deprecated` for deprecated functions with guidance on alternatives
+- Include `@return` for non-void functions, even if obvious.
+- If exceptions are thrown, use `@throws` / `@exception`.
+- If **any** methods or functions have test within the name, include `@qualifier test` to indicate it's a test function.
+- Use `@overload <function declaration>` for overloaded functions to link them
+- Use `@deprecated` for deprecated functions with guidance on alternatives
 - Explicitly document ownership and lifetime expectations for:
   - Pointer parameters
   - Reference parameters
@@ -124,103 +124,130 @@ Place at the top of source/header files:
 #### For Classes
 
 ```cpp
-/*! \class ClassName HeaderFile.h Path/To/HeaderFile.h
-    \brief Short, one-line summary in sentence form.
-    \details Optional longer description that explains behavior, design decisions,
+/*! @class ClassName HeaderFile.h Path/To/HeaderFile.h
+    @brief Short, one-line summary in sentence form.
+    @details Optional longer description that explains behavior, design decisions,
     constraints, and important usage notes.
-    \warning Important warnings about misuse or edge cases.
-    \tparam T Description of the template parameter T.
-    \note Additional notes or remarks.
-    \date The date in MM/DD/YYYY format.
-    \version The current version of the file.
-    \since The version or date since this file has been present.
-    \author The author of the file.
+    @warning Important warnings about misuse or edge cases.
+    @tparam T Description of the template parameter T.
+    @note Additional notes or remarks.
+    @date The date in MM/DD/YYYY format.
+    @version The current version of the file.
+    @since The version or date since this file has been present.
+    @author The author of the file.
  */
 ```
 
 #### For Structs
 
 ```cpp
-/*! \struct StructName HeaderFile.h Path/To/HeaderFile.h
-    \brief Short, one-line summary in sentence form.
-    \details Optional longer description that explains behavior, design decisions,
+/*! @struct StructName HeaderFile.h Path/To/HeaderFile.h
+    @brief Short, one-line summary in sentence form.
+    @details Optional longer description that explains behavior, design decisions,
     constraints, and important usage notes.
-    \warning Important warnings about misuse or edge cases.
-    \tparam T Description of the template parameter T.
-    \note Additional notes or remarks.
-    \date The date in MM/DD/YYYY format.
-    \version The current version of the file.
-    \since The version or date since this file has been present.
-    \author The author of the file.
+    @warning Important warnings about misuse or edge cases.
+    @tparam T Description of the template parameter T.
+    @note Additional notes or remarks.
+    @date The date in MM/DD/YYYY format.
+    @version The current version of the file.
+    @since The version or date since this file has been present.
+    @author The author of the file.
  */
 ```
 
 #### For Enums
 
 ```cpp
-/*! \enum EnumName
-    \showenumvalues
-    \brief Short, one-line summary in sentence form.
-    \details Optional longer description that explains behavior, design decisions,
+/*! @enum EnumName
+    @showenumvalues
+    @brief Short, one-line summary in sentence form.
+    @details Optional longer description that explains behavior, design decisions,
     constraints, and important usage notes.
-    \warning Important warnings about misuse or edge cases.
-    \tparam T Description of the template parameter T.
-    \note Additional notes or remarks.
-    \date The date in MM/DD/YYYY format.
-    \version The current version of the file.
-    \since The version or date since this file has been present.
-    \author The author of the file.
+    @warning Important warnings about misuse or edge cases.
+    @tparam T Description of the template parameter T.
+    @note Additional notes or remarks.
+    @date The date in MM/DD/YYYY format.
+    @version The current version of the file.
+    @since The version or date since this file has been present.
+    @author The author of the file.
  */
 ```
 
 #### Other considerations for Classes / Structs / Enums:
 
-- Always include '\brief', '\date', '\version', '\since', and '\author' tags
-- For the `\enum`, include `\showenumvalues` to list all enum values.
-- If the type is a POD container, data carrier, or configuration struct, explicitly state that purpose in the `\brief`.
+- Always include '@brief', '@date', '@version', '@since', and '@author' tags
+- For the `@enum`, include `@showenumvalues` to list all enum values.
+- If the type is a POD container, data carrier, or configuration struct, explicitly state that purpose in the `@brief`.
 - For the member variables of each class, struct, and enum (whether private, public, or protected), use the format below to document the member variables.
 
 #### For Namespaces
 
 ```cpp
-/*! \namespace NamespaceName
-    \brief Short, one-line summary in sentence form.
-    \details Optional longer description that explains behavior, design decisions, constraints, and important usage notes.
-    \note Additional notes or remarks.
-    \date The date in MM/DD/YYYY format.
-    \version The current version of the file.
-    \since The version or date since this file has been present.
-    \author The author of the file.
+/*! @namespace NamespaceName
+    @brief Short, one-line summary in sentence form.
+    @details Optional longer description that explains behavior, design decisions, constraints, and important usage notes.
+    @note Additional notes or remarks.
+    @date The date in MM/DD/YYYY format.
+    @version The current version of the file.
+    @since The version or date since this file has been present.
+    @author The author of the file.
  */
 ```
 
 ### For Member Variables
 
 ```cpp
-/*! \var memberVariable
-    \brief Short, one-line summary in sentence form.
-    \details Optional longer description that explains behavior, constraints,
+/*! @var memberVariable
+    @brief Short, one-line summary in sentence form.
+    @details Optional longer description that explains behavior, constraints,
     and important usage notes.
-    \showinitializer
-    \note Additional notes or remarks.
+    @showinitializer
+    @note Additional notes or remarks.
  */
 ```
 
 #### Other considerations for Member Variables:
 
-- If **any** member variables have test within the name, include `\qualifier test` to indicate it's a test variable.
+- If **any** member variables have test within the name, include `@qualifier test` to indicate it's a test variable.
 - If the member variable is a pointer, indicate ownership semantics (e.g., "owns the memory", "non-owning reference", "may be nullptr").
 - If the variable is a C++20 concept or constraint, document the requirements it enforces.
-  - Furthermore, use `\concept name` to specify it's a concept.
-- If the variable is a typedef, use `\typedef <typedef declaration>` to specify it's a typedef.
+  - Furthermore, use `@concept name` to specify it's a concept.
+- If the variable is a typedef, use `@typedef <typedef declaration>` to specify it's a typedef.
+
+### Template Parameters
+
+Given the following example:
+
+```cpp
+template <const std::size_t PrimeSize>
+[[nodiscard]] constexpr std::bitset<PrimeSize> GeneratePrimeBitset(const std::size_t maxNumber) noexcept
+```
+
+An appropriate template parameter documentation would be:
+
+```cpp
+/*! @brief Generates a bitset representing primality for numbers up to @p maxNumber
+    @note This uses the Sieve of Eratosthenes
+    @pre PrimeSize > 0 && @p maxNumber < PrimeSize
+    @tparam PrimeSize The fixed size of the returned std::bitset (must be > 0)
+    @param[in] maxNumber The maximum number to mark in the bitset (must be < PrimeSize)
+    @retval std::bitset<PrimeSize> A bitset where bit i is true iff i is prime (for 0 <= i <= maxNumber)
+    @date 01/12/2026
+    @version 0.0.3
+    @since 0.0.3
+    @author Matthew Moore
+ */
+```
+
+The template param must follow the form of `@tparam <TemplateParamName> <Description>`.
 
 ### C++26 Contracts and Semantic Preconditions
 
 - If a function has logical preconditions or postconditions, prefer expressing them
   as **C++ contracts** (`[[expects]]`, `[[ensures]]`) when available.
 - Mirror contracts in documentation:
-  - `\pre` → `[[expects]]`
-  - `\post` → `[[ensures]]`
+  - `@pre` → `[[expects]]`
+  - `@post` → `[[ensures]]`
 - Clearly document the behavior on contract violation:
   - Undefined behavior
   - Program termination
@@ -239,8 +266,8 @@ Place at the top of source/header files:
 Example:
 
 ```
-\param[in] input A borrowed range that must outlive the returned view.
-\return A lazy view referencing the input range.
+@param[in] input A borrowed range that must outlive the returned view.
+@return A lazy view referencing the input range.
 ```
 
 ### Coroutines, Async APIs, and Senders/Receivers
@@ -254,9 +281,9 @@ Example:
 Example:
 
 ```
-\note This coroutine is lazy; execution begins on first await.
-\note Resumes on the caller's execution context.
-\note Cancellation propagates via std::stop_token.
+@note This coroutine is lazy; execution begins on first await.
+@note Resumes on the caller's execution context.
+@note Cancellation propagates via std::stop_token.
 ```
 
 ### Modern Error Channels
@@ -285,7 +312,7 @@ Example:
 Example:
 
 ```
-\note All enum values must be handled exhaustively in pattern matching expressions.
+@note All enum values must be handled exhaustively in pattern matching expressions.
 ```
 
 ### Layout and Address Guarantees
@@ -300,11 +327,11 @@ Example:
     - Avoid: “Computes hash.”
 2.  **Avoid redundancy**
     - Don’t just repeat the parameter name.
-    - Bad: `\param` size The size.
-    - Good: `\param` size Number of bytes to read from the buffer.
+    - Bad: `@param` size The size.
+    - Good: `@param` size Number of bytes to read from the buffer.
 
 3.  **Mention units & ranges**
-    - E.g.: `\param` timeoutMs Timeout in milliseconds. Must be >= 0.
+    - E.g.: `@param` timeoutMs Timeout in milliseconds. Must be >= 0.
 
 4.  **Error behavior**
     - If the function can fail or return error codes, describe how.
@@ -336,7 +363,7 @@ Example:
     - Simple getters/setters
     - Trivial constructors/destructors
     - Operators that directly map to standard behavior (e.g., assignment, equality)
-    - In such cases, use a brief `\brief` only, unless additional semantics exist.
+    - In such cases, use a brief `@brief` only, unless additional semantics exist.
 
 ### How to Apply These Instructions
 
@@ -350,6 +377,6 @@ When I ask you to:
 
 - **Inspect the signature and context** (parameters, return type, template params).
 - **Generate a Doxygen comment block** immediately above the entity.
-- Use the appropriate tags: `\file`, `\brief`, `\param`, `\return`, `\tparam`, `\throws`, `\return`, `\note`, etc.
+- Use the appropriate tags: `@file`, `@brief`, `@param`, `@return`, `@tparam`, `@throws`, `@return`, `@note`, etc.
 - Ensure the comments are correct, specific, and technically meaningful, not generic placeholders.
 - If information is ambiguous or missing, make reasonable assumptions but keep them realistic and conservative.
