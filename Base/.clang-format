@@ -51,6 +51,7 @@ IndentAccessModifiers: true
 IndentCaseBlocks: true
 IndentCaseLabels: true
 IndentWidth: 4
+IndentPPDirectives: BeforeHash
 InsertBraces: true
 IntegerLiteralSeparator:
   Binary: 4

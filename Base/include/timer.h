@@ -18,6 +18,7 @@
 #include <string_view>
 #include <utility>
 
+#include "attributeMacros.h"
 #include "typedefs.h"
 
 /*! @namespace Utility Holds any useful functionality that doesn't fit anywhere else
@@ -93,7 +94,7 @@ namespace Clock
 				@author Matthew Moore
 			*/
 			template <Ratio T = std::ratio<1L>>
-			[[nodiscard]] static constexpr std::string_view getUnit() noexcept
+			ATTR_NODISCARD static constexpr std::string_view getUnit() noexcept
 			{
 				if constexpr (T::num == 1) // This check is to make sure that the unit is <=1s
 				{
@@ -156,7 +157,7 @@ namespace Clock
 				@author Matthew Moore
 			*/
 			template <Ratio T = std::ratio<1L>>
-			[[nodiscard]] static double stop() noexcept
+			ATTR_NODISCARD static double stop() noexcept
 			{
 				using Duration = std::chrono::duration<double, T>;
 				mUnit = getUnit<T>();
@@ -236,7 +237,7 @@ namespace Clock
 				@author Matthew Moore
 			*/
 			template <Ratio T = std::ratio<1L>>
-			[[nodiscard]] static double functionStop() noexcept
+			ATTR_NODISCARD static double functionStop() noexcept
 			{
 				using Duration = std::chrono::duration<double, T>;
 				return std::chrono::duration_cast<Duration>(Clock::now() - mFunctionStart).count();

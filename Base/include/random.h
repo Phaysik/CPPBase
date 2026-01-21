@@ -12,6 +12,7 @@
 #include <chrono>
 #include <random>
 
+#include "attributeMacros.h"
 #include "cconcepts.h" // for Integral
 #include "typedefs.h"
 
@@ -42,7 +43,7 @@ namespace Utility
 				@since x.x.x
 				@author Matthew Moore
 			*/
-			[[nodiscard]] static int get(int min, int max) noexcept
+			ATTR_NODISCARD static int get(int min, int max) noexcept
 			{
 				return std::uniform_int_distribution{min, max}(mTwister);
 			}
@@ -59,7 +60,7 @@ namespace Utility
 				@author Matthew Moore
 			*/
 			template <Concepts::Integral T>
-			[[nodiscard]] static T get(T min, T max) noexcept
+			ATTR_NODISCARD static T get(T min, T max) noexcept
 			{
 				return std::uniform_int_distribution<T>{min, max}(mTwister);
 			}
@@ -71,7 +72,7 @@ namespace Utility
 				@since x.x.x
 				@author Matthew Moore
 			*/
-			[[nodiscard]] static std::mt19937 &getTwister() noexcept
+			ATTR_NODISCARD static std::mt19937 &getTwister() noexcept
 			{
 				return mTwister;
 			}
@@ -84,7 +85,7 @@ namespace Utility
 				@since x.x.x
 				@author Matthew Moore
 			*/
-			[[nodiscard]] static std::mt19937 generate() noexcept
+			ATTR_NODISCARD static std::mt19937 generate() noexcept
 			{
 				std::random_device randomDevice{};
 

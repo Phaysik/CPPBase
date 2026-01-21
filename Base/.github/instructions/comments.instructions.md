@@ -34,7 +34,7 @@ Use **standard Doxygen tags** and clear, concise descriptions. Assume the codeba
        - “No-throw”
        - “Strong exception guarantee”
        - “Basic exception guarantee”
-   - If a function/class/variable is referencing another entity, use `@see <related entity>` to link them
+   - If a function/class/variable is referencing another entity, use `@ref <related entity>` to link them
 
 5. **Write in third person, present tense**
    - Example: “Computes the hash of the input buffer” (not “Compute” or “This function computes…” unless it improves clarity)
@@ -82,7 +82,7 @@ Place at the top of source/header files:
     @return Description of the return value. If the function is `void`
     @throws SomeExceptionType Description of condition(s) that cause this.
     @throws AnotherException  Optional additional thrown types.
-    @see RelatedFunction(), RelatedClass
+    @ref RelatedFunction(), RelatedClass
     @date The date in MM/DD/YYYY format.
     @version The current version of the file.
     @since The version or date since this file has been present.
@@ -109,7 +109,7 @@ Place at the top of source/header files:
   - For the lifetime of the object
   - Until explicitly released
 - Mention whether parameters are allowed to be **nullptr** when applicable
-- When complexity is **non-obvious**, include:
+- When complexity is **non-obvious**, include the following within a `@note` block:
   - Time complexity (Big-O)
   - Space complexity
 - **Especially important for**:
@@ -192,6 +192,9 @@ Place at the top of source/header files:
     @since The version or date since this file has been present.
     @author The author of the file.
  */
+ namespace NamespaceName {
+     // namespace contents
+ }
 ```
 
 ### For Member Variables
@@ -216,20 +219,17 @@ Place at the top of source/header files:
 
 ### Template Parameters
 
-Given the following example:
+- The template param must follow the form of `@tparam <TemplateParamType> <Description>`.
+- Also provide a reference to the type in the description if the template param type is something that the user has created somewhere in the codebase.
+
+Example:
 
 ```cpp
-template <const std::size_t PrimeSize>
-[[nodiscard]] constexpr std::bitset<PrimeSize> GeneratePrimeBitset(const std::size_t maxNumber) noexcept
-```
-
-An appropriate template parameter documentation would be:
-
-```cpp
-/*! @brief Generates a bitset representing primality for numbers up to @p maxNumber
+/*! @brief Generates an array representing primality for numbers up to @p maxNumber
     @note This uses the Sieve of Eratosthenes
     @pre PrimeSize > 0 && @p maxNumber < PrimeSize
-    @tparam PrimeSize The fixed size of the returned std::bitset (must be > 0)
+    @tparam Concepts::UnsignedIntegral The type of the array which satisfies @ref Concepts::UnsignedIntegral
+    @tparam std::size_t The fixed size of the returned std::bitset (must be > 0)
     @param[in] maxNumber The maximum number to mark in the bitset (must be < PrimeSize)
     @retval std::bitset<PrimeSize> A bitset where bit i is true iff i is prime (for 0 <= i <= maxNumber)
     @date 01/12/2026
@@ -237,9 +237,9 @@ An appropriate template parameter documentation would be:
     @since 0.0.3
     @author Matthew Moore
  */
+template <Concepts::UnsignedIntegral Number, const std::size_t PrimeSize>
+[[nodiscard]] constexpr std::array<Number, PrimeSize> GeneratePrimeBitset(const std::size_t maxNumber) noexcept
 ```
-
-The template param must follow the form of `@tparam <TemplateParamName> <Description>`.
 
 ### C++26 Contracts and Semantic Preconditions
 
@@ -320,6 +320,22 @@ Example:
 - If a member variable is marked `[[no_unique_address]]`:
   - Document that address identity and object layout are not guaranteed.
 
+### Concepts
+
+- If the variable is defined as a C++20 concept or constraint, document the requirements it enforces.
+  - Furthermore, use `@concept name` to specify it's a concept.
+
+Example
+
+```cpp
+/*! @concept IsIntegral
+    @brief Checks whether a type is an integral type.
+		@tparam T The type to test.
+	*/
+template <typename T>
+concept IsIntegral = std::is_integral_v<T>;
+```
+
 ### Style Guidelines
 
 1.  **Clarity over brevity**
@@ -364,6 +380,10 @@ Example:
     - Trivial constructors/destructors
     - Operators that directly map to standard behavior (e.g., assignment, equality)
     - In such cases, use a brief `@brief` only, unless additional semantics exist.
+
+13. **Mentioning another entity (function/class/struct/variable/etc) in the code base**
+    - Do NOT use `<related entity>`
+    - Use `@ref <related entity>` to link them as that will create a hyperlink in the generated documentation.
 
 ### How to Apply These Instructions
 
