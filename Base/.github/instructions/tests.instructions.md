@@ -235,6 +235,7 @@ EXPECT_DEATH(fn(invalid_input), ".*");
 ## Coverage-Aware Mode
 
 - When generating tests, prioritize runtime code coverage without compromising test correctness, clarity, or determinism.
+- This means that any variables within a test case **CANNOT** be **const** or **constexpr** as doing so would prevent execution of certain code paths at runtime.
 
 ### General Coverage Rules
 

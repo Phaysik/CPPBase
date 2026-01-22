@@ -341,6 +341,7 @@ concept IsIntegral = std::is_integral_v<T>;
 1.  **Clarity over brevity**
     - Prefer: “Computes the SHA-256 digest of the given buffer.”
     - Avoid: “Computes hash.”
+
 2.  **Avoid redundancy**
     - Don’t just repeat the parameter name.
     - Bad: `@param` size The size.
