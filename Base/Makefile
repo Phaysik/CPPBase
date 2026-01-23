@@ -287,7 +287,7 @@ initialize_repo:
 	git clone https://github.com/Phaysik/CPPBase
 	cp -ra CPPBase/Base/. .
 	rm -rf CPPBase
-	mv hooks .git
+	mv hooks/* .git/hooks
 	rm -rf hooks
 	chmod +x .git/hooks/pre-commit
 	chmod +x .git/hooks/commit-msg
