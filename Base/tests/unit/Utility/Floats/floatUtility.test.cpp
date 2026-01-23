@@ -7,7 +7,7 @@
 	@version x.x.x
 	@since x.x.x
 	@author Matthew Moore
- */
+*/
 
 #include "Utility/Floats/floatUtility.h"
 

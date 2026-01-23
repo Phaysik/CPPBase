@@ -1,10 +1,10 @@
-#/*! @file timer.test.cpp
-#    @brief Google Test unit tests for `Clock::Timer` utilities.
-#    @date --/--/----
-#    @version x.x.x
-#    @since x.x.x
-#    @author Matthew Moore
-# */
+/*! @file timer.test.cpp
+	@brief Google Test unit tests for `Clock::Timer` utilities.
+	@date --/--/----
+	@version x.x.x
+	@since x.x.x
+	@author Matthew Moore
+*/
 
 #include "Utility/Clock/timer.h"
 

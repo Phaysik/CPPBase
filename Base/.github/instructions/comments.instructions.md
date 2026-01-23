@@ -98,7 +98,6 @@ Place at the top of source/header files:
 - Include `@return` for non-void functions, even if obvious.
 - If exceptions are thrown, use `@throws` / `@exception`.
 - If **any** methods or functions have test within the name, include `@qualifier test` to indicate it's a test function.
-- Use `@overload <function declaration>` for overloaded functions to link them
 - Use `@deprecated` for deprecated functions with guidance on alternatives
 - Explicitly document ownership and lifetime expectations for:
   - Pointer parameters
@@ -334,6 +333,26 @@ Example
 	*/
 template <typename T>
 concept IsIntegral = std::is_integral_v<T>;
+```
+
+### Overloads
+
+- For overloaded functions, use `@overload <function declaration>` to link them.
+
+Example
+
+```cpp
+/*! @brief Processes a list of integers.
+    @param[in] data The data to process.
+    @param[in] startIndex The starting index within the list.
+ */
+void processData(const std::list<int>& data, const int startIndex);
+
+/*! @overload void processData(const std::vector<int>& data)
+    @brief Processes a vector of integers.
+    @param[in] data The data to process.
+ */
+void processData(const std::vector<int>& data);
 ```
 
 ### Style Guidelines

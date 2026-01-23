@@ -69,6 +69,7 @@ Use forward declarations where appropriate
 
 - Use the name of the class or function under test
 - Append _Test_ for test fixtures
+- **DO NOT** add underscores in the test suite name
 
 Examples:
 
@@ -78,8 +79,9 @@ Examples:
 
 ### Test Case Naming
 
-- Use **Given_When_Then** or **Behavior_Condition_Result** style:
-  - TEST_F(ParserTest, GivenValidInput_WhenParsing_ThenSucceeds)
+- Use **GivenWhenThen** or **BehaviorConditionResult** style:
+  - TEST_F(ParserTest, GivenValidInputWhenParsingThenSucceeds)
+- **DO NOT** add underscores in the test case name
 
 ## Test Fixtures
 
