@@ -1,23 +1,38 @@
 #!/bin/sh
 
 main() {
+    # Check for TODO comments
+    echo "Checking for TODO comments..."
+    if find . -path ./src/tracy -prune -o -type f -name '*.cpp' -print | xargs grep -n 'TODO'; then
+        echo "Please remove TODO comments before committing."
+        exit 1
+    fi
+
+    # Check for sensitive keywords
+    if git diff --cached --name-only | grep -vE "^(\\.github|git|hooks)/" | xargs grep -qiE "api_key|secret"; then
+        echo "Sensitive information detected. Please remove it before committing."
+        exit 1
+    fi
+
+    # Ensure scripts have the executable bit set
+    if [ -n "$(find . -name '*.sh' ! -perm -u+x)" ]; then
+        echo "Script files must have execute permissions."
+        exit 1
+    fi
+
+    echo "Running release build..."
+
+    if ! make release; then
+        echo "Release build failed. Please fix the issues before committing."
+        exit 1
+    fi
+
     echo "Running clang-format..."
 
     if ! make format; then
         echo "Linting failed. Please fix the issues before committing."
         exit 1
     fi
-
-    echo "Running clang-tidy..."
-
-    tidy_frag_file="clang_tidy.frag"
-
-    if ! make tidy > "$tidy_frag_file"; then
-        echo "Clang-tidy failed. Please fix the issues found in "$tidy_frag_file" before committing."
-        exit 1
-    fi
-
-    rm -rf "$tidy_frag_file"
 
     echo "Running flawfinder..."
 
@@ -41,13 +56,6 @@ main() {
 
     rm -rf "$cppcheck_frag_file"
 
-    echo "Running release build..."
-
-    if ! make release; then
-        echo "Release build failed. Please fix the issues before committing."
-        exit 1
-    fi
-
     # Count the number of files in the include/ directory
     file_count=$(find include/ -type f | wc -l)
 
@@ -61,24 +69,16 @@ main() {
         fi
     fi
 
-    # Check for TODO comments
-    echo "Checking for TODO comments..."
-    if find . -path ./src/tracy -prune -o -type f -name '*.cpp' -print | xargs grep -n 'TODO'; then
-        echo "Please remove TODO comments before committing."
+    echo "Running clang-tidy..."
+
+    tidy_frag_file="clang_tidy.frag"
+
+    if ! make tidy > "$tidy_frag_file"; then
+        echo "Clang-tidy failed. Please fix the issues found in "$tidy_frag_file" before committing."
         exit 1
     fi
 
-    # Check for sensitive keywords
-    if git diff --cached --name-only | grep -vE "^(\\.github|git|hooks)/" | xargs grep -qiE "api_key|secret"; then
-        echo "Sensitive information detected. Please remove it before committing."
-        exit 1
-    fi
-
-    # Ensure scripts have the executable bit set
-    if [ -n "$(find . -name '*.sh' ! -perm -u+x)" ]; then
-        echo "Script files must have execute permissions."
-        exit 1
-    fi
+    rm -rf "$tidy_frag_file"
 }
 
 main "$@"
