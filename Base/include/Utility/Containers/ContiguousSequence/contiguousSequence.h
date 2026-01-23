@@ -80,11 +80,8 @@ namespace Utility::Containers::ContiguousSequence
 		See that overload for full preconditions and complexity guarantees.
 		@tparam Concepts::Integral Integral The integral type used for indices
 			   and arithmetic. Must satisfy @ref Concepts::Integral.
-		@param[in] sequence Read-only span of elements to sum. Passing an
-							empty span yields a return value of zero.
-		@param[in] startIndex Zero-based index at which summation begins. If
-							  `startIndex >= sequence.size()` the function
-							  returns zero and performs no accesses.
+		@param[in] sequence Read-only span of elements to sum.
+		@param[in] startIndex Zero-based index at which summation begins. Defaults to 0.
 		@return The sum of elements from `startIndex` to the end as an
 				`Integral` value.
 	*/
