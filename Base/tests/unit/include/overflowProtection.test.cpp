@@ -13,8 +13,8 @@
 
 #include <gtest/gtest.h>
 
-using OverflowProtection::SafeMultiply;
-using OverflowProtection::WillMultiplyOverflow;
+using Utility::OverflowProtection::SafeMultiply;
+using Utility::OverflowProtection::WillMultiplyOverflow;
 
 // NOLINTBEGIN(misc-const-correctness,cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
 

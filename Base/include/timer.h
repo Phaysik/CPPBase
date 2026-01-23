@@ -21,13 +21,13 @@
 #include "attributeMacros.h"
 #include "typedefs.h"
 
-/*! @namespace Utility Holds any useful functionality that doesn't fit anywhere else
+/*! @namespace Utility::Clock Holds any useful functionality that doesn't fit anywhere else
 	@date --/--/----
 	@version x.x.x
 	@since x.x.x
 	@author Matthew Moore
 */
-namespace Clock
+namespace Utility::Clock
 {
 	template <typename T>
 	concept Ratio = std::is_same_v<T, std::ratio<T::num, T::den>>; /*!< A concept to check if a type is a std::ratio */
@@ -272,6 +272,6 @@ namespace Clock
 			static inline std::string_view mUnit{"s"};								   /*!< The unit of time for what is being timed */
 			static inline std::string_view mFileName{"null"};						   /*!< The unit of time for what is being timed */
 	};
-} // namespace Clock
+} // namespace Utility::Clock
 
 #endif

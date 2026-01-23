@@ -14,14 +14,14 @@
 #include "attributeMacros.h"
 #include "cconcepts.h"
 
-/*! @namespace OverflowProtection
+/*! @namespace Utility::OverflowProtection
 	@brief Utilities for detecting and guarding against unsigned integer overflow.
 	@details Provides small, constexpr helpers to check for multiplication overflow and to perform
 	saturating multiplication when overflow would occur. These helpers are intended for use with
 	unsigned integral types and are constexpr so they can be evaluated at compile time when possible.
 	@note All functions are `noexcept` and return conservative values on overflow (e.g., `std::numeric_limits<Number>::max()`).
  */
-namespace OverflowProtection
+namespace Utility::OverflowProtection
 {
 
 	template <Concepts::UnsignedIntegral Number>
@@ -59,6 +59,6 @@ namespace OverflowProtection
 	{
 		return WillMultiplyOverflow<Number>(num1, num2) ? std::numeric_limits<Number>::max() : static_cast<Number>(num1 * num2);
 	}
-} // namespace OverflowProtection
+} // namespace Utility::OverflowProtection
 
 #endif
