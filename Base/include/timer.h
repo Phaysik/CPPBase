@@ -180,7 +180,7 @@ namespace Clock
 			*/
 			template <Ratio T = std::ratio<1L>, typename Callable, typename... Args>
 				requires(std::is_invocable_v<Callable, Args...>)
-			static void timeFunction(std::string_view identifier, const ub iterations, Callable &&function, Args &&...args) noexcept
+			static void timeFunction(std::string_view identifier, const ub iterations, Callable &&function, Args &&...args)
 			{
 				std::ofstream &logFile = getLogFile();
 
