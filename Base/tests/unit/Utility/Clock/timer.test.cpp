@@ -50,6 +50,9 @@ TEST(TimerStartStopTest, MeasuresPositiveDuration)
 
 TEST(TimerTimeFunctionTest, WritesTimingOutputToStdoutWhenNoLogFile)
 {
+	// Ensure any previously opened log file is closed so output goes to stdout.
+	Timer::closeLogFile();
+
 	// Capture stdout produced by timeFunction
 	std::ostringstream captured;
 	std::streambuf *old = std::cout.rdbuf(captured.rdbuf());
@@ -94,8 +97,11 @@ TEST(TimerCreateLogFileTest, CreatesLogFileAndWritesOutput)
 	// Time the function which should write into the log file
 	Timer::timeFunction<std::ratio<1>>("file_trivial", 2U, trivial);
 
-	// Close the stream held by Timer by calling destructor on a temporary Timer
-	// (Timer is non-instantiable), but we can flush by opening and closing the file ourselves
+	// Close the stream held by Timer by creating a temporary Timer instance which will close
+	// the internal log file in its destructor, ensuring the file can be removed reliably.
+	// Ensure internal log stream is closed so file can be removed reliably.
+	Timer::closeLogFile();
+
 	// Verify file exists (content may be buffered in the process' open stream);
 	// presence of the file demonstrates createLogFile opened it successfully.
 	EXPECT_TRUE(fs::exists(tmpName));

@@ -135,6 +135,23 @@ namespace Utility::Clock
 				getLogFile(&filename);
 			}
 
+			/*! @brief Closes the currently opened log file (if any) and resets the stored file name.
+				@post Any open internal log file is closed and future calls to `createLogFile` may reopen a file.
+				@date --/--/----
+				@version x.x.x
+				@since x.x.x
+				@author Matthew Moore
+			*/
+			static void closeLogFile() noexcept
+			{
+				if (std::ofstream &logFile = getLogFile(); logFile.is_open())
+				{
+					logFile.close();
+				}
+
+				mFileName = "null";
+			}
+
 			/*! @brief Sets #mStart to the current time
 				@post #mStart is set to Clock::now()
 				@date --/--/----
@@ -255,10 +272,14 @@ namespace Utility::Clock
 			static std::ofstream &getLogFile(const std::string *filename = nullptr) noexcept
 			{
 				static std::ofstream mLogFile;
-				static std::once_flag flag;
+				static std::mutex logMutex;
 				if (filename != nullptr || mFileName != "null")
 				{
-					std::call_once(flag, [&filename]() { mLogFile.open(filename ? *filename : std::string(mFileName)); });
+					const std::scoped_lock lock(logMutex);
+					if (!mLogFile.is_open())
+					{
+						mLogFile.open((filename != nullptr) ? *filename : std::string(mFileName));
+					}
 				}
 
 				return mLogFile;
