@@ -61,12 +61,7 @@ namespace Utility::Containers::ContiguousSequence
 
 		for (Integral i{startIndex}; i < startIndex + length; ++i)
 		{
-			// In C++26 - Span's will get the `.at()` member function for bounds-checked access.
-			// Until then, have clang-tidy ignore this
-
-			// NOLINTBEGIN(cppcoreguidelines-pro-bounds-avoid-unchecked-container-access)
-			sum += sequence[sc<std::size_t>(i)];
-			// NOLINTEND(cppcoreguidelines-pro-bounds-avoid-unchecked-container-access)
+			sum += sequence.at(sc<std::size_t>(i));
 		}
 
 		return sum;
