@@ -1,6 +1,6 @@
 CompileFlags:
   Remove: ['-fimplicit-constexpr', '-fhardened']
-  Add: ['-std=c++23', '-ferror-limit=0']
+  Add: ['-std=c++2c', '-ferror-limit=0']
 
 Diagnostics:
   ClangTidy:
