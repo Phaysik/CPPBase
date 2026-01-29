@@ -83,6 +83,11 @@ Examples:
   - TEST_F(ParserTest, GivenValidInputWhenParsingThenSucceeds)
 - **DO NOT** add underscores in the test case name
 
+### Variable Naming
+
+- **Do NOT** use variable names less than 3 characters long
+- Variable names should be descriptive of their purpose
+
 ## Test Fixtures
 
 Use test fixtures when:
@@ -286,6 +291,28 @@ EXPECT_DEATH(fn(invalid_input), ".*");
 - Do NOT add artificial logic solely to increase coverage
 - Do NOT test unreachable or undefined behavior
 - Do NOT weaken assertions to “hit lines”
+
+### Clang-Tidy Suppression
+
+- I wish to ignore the most common sources of warnings issued by clang-tidy
+- Follow the below example to wrap all test cases within NOLINTBEGIN/NOLINTEND comments
+
+```cpp
+#include <vector>
+#include ...
+
+// NOLINTBEGIN(misc-const-correctness,cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+
+TEST(FizzBuzzTest, GivenZeroReturnsEmpty)
+{
+	const auto result = fizzBuzz<ui>(0U);
+	EXPECT_TRUE(result.empty());
+}
+...
+
+// NOLINTEND(misc-const-correctness,cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+
+```
 
 ## How to Apply These Instructions
 
