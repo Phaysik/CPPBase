@@ -7,6 +7,7 @@
 */
 
 #include <cstdlib>
+#include <exception>
 
 /*! @brief The entry point for the program
 	@date --/--/----
