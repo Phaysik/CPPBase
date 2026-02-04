@@ -176,6 +176,30 @@ setUpConfigCat() {
     sudo rm -rf vcpkg
 }
 
+installVulkan() {
+    echo "Installing Vulkan System Packages..."
+
+    sudo apt-get install vulkan-tools libvulkan-dev vulkan-validationlayers spirv-tools -y
+
+    echo "Installing math and rendering libraries..."
+
+    sudo apt-get install libglfw3-dev libglm-dev -y
+
+    echo "Installing shader compiler..."
+
+    downloadUrl=`sudo curl -s https://storage.googleapis.com/shaderc/badges/build_link_linux_gcc_release.html | grep -oP '(?<=url=)[^"]+'`
+    sudo wget $downloadUrl
+
+    sudo mkdir -p shaderCompiler
+    sudo tar -xvzf install.tgz -C shaderCompiler --strip-components=1
+    sudo cp shaderCompiler/bin/glslc /usr/bin
+    sudo rm -rf shaderCompiler
+
+    echo "Installing remaining dependencies..."
+
+    sudo apt-get install libxxf86vm-dev libxi-dev -y
+}
+
 main() {
     echo "This shell file is set up to only work on Ubuntu operating systems"
 
