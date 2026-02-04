@@ -6,7 +6,7 @@
 	@author Matthew Moore
 */
 
-#include <iostream>
+#include <cstdlib>
 
 /*! @brief The entry point for the program
 	@date --/--/----
@@ -22,13 +22,14 @@ int main(int argc, char **argv)
 	{
 		-
 	}
-	catch (...)
+	catch (const std::exception &e)
 	{
-		std::cerr << "Abnormal termination" << '\n';
+		std::cerr << "Abnormal termination: " << e.what() << '\n';
+		return EXIT_FAILURE;
 	}
 #else
 	-
 #endif
 
-	return 0;
+	return EXIT_SUCCESS;
 }
