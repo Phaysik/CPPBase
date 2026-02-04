@@ -77,4 +77,19 @@
 	#define ATTR_NODISCARD
 #endif
 
+#if __has_cpp_attribute(maybe_unused)
+	/*! @def ATTR_MAYBE_UNUSED
+		@brief Portable macro for the C++ `[[maybe_unused]]` attribute.
+		@details Expands to `[[maybe_unused]]` when supported by the compiler, otherwise to an empty token.
+		The `[[maybe_unused]]` attribute indicates that the a parameter may be unused.
+		@example
+		@code{.cpp}
+		int compute_value(ATTR_MAYBE_UNUSED number) { return 42; }
+		@endcode
+	*/
+	#define ATTR_MAYBE_UNUSED [[maybe_unused]]
+#else
+	#define ATTR_MAYBE_UNUSED
+#endif
+
 #endif
