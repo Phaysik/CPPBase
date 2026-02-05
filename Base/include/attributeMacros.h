@@ -92,4 +92,22 @@
 	#define ATTR_MAYBE_UNUSED
 #endif
 
+#if __has_cpp_attribute(pure)
+	/*! @def ATTR_PURE
+		@brief Portable macro for the C++ `[[pure]]` attribute.
+		@details Expands to `[[pure]]` when supported by the compiler, otherwise to an empty token.
+		The `[[pure]]` attribute indicates that a function has no side effects and its return value depends only on
+		its arguments (not on global state). Use this macro to annotate library functions where this guarantee holds.
+		@warning Misusing the attribute (annotating a function that reads global state or has side effects) can
+		produce incorrect code generation.
+		@example
+		@code{.cpp}
+		ATTR_PURE int compute_value(int x) { return x * 2; }
+		@endcode
+	*/
+	#define ATTR_PURE [[pure]]
+#else
+	#define ATTR_PURE
+#endif
+
 #endif
