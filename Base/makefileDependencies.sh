@@ -219,6 +219,9 @@ installVulkan() {
 
     sudo ln -s $1 default
 
+    sudo cp -r ~/vulkansdk/default/x86_64/lib/* /usr/lib/
+    sudo cp -r ~/vulkansdk/default/x86_64/include/* /usr/include/
+
     echo "Add the following to ~/.zshrc:"
     echo "source ~/vulkansdk/default/setup-env.sh"
     echo ""
