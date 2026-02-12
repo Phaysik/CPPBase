@@ -1,9 +1,10 @@
 COMPILER = g++
 COMPILER_STANDARD = 15
 COMPILER_VERSION = -std=c++2c
-COMPILER_FLAGS_RELEASE = ${COMPILER_VERSION} -O3 -DNDEBUG
-COMPILER_FLAGS_DEV = ${COMPILER_VERSION} -O0 -g -pg
-COMPILER_FLAGS_VALGRIND = ${COMPILER_VERSION} -O0 -g
+COMPILE_FLAGS_COMMON =
+COMPILER_FLAGS_RELEASE = ${COMPILER_VERSION} -O3 -DNDEBUG ${COMPILER_FLAGS_COMMON}
+COMPILER_FLAGS_DEV = ${COMPILER_VERSION} -O0 -g -pg ${COMPILER_FLAGS_COMMON}
+COMPILER_FLAGS_VALGRIND = ${COMPILER_VERSION} -O0 -g ${COMPILER_FLAGS_COMMON}
 
 WARNINGS = -fdelete-null-pointer-checks -fstrict-aliasing -fimplicit-constexpr -pedantic -pedantic-errors -Wall -Wextra -Weffc++ -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Wformat-nonliteral -Wformat-security -Wformat-signedness -Wformat-truncation=2 -Wformat-y2k -Wlogical-op -Wmissing-declarations -Wmissing-include-dirs -Wnull-dereference -Wnoexcept -Woverloaded-virtual -Wredundant-decls -Wshadow -Wsign-conversion -Wsign-promo -Wstrict-null-sentinel -Wswitch-default -Wswitch-enum -Wundef -Wunused -Wunused-const-variable=2 -Wuseless-cast -Wuninitialized -Wstrict-aliasing -Wduplicated-branches -Wtrampolines -Wduplicated-cond -Wbidi-chars=any -Wfloat-equal -Wconversion -Winline -Wzero-as-null-pointer-constant -Wmissing-noreturn -Wsuggest-attribute=pure -Wsuggest-attribute=const -Wsuggest-attribute=malloc -Wsuggest-attribute=cold -Wsuggest-attribute=format -Wmissing-format-attribute -Wpacked -Wunused-macros -Wno-missing-requires -Wno-missing-template-keyword -Wvariadic-macros -Wunsafe-loop-optimizations -Wno-changes-meaning -Wdouble-promotion -Wcomma-subscript -Wdangling-reference -Wsuggest-final-types -Wsuggest-override -Wsuggest-final-methods -Winvalid-constexpr -Wold-style-cast -Wextra-semi -Wenum-conversion -Werror $(if $(filter-out 13,$(COMPILER_STANDARD)), -Wnrvo -Wsuggest-attribute=returns_nonnull)
 
@@ -14,7 +15,7 @@ DEBUG_WARNINGS = -fsanitize=address -fsanitize=pointer-compare -fsanitize=pointe
 INCLUDE_FOLDER = include
 INCLUDE_ARGUMENT = -I${INCLUDE_FOLDER}
 LIBRARIES =
-RESOURCES_FOLDER = .\/resources
+RESOURCES_FOLDER = resources
 
 SOURCE_FOLDER = src
 SOURCES = $(shell find ${SOURCE_FOLDER} -type f -not -path '*/tracy/*.cpp' -name '*.cpp')
@@ -127,7 +128,17 @@ else ifeq ($(TEST_OPTIONS), unit)
 	OBJECTS_TEST_USING = $(OBJECTS_TEST_UNITS_ALL)
 endif
 
+SHADER_DIR = ${RESOURCES_FOLDER}/shaders
+SHADERS = $(wildcard ${SHADER_DIR}/*.slang)
+SPV_FILES = ${SHADERS:.slang=.spv}
+
+SLANG_COMPILER = slangc
+SLANG_FLAGS = -target spirv -profile spirv_1_4 -emit-spirv-directly -fvk-use-entrypoint-name
+
 default: compile
+
+$(SHADER_DIR)/%.spv: $(SHADER_DIR)/%.slang
+	${SLANG_COMPILER} $< ${SLANG_FLAGS} -entry vertMain -entry fragMain -o $@
 
 ${OUTPUT_FOLDER_RELEASE}/%.o: ${SOURCE_FOLDER}/%.cpp
 	@dir=$(dir $@); \
@@ -136,7 +147,7 @@ ${OUTPUT_FOLDER_RELEASE}/%.o: ${SOURCE_FOLDER}/%.cpp
 
 -include $(DEPS_RELEASE)
 
-compile: $(OBJECTS_RELEASE)
+compile: shaders $(OBJECTS_RELEASE)
 	${COMPILER} ${COMPILER_FLAGS_RELEASE} ${OBJECTS_RELEASE} ${LIBRARIES} ${RELEASE_WARNINGS} -o ${OUTPUT_FOLDER_RELEASE}/${OUTPUT_FILE_RELEASE}
 	if [ -d ${RESOURCES_FOLDER} ]; then \
 		cp -r ${RESOURCES_FOLDER} ${OUTPUT_FOLDER_RELEASE}; \
@@ -152,7 +163,7 @@ ${OUTPUT_FOLDER_DEV}/%.o: ${SOURCE_FOLDER}/%.cpp
 
 -include $(DEPS_DEV)
 
-debug: $(OBJECTS_DEV)
+debug: shaders $(OBJECTS_DEV)
 	${COMPILER} ${COMPILER_FLAGS_DEV} ${OBJECTS_DEV} ${LIBRARIES} ${DEBUG_WARNINGS} -o ${OUTPUT_FOLDER_DEV}/${OUTPUT_FILE_DEV}
 	if [ -d ${RESOURCES_FOLDER} ]; then \
 		cp -r ${RESOURCES_FOLDER} ${OUTPUT_FOLDER_DEV}; \
@@ -169,7 +180,7 @@ ${OUTPUT_FOLDER_VALGRIND}/%.o: ${SOURCE_FOLDER}/%.cpp
 
 -include $(DEPS_VALGRIND)
 
-val: $(OBJECTS_VALGRIND)
+val: shaders $(OBJECTS_VALGRIND)
 	${COMPILER} ${COMPILER_FLAGS_VALGRIND} ${OBJECTS_VALGRIND} ${LIBRARIES} -o ${OUTPUT_FOLDER_VALGRIND}/${OUTPUT_FILE_VALGRIND}
 	if [ -d ${RESOURCES_FOLDER} ]; then \
 		cp -r ${RESOURCES_FOLDER} ${OUTPUT_FOLDER_VALGRIND}; \
