@@ -11,3 +11,5 @@
 .vscode/settings.json
 .vscode/.cache
 /src/tracy/*
+*.spv
+gmon.out
