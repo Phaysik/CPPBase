@@ -9,7 +9,7 @@
 	@author Matthew Moore
 */
 
-#include "Utility/Floats/floatUtility.h"
+#include "Utility/Math/floatUtility.h"
 
 #include <numbers>
 

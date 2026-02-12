@@ -14,7 +14,7 @@
 
 #include "attributeMacros.h"
 
-/*! @namespace Utility::Floats
+/*! @namespace Utility::Math
 	@brief Helper utilities and constants for robust floating-point comparisons.
 	@details This namespace provides lightweight, constexpr helpers intended for safe
 	comparison of floating-point values using both absolute and relative tolerances.
@@ -25,7 +25,7 @@
 	@note Constants represent conservative defaults; callers may override them by passing
 	explicit epsilon values to the functions.
  */
-namespace Utility::Floats
+namespace Utility::Math
 {
 	/*! @brief Small absolute tolerance used when comparing values near zero.
 		@details Use this epsilon when the magnitudes of values under comparison are
@@ -69,6 +69,6 @@ namespace Utility::Floats
 		// Otherwise fall back to Knuth's algorithm
 		return std::abs(lhs - rhs) <= (std::max(std::abs(lhs), std::abs(rhs)) * relEpsilon);
 	}
-} // namespace Utility::Floats
+} // namespace Utility::Math
 
 #endif
