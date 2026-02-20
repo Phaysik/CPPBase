@@ -34,20 +34,6 @@ namespace Utility
 	class Random
 	{
 		public:
-			/*! @brief Gets a random number in the range [min, max]
-				@param[in] min The minimum value (inclusive)
-				@param[in] max The maximum value (inclusive)
-				@retval int The random number in the range
-				@date --/--/----
-				@version x.x.x
-				@since x.x.x
-				@author Matthew Moore
-			*/
-			ATTR_NODISCARD static int get(int min, int max) noexcept
-			{
-				return std::uniform_int_distribution{min, max}(mTwister);
-			}
-
 			/*! @brief Gets a random number in the range [min, max] wtih a templated return type in case you need to cast the uniform
 			   distribution result to a different type
 				@tparam T The type to cast the uniform distribution result to
@@ -60,7 +46,7 @@ namespace Utility
 				@author Matthew Moore
 			*/
 			template <Concepts::Integral T>
-			ATTR_NODISCARD static T get(T min, T max) noexcept
+			ATTR_NODISCARD static T get(const T min, const T max) noexcept
 			{
 				return std::uniform_int_distribution<T>{min, max}(mTwister);
 			}
