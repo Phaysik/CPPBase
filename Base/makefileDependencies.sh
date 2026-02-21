@@ -163,6 +163,9 @@ setUpTracy() {
     cd ..
     sudo rm -rf tracy-latest
 
+    sudo cp -r /usr/local/include/tracy /usr/include/
+    sudo cp /usr/local/lib/libTracy* /usr/lib/
+
     sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-$1 $1
     sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-$1 $1
 }
@@ -384,8 +387,8 @@ main() {
                 pip3 install flawfinder --break-system-packages
             fi
 
-            if [ -x "$(command -v Tracy-Server)" ]; then
-                echo "Tracy-Server already exists"
+            if [ -x "$(command -v tracy-profiler)" ]; then
+                echo "tracy-profiler already exists"
             else
                 setUpTracy $gpp_priority
             fi

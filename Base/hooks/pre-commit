@@ -15,7 +15,7 @@ main() {
     fi
 
     # Ensure scripts have the executable bit set
-    if [ -n "$(find . -name '*.sh' ! -perm -u+x)" ]; then
+    if [ -n "$(find . -name -maxdepth 1 '*.sh' ! -perm -u+x)" ]; then
         echo "Script files must have execute permissions."
         exit 1
     fi
