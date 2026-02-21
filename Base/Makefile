@@ -325,7 +325,7 @@ profile: gprof
 	mv ${ANNOTATION_FILES} ${PROFILE_ANNOTATIONS_FOLDER}
 
 initialize_repo:
-	git clone https://github.com/Phaysik/CPPBase
+	git clone --recurse-submodules https://github.com/Phaysik/CPPBase
 	cp -ra CPPBase/Base/. .
 	rm -rf CPPBase
 	mv hooks/* .git/hooks
