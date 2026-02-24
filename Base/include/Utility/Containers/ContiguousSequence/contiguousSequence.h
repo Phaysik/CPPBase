@@ -30,7 +30,7 @@
 	@version 0.0.1
 	@since 0.0.1
 	@author Matthew Moore
- */
+*/
 namespace Utility::Containers::ContiguousSequence
 {
 	/*! @brief Sum `length` elements from @p sequence starting at @p startIndex.
