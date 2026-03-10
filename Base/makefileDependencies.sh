@@ -276,6 +276,26 @@ installBenchmark() {
     sudo rm -rf benchmark
 }
 
+installSpdlog() {
+    git clone https://github.com/gabime/spdlog.git
+    cd spdlog
+
+    sudo mkdir -p build
+    cd build
+
+    sudo cmake ..
+    sudo make install
+
+    sudo cp /usr/local/lib/libspdlog* /usr/lib/
+    sudo cp -r /usr/local/include/spdlog* /usr/include
+    sudo cp /usr/local/lib/pkgconfig/spdlog* /usr/lib/pkgconfig/
+    sudo cp -r /usr/local/lib/cmake/spdlog /usr/lib/cmake/
+
+    cd ..
+    cd ..
+    sudo rm -rf spdlog
+}
+
 main() {
     echo "This shell file is set up to only work on Ubuntu operating systems"
 
@@ -328,6 +348,13 @@ main() {
         else
             echo "Setting up Google Benchmark"
             installBenchmark
+        fi
+
+        if [ -f "/usr/lib/libspdlog.a" ]; then
+            echo "Spdlog already exists"
+        else
+            echo "Setting up Spdlog"
+            installSpdlog
         fi
 
         # If not 'a' or 'A', set up documentation, formatting, and linting tools
