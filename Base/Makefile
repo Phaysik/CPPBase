@@ -8,15 +8,31 @@ COMPILER_FLAGS_TEST = ${COMPILER_VERSION} --coverage -fPIC -O0 -g -fprofile-arcs
 COMPILER_FLAGS_VALGRIND = ${COMPILER_VERSION} -O0 -g ${COMPILE_FLAGS_COMMON}
 COMPILER_FLAGS_BENCHMARK = ${COMPILER_VERSION} -O3 -pg ${COMPILE_FLAGS_COMMON}
 
-WARNINGS = -fdelete-null-pointer-checks -fstrict-aliasing -fimplicit-constexpr -pedantic -pedantic-errors -Wall -Wextra -Weffc++ -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Wformat-nonliteral -Wformat-security -Wformat-signedness -Wformat-truncation=2 -Wformat-y2k -Wlogical-op -Wmissing-declarations -Wmissing-include-dirs -Wnull-dereference -Wnoexcept -Woverloaded-virtual -Wredundant-decls -Wshadow -Wsign-conversion -Wsign-promo -Wstrict-null-sentinel -Wswitch-default -Wswitch-enum -Wundef -Wunused -Wunused-const-variable=2 -Wuseless-cast -Wuninitialized -Wstrict-aliasing -Wduplicated-branches -Wtrampolines -Wduplicated-cond -Wbidi-chars=any -Wfloat-equal -Wconversion -Winline -Wzero-as-null-pointer-constant -Wmissing-noreturn -Wsuggest-attribute=pure -Wsuggest-attribute=const -Wsuggest-attribute=malloc -Wsuggest-attribute=cold -Wsuggest-attribute=format -Wmissing-format-attribute -Wpacked -Wunused-macros -Wno-missing-requires -Wno-missing-template-keyword -Wvariadic-macros -Wunsafe-loop-optimizations -Wno-changes-meaning -Wdouble-promotion -Wcomma-subscript -Wdangling-reference -Wsuggest-final-types -Wsuggest-override -Wsuggest-final-methods -Winvalid-constexpr -Wold-style-cast -Wextra-semi -Wenum-conversion -Werror $(if $(filter-out 13,$(COMPILER_STANDARD)), -Wnrvo -Wsuggest-attribute=returns_nonnull)
+GCC_WARNINGS = $(if $(findstring g++,$(COMPILER)), -fdelete-null-pointer-checks -fstrict-aliasing -fimplicit-constexpr -pedantic -pedantic-errors -Wall -Wextra -Weffc++ -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Wformat-nonliteral -Wformat-security -Wformat-signedness -Wformat-truncation=2 -Wformat-y2k -Wlogical-op -Wmissing-declarations -Wmissing-include-dirs -Wnull-dereference -Wnoexcept -Woverloaded-virtual -Wredundant-decls -Wshadow -Wsign-conversion -Wsign-promo -Wstrict-null-sentinel -Wswitch-default -Wswitch-enum -Wundef -Wunused -Wunused-const-variable=2 -Wuseless-cast -Wuninitialized -Wstrict-aliasing -Wduplicated-branches -Wtrampolines -Wduplicated-cond -Wbidi-chars=any -Wfloat-equal -Wconversion -Winline -Wzero-as-null-pointer-constant -Wmissing-noreturn -Wsuggest-attribute=pure -Wsuggest-attribute=const -Wsuggest-attribute=malloc -Wsuggest-attribute=cold -Wsuggest-attribute=format -Wsuggest-attribute=returns_nonnull -Wmissing-format-attribute -Wpacked -Wunused-macros -Wno-missing-requires -Wno-missing-template-keyword -Wvariadic-macros -Wunsafe-loop-optimizations -Wno-changes-meaning -Wdouble-promotion -Wcomma-subscript -Wdangling-reference -Wsuggest-final-types -Wsuggest-override -Wsuggest-final-methods -Winvalid-constexpr -Wold-style-cast -Wextra-semi -Wenum-conversion $(if $(filter-out 13,$(COMPILER_STANDARD)), -Wnrvo))
 
-RELEASE_WARNINGS = $(if $(filter-out 13,$(COMPILER_STANDARD)), -fhardened -Whardened)
+CLANG_WARNINGS = $(if $(findstring clang,$(COMPILER)), -fdelete-null-pointer-checks -fstrict-aliasing -pedantic -pedantic-errors -Wall -Wextra -Weffc++ -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Wformat-nonliteral -Wformat-security -Wformat-signedness -Wformat-y2k -Wmissing-declarations -Wmissing-include-dirs -Wnull-dereference -Woverloaded-virtual -Wredundant-decls -Wshadow -Wsign-conversion -Wsign-promo -Wswitch-default -Wswitch-enum -Wundef -Wunused -Wuninitialized -Wstrict-aliasing -Wfloat-equal -Wconversion -Winline -Wzero-as-null-pointer-constant -Wmissing-noreturn -Wmissing-format-attribute -Wpacked -Wunused-macros -Wvariadic-macros -Wdouble-promotion -Wsuggest-override -Winvalid-constexpr -Wold-style-cast -Wextra-semi -Wenum-conversion -Werror $(if $(filter-out 13,$(COMPILER_STANDARD)), -Wnrvo))
 
-DEBUG_WARNINGS = -fsanitize=address -fsanitize=pointer-compare -fsanitize=pointer-subtract -fsanitize=leak -fsanitize=undefined -fsanitize=shift -fsanitize=shift-exponent -fsanitize=shift-base -fsanitize=integer-divide-by-zero -fsanitize=unreachable -fsanitize=vla-bound -fsanitize=null -fsanitize=return -fsanitize=signed-integer-overflow -fsanitize=bounds -fsanitize=bounds-strict -fsanitize=alignment -fsanitize=object-size -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fsanitize=nonnull-attribute -fsanitize=returns-nonnull-attribute -fsanitize=bool -fsanitize=enum -fsanitize=vptr -fsanitize=pointer-overflow -fsanitize=builtin -fsanitize-address-use-after-scope
+WARNINGS = ${GCC_WARNINGS} ${CLANG_WARNINGS}
+
+GCC_RELEASE_WARNINGS = $(if $(findstring g++,$(COMPILER)), $(if $(filter-out 13,$(COMPILER_STANDARD)), -fhardened -Whardened))
+
+CLANG_RELEASE_WARNINGS = $(if $(findstring clang,$(COMPILER)), )
+
+RELEASE_WARNINGS = ${GCC_RELEASE_WARNINGS} ${CLANG_RELEASE_WARNINGS}
+
+GCC_DEBUG_WARNINGS = $(if $(findstring g++,$(COMPILER)), -fsanitize=address -fsanitize=pointer-compare -fsanitize=pointer-subtract -fsanitize=leak -fsanitize=undefined -fsanitize=shift -fsanitize=shift-exponent -fsanitize=shift-base -fsanitize=integer-divide-by-zero -fsanitize=unreachable -fsanitize=vla-bound -fsanitize=null -fsanitize=return -fsanitize=signed-integer-overflow -fsanitize=bounds -fsanitize=bounds-strict -fsanitize=alignment -fsanitize=object-size -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fsanitize=nonnull-attribute -fsanitize=returns-nonnull-attribute -fsanitize=bool -fsanitize=enum -fsanitize=vptr -fsanitize=pointer-overflow -fsanitize=builtin -fsanitize-address-use-after-scope)
+
+CLANG_DEBUG_WARNINGS = $(if $(findstring clang,$(COMPILER)), -fsanitize=address -fsanitize=pointer-compare -fsanitize=pointer-subtract -fsanitize=leak -fsanitize=undefined -fsanitize=shift -fsanitize=shift-exponent -fsanitize=shift-base -fsanitize=integer-divide-by-zero -fsanitize=unreachable -fsanitize=vla-bound -fsanitize=null -fsanitize=return -fsanitize=signed-integer-overflow -fsanitize=bounds -fsanitize=alignment -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fsanitize=nonnull-attribute -fsanitize=returns-nonnull-attribute -fsanitize=bool -fsanitize=enum -fsanitize=pointer-overflow -fsanitize=builtin -fsanitize-address-use-after-scope)
+
+DEBUG_WARNINGS = ${GCC_DEBUG_WARNINGS} ${CLANG_DEBUG_WARNINGS}
 
 INCLUDE_FOLDER = include
 INCLUDE_ARGUMENT = -I${INCLUDE_FOLDER}
-LIBRARIES =
+
+GCC_LIBRARIES = $(if $(findstring g++,$(COMPILER)), )
+CLANG_LIBRARIES = $(if $(findstring clang,$(COMPILER)), -lstdc++)
+LIBRARIES = ${GCC_LIBRARIES} ${CLANG_LIBRARIES}
+
 RESOURCES_FOLDER = resources
 
 SOURCE_FOLDER = src
