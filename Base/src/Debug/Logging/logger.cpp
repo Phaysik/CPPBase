@@ -79,7 +79,7 @@ namespace Utility::Debug::Logging
 	}
 
 // GCC incorrectly suggests returns_nonnull for reference-returning functions; suppress since references are inherently non-null.
-#if defined(__GNUC__) && !defined(__clang__)
+#if defined(ATTR_GCC) && !defined(ATTR_CLANG)
 	#pragma GCC diagnostic push
 	#pragma GCC diagnostic ignored "-Wsuggest-attribute=returns_nonnull"
 #endif
@@ -102,7 +102,7 @@ namespace Utility::Debug::Logging
 		return fileName;
 	}
 
-#if defined(__GNUC__) && !defined(__clang__)
+#if defined(ATTR_GCC) && !defined(ATTR_CLANG)
 	#pragma GCC diagnostic pop
 #endif
 } // namespace Utility::Debug::Logging
