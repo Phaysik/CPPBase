@@ -78,6 +78,12 @@ namespace Utility::Debug::Logging
 		}
 	}
 
+// GCC incorrectly suggests returns_nonnull for reference-returning functions; suppress since references are inherently non-null.
+#if defined(__GNUC__) && !defined(__clang__)
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored "-Wsuggest-attribute=returns_nonnull"
+#endif
+
 	std::shared_ptr<spdlog::logger> &Logger::getLoggerInstance()
 	{
 		static std::shared_ptr<spdlog::logger> logger;
@@ -95,4 +101,8 @@ namespace Utility::Debug::Logging
 		static std::string fileName;
 		return fileName;
 	}
+
+#if defined(__GNUC__) && !defined(__clang__)
+	#pragma GCC diagnostic pop
+#endif
 } // namespace Utility::Debug::Logging
