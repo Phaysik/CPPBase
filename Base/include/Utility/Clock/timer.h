@@ -225,7 +225,7 @@ namespace Utility::Clock
 
 				if (iterations > 1)
 				{
-					output << std::format("\tAverage: {}{}\n", average / sc<double>(iterations), unit);
+					output << std::format("\tAverage: {}{}\n", average / static_cast<double>(iterations), unit);
 				}
 			}
 

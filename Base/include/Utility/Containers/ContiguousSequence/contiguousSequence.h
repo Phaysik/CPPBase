@@ -13,7 +13,6 @@
 
 #include "attributeMacros.h"
 #include "cconcepts.h"
-#include "typedefs.h"
 
 /*! @namespace Utility::Containers::ContiguousSequence
 	@brief Utilities for working with contiguous sequence containers
@@ -52,7 +51,7 @@ namespace Utility::Containers::ContiguousSequence
 	ATTR_NODISCARD constexpr Integral computeContiguousSequenceSum(const std::span<const Integral> &sequence, const Integral startIndex,
 																   const Integral length)
 	{
-		if (startIndex >= sc<Integral>(sequence.size()) || (startIndex + length) > sc<Integral>(sequence.size()))
+		if (startIndex >= static_cast<Integral>(sequence.size()) || (startIndex + length) > static_cast<Integral>(sequence.size()))
 		{
 			return Integral{0};
 		}
@@ -61,7 +60,7 @@ namespace Utility::Containers::ContiguousSequence
 
 		for (Integral i{startIndex}; i < startIndex + length; ++i)
 		{
-			sum += sequence.at(sc<std::size_t>(i));
+			sum += sequence.at(static_cast<std::size_t>(i));
 		}
 
 		return sum;
