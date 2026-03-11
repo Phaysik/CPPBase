@@ -2,7 +2,7 @@
 	@brief Google Test unit tests for the static Logger wrapper.
 	@details Exercises initialization, level get/set, name/file replacement, and all seven logging-level template methods. Each test writes
    to a temporary file that is cleaned up in TearDown.
-	@date 03/11/2026
+	@date --/--/----
 	@version x.x.x
 	@since x.x.x
 	@author Matthew Moore
@@ -12,14 +12,17 @@
 
 #include <filesystem>
 #include <fstream>
+#include <memory>
 #include <sstream>
 #include <string>
-
-#include "spdlog/spdlog.h"
 
 #include <gtest/gtest.h>
 
 #include "attributeMacros.h"
+
+#include <spdlog/common.h>
+#include <spdlog/logger.h>
+#include <spdlog/spdlog.h>
 
 using Utility::Debug::Logging::Logger;
 
@@ -29,10 +32,6 @@ namespace // NOSONAR
 {
 	class LoggerTest : public ::testing::Test // NOSONAR
 	{
-		private:
-			std::string loggerName{"test_logger"};
-			std::string logFileName{"logger_test_output.log"};
-
 		protected:
 			void SetUp() override
 			{
@@ -80,6 +79,10 @@ namespace // NOSONAR
 				contents << file.rdbuf();
 				return contents.str();
 			}
+
+		private:
+			std::string loggerName{"test_logger"};
+			std::string logFileName{"logger_test_output.log"};
 	};
 
 	// ────────────────────────────────────────────────────────────

@@ -1,6 +1,6 @@
 /*! @file logger.h
 	@brief Contains the function declarations for a static logging wrapper around spdlog.
-	@date 03/11/2026
+	@date --/--/----
 	@version x.x.x
 	@since x.x.x
 	@author Matthew Moore
@@ -14,12 +14,12 @@
 #include <string_view>
 #include <utility>
 
-#include "spdlog/logger.h"
-
 #include "attributeMacros.h"
 
+#include <spdlog/logger.h>
+
 /*! @namespace Utility::Debug::Logging Provides debug and diagnostic logging facilities.
-	@date 03/11/2026
+	@date --/--/----
 	@version x.x.x
 	@since x.x.x
 	@author Matthew Moore
@@ -105,7 +105,7 @@ namespace Utility::Debug::Logging
 				@param[in] fileName The path to the log output file.
 				@throws std::runtime_error If spdlog initialization fails.
 			*/
-			static void initialize(const std::string &loggerName, const std::string &fileName);
+			static void initialize(std::string_view loggerName, std::string_view fileName);
 
 			// MARK: Static Template Member Functions
 

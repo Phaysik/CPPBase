@@ -8,10 +8,17 @@
 
 #include "Utility/Debug/Logging/logger.h"
 
-#include "spdlog/sinks/basic_file_sink.h"
-#include "spdlog/spdlog.h"
+#include <memory>
+#include <stdexcept>
+#include <string>
+#include <string_view>
 
 #include "attributeMacros.h"
+
+#include <spdlog/common.h>
+#include <spdlog/logger.h>
+#include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/spdlog.h>
 
 namespace Utility::Debug::Logging
 {
@@ -46,8 +53,11 @@ namespace Utility::Debug::Logging
 
 	// MARK: Static Member Function
 
-	void Logger::initialize(const std::string &loggerName, const std::string &fileName)
+	void Logger::initialize(std::string_view loggerName, std::string_view fileName)
 	{
+		const std::string convertedLoggerName{loggerName};
+		const std::string convertedFileName{fileName};
+
 		if (getLoggerInstance())
 		{
 			spdlog::drop(getLoggerName());
@@ -55,12 +65,12 @@ namespace Utility::Debug::Logging
 
 		getLoggerInstance().reset();
 
-		getLoggerName() = loggerName;
-		getFileNameStore() = fileName;
+		getLoggerName() = convertedLoggerName;
+		getFileNameStore() = convertedFileName;
 
 		try
 		{
-			getLoggerInstance() = spdlog::basic_logger_mt(loggerName, fileName);
+			getLoggerInstance() = spdlog::basic_logger_mt(convertedLoggerName, convertedFileName);
 		}
 		catch (const spdlog::spdlog_ex &ex)
 		{
