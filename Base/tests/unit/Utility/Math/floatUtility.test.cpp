@@ -15,7 +15,7 @@
 
 #include <gtest/gtest.h>
 
-using Utility::Floats::approximatelyEqualAbsRel;
+using Utility::Math::approximatelyEqualAbsRel;
 
 // NOLINTBEGIN(misc-const-correctness,cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
 

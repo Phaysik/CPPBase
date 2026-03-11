@@ -1,0 +1,218 @@
+/*! @file logger.h
+	@brief Contains the function declarations for a static logging wrapper around spdlog.
+	@date 03/11/2026
+	@version x.x.x
+	@since x.x.x
+	@author Matthew Moore
+*/
+
+#ifndef INCLUDE_UTILITY_DEBUG_LOGGING_LOGGER_H
+#define INCLUDE_UTILITY_DEBUG_LOGGING_LOGGER_H
+
+#include <memory>
+#include <string>
+#include <string_view>
+#include <utility>
+
+#include "spdlog/logger.h"
+
+#include "attributeMacros.h"
+
+/*! @namespace Utility::Debug::Logging Provides debug and diagnostic logging facilities.
+	@date 03/11/2026
+	@version x.x.x
+	@since x.x.x
+	@author Matthew Moore
+*/
+namespace Utility::Debug::Logging
+{
+	/*! @class Logger logger.h "include/Utility/Debug/Logging/logger.h"
+		@brief A static-only wrapper around spdlog that provides global logging through deferred initialization.
+		@details All constructors, copy/move operators, and the destructor are deleted to prevent instantiation. Call @ref initialize before
+	   any logging methods. Internal state is stored via function-local statics to avoid static-initialization-order issues.
+	*/
+	class Logger
+	{
+		public:
+			/*! @brief Default constructor is deleted to prevent instantiation. */
+			Logger() = delete;
+
+			/*! @brief Copy constructor is deleted to prevent instantiation. */
+			Logger(const Logger &) = delete;
+
+			/*! @brief Move constructor is deleted to prevent instantiation. */
+			Logger(Logger &&) = delete;
+
+			/*! @brief Copy assignment operator is deleted to prevent instantiation. */
+			Logger &operator=(const Logger &) = delete;
+
+			/*! @brief Move assignment operator is deleted to prevent instantiation. */
+			Logger &operator=(Logger &&) = delete;
+
+			/*! @brief Destructor is deleted to prevent instantiation. */
+			~Logger() = delete;
+
+			// MARK: Getter
+
+			/*! @brief Gets the current logging level of the underlying spdlog logger.
+				@pre @ref initialize must have been called before invoking this method.
+				@return The current spdlog logging level.
+			*/
+			ATTR_NODISCARD static spdlog::level::level_enum getLevel();
+
+			// MARK: Setters
+
+			/*! @brief Sets the logging level of the underlying spdlog logger.
+				@pre @ref initialize must have been called before invoking this method.
+				@param[in] level The spdlog level to set (e.g., spdlog::level::debug).
+			*/
+			static void setLevel(spdlog::level::level_enum level);
+
+			/*! @brief Replaces the logger with a new one using the given name, keeping the current file.
+				@details Destroys the existing spdlog logger and creates a new one via @ref initializeLogger.
+				@pre @ref initialize must have been called before invoking this method.
+				@post The internal logger is replaced; the previous logger is destroyed.
+				@param[in] loggerName The new name for the logger.
+				@throws std::runtime_error If spdlog re-initialization fails.
+			*/
+			static void setLoggerName(const std::string &loggerName);
+
+			/*! @brief Replaces the logger with a new one writing to the given file, keeping the current name.
+				@details Destroys the existing spdlog logger and creates a new one via @ref initializeLogger.
+				@pre @ref initialize must have been called before invoking this method.
+				@post The internal logger is replaced; the previous logger is destroyed.
+				@param[in] fileName The new file path for log output.
+				@throws std::runtime_error If spdlog re-initialization fails.
+			*/
+			static void setFileName(const std::string &fileName);
+
+			/*! @brief Replaces the logger with a new one using the given name and file, keeping the current settings.
+				@details Destroys the existing spdlog logger and creates a new one via @ref initializeLogger.
+				@pre @ref initialize must have been called before invoking this method.
+				@post The internal logger is replaced; the previous logger is destroyed.
+				@param[in] loggerName The new name for the logger.
+				@param[in] fileName The new file path for log output.
+				@throws std::runtime_error If spdlog re-initialization fails.
+			*/
+			static void setLoggerAndFileName(const std::string &loggerName, const std::string &fileName);
+
+			// MARK: Static Member Function
+
+			/*! @brief Initializes the static logger with the given name and output file.
+				@details Creates a new spdlog file logger via spdlog::basic_logger_mt and stores it internally. Must be called before any
+			   logging methods (trace, debug, info, etc.).
+				@param[in] loggerName The name used to identify the logger within spdlog's registry.
+				@param[in] fileName The path to the log output file.
+				@throws std::runtime_error If spdlog initialization fails.
+			*/
+			static void initialize(const std::string &loggerName, const std::string &fileName);
+
+			// MARK: Static Template Member Functions
+
+			/*! @brief Logs a message at the specified level.
+				@pre @ref initialize must have been called before invoking this method.
+				@tparam Args The types of the format arguments.
+				@param[in] format The fmt-style format string.
+				@param[in] args The arguments to format into the message.
+				@param[in] level The spdlog level to log at (defaults to spdlog::level::info).
+			*/
+			template <typename... Args>
+			static void log(const std::string_view &format, Args &&...args, spdlog::level::level_enum level = spdlog::level::info)
+			{
+				getLoggerInstance()->log(level, fmt::runtime(format), std::forward<Args>(args)...);
+			}
+
+			/*! @brief Logs a message at the trace level.
+				@pre @ref initialize must have been called before invoking this method.
+				@tparam Args The types of the format arguments.
+				@param[in] format The fmt-style format string.
+				@param[in] args The arguments to format into the message.
+			*/
+			template <typename... Args>
+			static void trace(const std::string_view &format, Args &&...args)
+			{
+				getLoggerInstance()->trace(fmt::runtime(format), std::forward<Args>(args)...);
+			}
+
+			/*! @brief Logs a message at the debug level.
+				@pre @ref initialize must have been called before invoking this method.
+				@tparam Args The types of the format arguments.
+				@param[in] format The fmt-style format string.
+				@param[in] args The arguments to format into the message.
+			*/
+			template <typename... Args>
+			static void debug(const std::string_view &format, Args &&...args)
+			{
+				getLoggerInstance()->debug(fmt::runtime(format), std::forward<Args>(args)...);
+			}
+
+			/*! @brief Logs a message at the info level.
+				@pre @ref initialize must have been called before invoking this method.
+				@tparam Args The types of the format arguments.
+				@param[in] format The fmt-style format string.
+				@param[in] args The arguments to format into the message.
+			*/
+			template <typename... Args>
+			static void info(const std::string_view &format, Args &&...args)
+			{
+				getLoggerInstance()->info(fmt::runtime(format), std::forward<Args>(args)...);
+			}
+
+			/*! @brief Logs a message at the warn level.
+				@pre @ref initialize must have been called before invoking this method.
+				@tparam Args The types of the format arguments.
+				@param[in] format The fmt-style format string.
+				@param[in] args The arguments to format into the message.
+			*/
+			template <typename... Args>
+			static void warn(const std::string_view &format, Args &&...args)
+			{
+				getLoggerInstance()->warn(fmt::runtime(format), std::forward<Args>(args)...);
+			}
+
+			/*! @brief Logs a message at the error level.
+				@pre @ref initialize must have been called before invoking this method.
+				@tparam Args The types of the format arguments.
+				@param[in] format The fmt-style format string.
+				@param[in] args The arguments to format into the message.
+			*/
+			template <typename... Args>
+			static void error(const std::string_view &format, Args &&...args)
+			{
+				getLoggerInstance()->error(fmt::runtime(format), std::forward<Args>(args)...);
+			}
+
+			/*! @brief Logs a message at the critical level.
+				@pre @ref initialize must have been called before invoking this method.
+				@tparam Args The types of the format arguments.
+				@param[in] format The fmt-style format string.
+				@param[in] args The arguments to format into the message.
+			*/
+			template <typename... Args>
+			static void critical(const std::string_view &format, Args &&...args)
+			{
+				getLoggerInstance()->critical(fmt::runtime(format), std::forward<Args>(args)...);
+			}
+
+		private:
+			// MARK: Private Static Member Functions
+
+			/*! @brief Provides access to the function-local static spdlog logger instance.
+				@return A reference to the shared pointer holding the spdlog logger. The reference remains valid for the lifetime of the
+			   program.
+			*/
+			static std::shared_ptr<spdlog::logger> &getLoggerInstance();
+
+			/*! @brief Provides access to the function-local static logger name string.
+				@return A reference to the stored logger name. The reference remains valid for the lifetime of the program.
+			*/
+			static std::string &getLoggerName();
+
+			/*! @brief Provides access to the function-local static file name string.
+				@return A reference to the stored file name. The reference remains valid for the lifetime of the program.
+			*/
+			static std::string &getFileNameStore();
+	};
+} // namespace Utility::Debug::Logging
+
+#endif
