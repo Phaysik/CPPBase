@@ -9,15 +9,7 @@
 #ifndef INCLUDE_ATTRIBUTEMACROS_H
 #define INCLUDE_ATTRIBUTEMACROS_H
 
-#ifdef __clang__
-	/*! @def ATTR_CLANG
-		@brief Defined when compiling with the Clang/LLVM compiler.
-		@details This macro is set to `1` when the compiler predefined macro `__clang__` is present.
-		Use it to conditionally enable Clang-specific features or attributes.
-		@note This macro is internal to the attribute macros helper and is not intended as a stable public API.
-	*/
-	#define ATTR_CLANG
-#elifdef __GNUC__
+#ifdef __GNUC__
 	/*! @def ATTR_GCC
 		@brief Defined when compiling with GCC.
 		@details This macro is set to `1` when the compiler predefined macro `__GNUC__` is present.
@@ -25,6 +17,14 @@
 		@note Do not assume exact GCC version from this macro; check `__GNUC__`/`__GNUC_MINOR__` when needed.
 	*/
 	#define ATTR_GCC
+#elifdef __clang__
+	/*! @def ATTR_CLANG
+		@brief Defined when compiling with the Clang/LLVM compiler.
+		@details This macro is set to `1` when the compiler predefined macro `__clang__` is present.
+		Use it to conditionally enable Clang-specific features or attributes.
+		@note This macro is internal to the attribute macros helper and is not intended as a stable public API.
+	*/
+	#define ATTR_CLANG
 #elifdef _MSC_VER
 	/*! @def ATTR_MSVC
 		@brief Defined when compiling with Microsoft Visual C++.
@@ -71,9 +71,23 @@
 		@endcode
 	*/
 	#define ATTR_PURE __attribute__((pure))
+
+	/*! @def ATTR_RETURNS_NONNULL
+		@brief Portable macro for the compiler `returns_nonnull` attribute.
+		@details Expands to `__attribute__((returns_nonnull))` on Clang and GCC, and to an empty token on other compilers. The
+	   `returns_nonnull` attribute indicates that a function never returns a null pointer. Use this macro to annotate functions that
+	   guarantee a non-null return value.
+		@warning Misusing the attribute (annotating a function that may return null) can produce undefined behavior.
+		@example
+		@code{.cpp}
+		ATTR_RETURNS_NONNULL int* get_value() { static int x = 42; return &x; }
+		@endcode
+	*/
+	#define ATTR_RETURNS_NONNULL __attribute__((returns_nonnull))
 #else
 	#define ATTR_CONST
 	#define ATTR_PURE
+	#define ATTR_RETURNS_NONNULL
 #endif
 
 #if __has_cpp_attribute(nodiscard)
