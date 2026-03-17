@@ -569,7 +569,7 @@
 	   finishes.
 		@example
 		@code{.cpp}
-		ATTR_NORETURN int compute_value(int number) { return number; }
+		ATTR_NORETURN void terminate_program() { exit(1); }
 		@endcode
 	*/
 	#define ATTR_NORETURN [[noreturn]]
