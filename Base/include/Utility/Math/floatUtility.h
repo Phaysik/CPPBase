@@ -12,9 +12,10 @@
 #include <algorithm>
 #include <cmath>
 
-#include "attributeMacros.h"
+#include "Core/attributeMacros.h"
+#include "Core/cconcepts.h"
 
-/*! @namespace Utility::Math
+/*! @namespace Project::Utility::Math
 	@brief Helper utilities and constants for robust floating-point comparisons.
 	@details This namespace provides lightweight, constexpr helpers intended for safe
 	comparison of floating-point values using both absolute and relative tolerances.
@@ -25,7 +26,7 @@
 	@note Constants represent conservative defaults; callers may override them by passing
 	explicit epsilon values to the functions.
 */
-namespace Utility::Math
+namespace Project::Utility::Math
 {
 	/*! @brief Small absolute tolerance used when comparing values near zero.
 		@details Use this epsilon when the magnitudes of values under comparison are
@@ -50,6 +51,7 @@ namespace Utility::Math
 		comparison of the form: |lhs - rhs| <= max(|lhs|, |rhs|) * relEpsilon, which scales the allowed
 		tolerance with the magnitude of the inputs. This implementation follows Knuth's recommended
 		approach for robust floating-point comparison.
+		@tparam FloatingPoint Must satisfy @ref Concepts::FloatingPoint.
 		@param[in] lhs Left-hand operand to compare.
 		@param[in] rhs Right-hand operand to compare.
 		@param[in] absEpsilon Absolute tolerance to use for near-zero comparisons. Defaults to `ABS_EPSILON`.
@@ -57,8 +59,10 @@ namespace Utility::Math
 		@return `true` if the values are considered equal within the provided tolerances; otherwise `false`.
 		@note The function is `constexpr` and `noexcept`, suitable for compile-time evaluation when used with constexpr values.
 	*/
-	ATTR_NODISCARD constexpr bool approximatelyEqualAbsRel(const double lhs, const double rhs, const double absEpsilon = ABS_EPSILON,
-														   const double relEpsilon = REL_EPSILON) noexcept
+	template <Project::Core::FloatingPoint FloatingPoint>
+	ATTR_NODISCARD constexpr bool approximatelyEqualAbsRel(const FloatingPoint lhs, const FloatingPoint rhs,
+														   const FloatingPoint absEpsilon = ABS_EPSILON,
+														   const FloatingPoint relEpsilon = REL_EPSILON) noexcept
 	{
 		// Check if the numbers are really close -- needed when comparing numbers near zero
 		if (std::abs(lhs - rhs) <= absEpsilon)
@@ -69,6 +73,6 @@ namespace Utility::Math
 		// Otherwise fall back to Knuth's algorithm
 		return std::abs(lhs - rhs) <= (std::max(std::abs(lhs), std::abs(rhs)) * relEpsilon);
 	}
-} // namespace Utility::Math
+} // namespace Project::Utility::Math
 
 #endif

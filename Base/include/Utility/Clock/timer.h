@@ -18,17 +18,18 @@
 #include <string_view>
 #include <utility>
 
-#include "attributeMacros.h"
-#include "typedefs.h"
+#include "Core/attributeMacros.h"
+#include "Core/typedefs.h"
 
-/*! @namespace Utility::Clock Holds any useful functionality that doesn't fit anywhere else
+/*! @namespace Project::Utility::Clock Holds any useful functionality that doesn't fit anywhere else
 	@date --/--/----
 	@version x.x.x
 	@since x.x.x
 	@author Matthew Moore
 */
-namespace Utility::Clock
+namespace Project::Utility::Clock
 {
+	using Project::Core::ub;
 	template <typename T>
 	concept Ratio = std::is_same_v<T, std::ratio<T::num, T::den>>; /*!< A concept to check if a type is a std::ratio */
 
@@ -38,7 +39,7 @@ namespace Utility::Clock
 		@since x.x.x
 		@author Matthew Moore
 	*/
-	enum class TimeUnit : ui
+	enum class TimeUnit : Project::Core::ui
 	{
 		Seconds = 1,
 		Milliseconds = 1'000,
@@ -293,6 +294,6 @@ namespace Utility::Clock
 			static inline std::string_view mUnit{"s"};								   /*!< The unit of time for what is being timed */
 			static inline std::string_view mFileName{"null"};						   /*!< The unit of time for what is being timed */
 	};
-} // namespace Utility::Clock
+} // namespace Project::Utility::Clock
 
 #endif

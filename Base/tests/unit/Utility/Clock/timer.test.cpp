@@ -19,7 +19,7 @@
 
 #include <gtest/gtest.h>
 
-using Utility::Clock::Timer;
+using Project::Utility::Clock::Timer;
 
 // NOLINTBEGIN(misc-const-correctness,cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
 

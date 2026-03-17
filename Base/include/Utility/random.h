@@ -12,16 +12,16 @@
 #include <chrono>
 #include <random>
 
-#include "attributeMacros.h"
-#include "cconcepts.h" // for Integral
+#include "Core/attributeMacros.h"
+#include "Core/cconcepts.h" // for Integral
 
-/*! @namespace Utility Holds any useful functionality that doesn't fit anywhere else
+/*! @namespace Project::Utility Holds any useful functionality that doesn't fit anywhere else
 	@date --/--/----
 	@version x.x.x
 	@since x.x.x
 	@author Matthew Moore
 */
-namespace Utility
+namespace Project::Utility
 {
 	/*! @class Random random.h "include/random.h"
 		@brief Class for creating a random number generator
@@ -44,7 +44,7 @@ namespace Utility
 				@since x.x.x
 				@author Matthew Moore
 			*/
-			template <Concepts::Integral T>
+			template <Project::Core::Integral T>
 			ATTR_NODISCARD static T get(const T min, const T max) noexcept
 			{
 				return std::uniform_int_distribution<T>{min, max}(mTwister);
@@ -90,6 +90,6 @@ namespace Utility
 
 			static inline std::mt19937 mTwister{generate()}; /*!< The global random number generator */
 	};
-} // namespace Utility
+} // namespace Project::Utility
 
 #endif

@@ -11,10 +11,10 @@
 
 #include <span>
 
-#include "attributeMacros.h"
-#include "cconcepts.h"
+#include "Core/attributeMacros.h"
+#include "Core/cconcepts.h"
 
-/*! @namespace Utility::Containers::ContiguousSequence
+/*! @namespace Project::Utility::Containers::ContiguousSequence
 	@brief Utilities for working with contiguous sequence containers
 	@details
 	This namespace provides small, efficient helper routines that operate on
@@ -30,8 +30,10 @@
 	@since 0.0.1
 	@author Matthew Moore
 */
-namespace Utility::Containers::ContiguousSequence
+namespace Project::Utility::Containers::ContiguousSequence
 {
+	using Project::Core::Integral;
+
 	/*! @brief Sum `length` elements from @p sequence starting at @p startIndex.
 		@details
 		Computes the sum of `length` contiguous elements beginning at
@@ -47,7 +49,7 @@ namespace Utility::Containers::ContiguousSequence
 				returns zero if `startIndex >= sequence.size()` or `startIndex + length > sequence.size()`.
 		@note Time complexity: O(length). Space complexity: O(1).
 	*/
-	template <Concepts::Integral Integral>
+	template <Integral Integral>
 	ATTR_NODISCARD constexpr Integral computeContiguousSequenceSum(const std::span<const Integral> &sequence, const Integral startIndex,
 																   const Integral length)
 	{
@@ -79,11 +81,11 @@ namespace Utility::Containers::ContiguousSequence
 		@return The sum of elements from `startIndex` to the end as an
 				`Integral` value.
 	*/
-	template <Concepts::Integral Integral>
+	template <Integral Integral>
 	ATTR_NODISCARD constexpr Integral computeContiguousSequenceSum(const std::span<const Integral> &sequence, const Integral startIndex = 0)
 	{
 		return computeContiguousSequenceSum<Integral>(sequence, startIndex, static_cast<Integral>(sequence.size()));
 	}
-} // namespace Utility::Containers::ContiguousSequence
+} // namespace Project::Utility::Containers::ContiguousSequence
 
 #endif

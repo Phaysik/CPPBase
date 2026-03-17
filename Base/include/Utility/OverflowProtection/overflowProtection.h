@@ -11,20 +11,21 @@
 
 #include <limits>
 
-#include "attributeMacros.h"
-#include "cconcepts.h"
+#include "Core/attributeMacros.h"
+#include "Core/cconcepts.h"
 
-/*! @namespace Utility::OverflowProtection
+/*! @namespace Project::Utility::OverflowProtection
 	@brief Utilities for detecting and guarding against unsigned integer overflow.
 	@details Provides small, constexpr helpers to check for multiplication overflow and to perform
 	saturating multiplication when overflow would occur. These helpers are intended for use with
 	unsigned integral types and are constexpr so they can be evaluated at compile time when possible.
 	@note All functions are `noexcept` and return conservative values on overflow (e.g., `std::numeric_limits<Number>::max()`).
 */
-namespace Utility::OverflowProtection
+namespace Project::Utility::OverflowProtection
 {
+	using Project::Core::UnsignedIntegral;
 
-	template <Concepts::UnsignedIntegral Number>
+	template <UnsignedIntegral Number>
 	/*! @brief Check if multiplication of two unsigned values will overflow.
 		@details Returns `true` if `num1 * num2` would be greater than
 		`std::numeric_limits<Number>::max()`; otherwise returns `false`.
@@ -45,7 +46,7 @@ namespace Utility::OverflowProtection
 		return num1 > static_cast<Number>(Limits::max() / num2);
 	}
 
-	template <Concepts::UnsignedIntegral Number>
+	template <UnsignedIntegral Number>
 	/*! @brief Multiply two unsigned integers, saturating on overflow.
 		@details Performs multiplication of `num1` and `num2`. If the multiplication
 		would overflow the representable range of `Number`, the function returns
@@ -61,6 +62,6 @@ namespace Utility::OverflowProtection
 	{
 		return WillMultiplyOverflow<Number>(num1, num2) ? std::numeric_limits<Number>::max() : static_cast<Number>(num1 * num2);
 	}
-} // namespace Utility::OverflowProtection
+} // namespace Project::Utility::OverflowProtection
 
 #endif

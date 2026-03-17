@@ -14,17 +14,17 @@
 #include <string_view>
 #include <utility>
 
-#include "attributeMacros.h"
+#include "Core/attributeMacros.h"
 
 #include <spdlog/logger.h>
 
-/*! @namespace Utility::Debug::Logging Provides debug and diagnostic logging facilities.
+/*! @namespace Project::Utility::Debug::Logging Provides debug and diagnostic logging facilities.
 	@date --/--/----
 	@version x.x.x
 	@since x.x.x
 	@author Matthew Moore
 */
-namespace Utility::Debug::Logging
+namespace Project::Utility::Debug::Logging
 {
 	/*! @class Logger logger.h "include/Utility/Debug/Logging/logger.h"
 		@brief A static-only wrapper around spdlog that provides global logging through deferred initialization.
@@ -213,6 +213,6 @@ namespace Utility::Debug::Logging
 			*/
 			static std::string &getFileNameStore();
 	};
-} // namespace Utility::Debug::Logging
+} // namespace Project::Utility::Debug::Logging
 
 #endif

@@ -16,15 +16,15 @@
 #include <sstream>
 #include <string>
 
-#include <gtest/gtest.h>
+#include "Core/attributeMacros.h"
 
-#include "attributeMacros.h"
+#include <gtest/gtest.h>
 
 #include <spdlog/common.h>
 #include <spdlog/logger.h>
 #include <spdlog/spdlog.h>
 
-using Utility::Debug::Logging::Logger;
+using Project::Utility::Debug::Logging::Logger;
 
 // NOLINTBEGIN(misc-const-correctness,cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
 

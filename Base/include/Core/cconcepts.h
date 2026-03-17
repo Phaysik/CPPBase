@@ -12,14 +12,14 @@
 #include <string>
 #include <type_traits>
 
-/*! @namespace Concepts
+/*! @namespace Project::Core
 	@brief Collection of common compile-time type concepts used across the codebase.
 	@details This namespace provides small, expressive concepts built on top of the standard
 	type-traits library. Use these concepts to constrain template parameters for integral,
 	unsigned, signed, floating-point, rational (integral or floating), and std::string-like types.
 	@note All concepts are compile-time predicates with no runtime cost.
 */
-namespace Concepts
+namespace Project::Core
 {
 	/*! @concept Integral
 		@brief Tests whether a type is an integral type.
@@ -88,6 +88,6 @@ namespace Concepts
 	*/
 	template <class Func, class... Args>
 	concept InvocableWithArgs = std::invocable<Func, Args...>;
-} // namespace Concepts
+} // namespace Project::Core
 
 #endif

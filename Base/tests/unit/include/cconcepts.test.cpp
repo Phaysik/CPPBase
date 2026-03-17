@@ -6,7 +6,7 @@
 	@author Matthew Moore
 */
 
-#include "cconcepts.h"
+#include "Core/cconcepts.h"
 
 #include <cstdint>
 #include <string>
@@ -14,12 +14,12 @@
 
 #include <gtest/gtest.h>
 
-using Concepts::FloatingPoint;
-using Concepts::Integral;
-using Concepts::RationalNumber;
-using Concepts::SignedIntegral;
-using Concepts::String;
-using Concepts::UnsignedIntegral;
+using Project::Core::FloatingPoint;
+using Project::Core::Integral;
+using Project::Core::RationalNumber;
+using Project::Core::SignedIntegral;
+using Project::Core::String;
+using Project::Core::UnsignedIntegral;
 
 // Compile-time sanity checks (will fail to compile if concepts change unexpectedly)
 static_assert(Integral<int>);

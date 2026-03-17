@@ -10,11 +10,14 @@
 
 #include <limits>
 
-#include <gtest/gtest.h>
-#include "typedefs.h"
+#include "Core/typedefs.h"
 
-using Utility::OverflowProtection::SafeMultiply;
-using Utility::OverflowProtection::WillMultiplyOverflow;
+#include <gtest/gtest.h>
+
+using Project::Core::ui;
+using Project::Core::ul;
+using Project::Utility::OverflowProtection::SafeMultiply;
+using Project::Utility::OverflowProtection::WillMultiplyOverflow;
 
 // NOLINTBEGIN(misc-const-correctness,cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
 

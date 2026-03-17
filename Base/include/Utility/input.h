@@ -16,15 +16,15 @@
 #include <span>
 #include <string>
 
-#include "cconcepts.h" // for Integral, String
+#include "Core/cconcepts.h" // for Integral, String
 
-/*! @namespace Utility Holds any useful functionality that doesn't fit anywhere else
+/*! @namespace Project::Utility Holds any useful functionality that doesn't fit anywhere else
 	@date --/--/----
 	@version x.x.x
 	@since x.x.x
 	@author Matthew Moore
 */
-namespace Utility
+namespace Project::Utility
 {
 	/*! @class Input input.h "include/input.h"
 		@brief Will try and extract valid user input and clean up the input buffer as needed
@@ -105,7 +105,7 @@ namespace Utility
 				@since x.x.x
 				@author Matthew Moore
 			*/
-			template <Concepts::String T>
+			template <Project::Core::String T>
 			static T getInput(std::string_view inputMessage = mInputMessage, std::string_view errorMessage = mErrorMessage,
 							  [[maybe_unused]] const bool ignoreExtraneous = true, std::istream &input = std::cin,
 							  const bool afterFailureOnly = false)
@@ -149,7 +149,7 @@ namespace Utility
 				@since x.x.x
 				@author Matthew Moore
 			*/
-			template <Concepts::Integral T>
+			template <Project::Core::Integral T>
 			static T getInput(const T min, const T max, std::string_view inputMessage = mInputMessage,
 							  std::string_view errorMessage = mErrorMessage, const bool ignoreExtraneous = true,
 							  std::istream &input = std::cin, const bool afterFailureOnly = false)
@@ -227,7 +227,7 @@ namespace Utility
 				@author Matthew Moore
 			*/
 			template <typename T, typename Func>
-				requires Concepts::InvocableWithArgs<Func, T>
+				requires Project::Core::InvocableWithArgs<Func, T>
 			static T getInput(Func &&func, std::string_view inputMessage = mInputMessage, std::string_view errorMessage = mErrorMessage,
 							  const bool ignoreExtraneous = true, std::istream &input = std::cin, const bool afterFailureOnly = false)
 			{
@@ -319,6 +319,6 @@ namespace Utility
 				}
 			}
 	};
-} // namespace Utility
+} // namespace Project::Utility
 
 #endif
