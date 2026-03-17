@@ -115,6 +115,130 @@
 	#else
 		#define ATTR_FLAG_ENUM
 	#endif
+
+	#if __has_attribute(always_inline)
+		/*! @def ATTR_ALWAYS_INLINE
+			@brief Portable macro for the compiler `always_inline` attribute.
+			@details Expands to `__attribute__((always_inline))` on Clang and GCC, and to an empty token on other compilers.
+			The `always_inline` attribute requests that the compiler inline a function at all call sites where it is used. It is
+			a strong hint to the optimizer and may be ignored by some toolchains or in builds where inlining is inhibited. Use this
+			macro for small wrapper or forwarding functions where guaranteeing inlining improves performance or eliminates overhead.
+			@warning Overuse can increase code size and may prevent useful compiler optimizations. Do not apply to large functions
+			or when the function's address is taken, unless inlining is truly required.
+			@example
+			@code{.cpp}
+			ATTR_ALWAYS_INLINE static inline int fast_mul2(int x) { return x * 2; }
+			@endcode
+		*/
+		#define ATTR_ALWAYS_INLINE __attribute__((always_inline))
+	#else
+		#define ATTR_ALWAYS_INLINE
+	#endif
+
+	#if __has_attribute(artificial)
+		/*! @def ATTR_ARTIFICIAL
+			@brief Portable macro for the compiler `artificial` attribute.
+			@details Expands to `__attribute__((artificial))` on Clang and GCC, and to an empty token on other compilers.
+			The `artificial` attribute marks a function or variable as being compiler- or tool-generated ("artificial"). When present,
+			debuggers and diagnostic tools may treat the entity as non-user code (for example, by suppressing certain warnings,
+			omitting frames from stack traces, or adjusting debug information).
+			Use this macro for thin wrapper functions, thunks, or compiler-generated helpers where treating the symbol as artificial
+			improves debug clarity.
+			@warning Behavior and debugger handling are implementation-defined. Do not rely on this attribute for program semantics
+			or to silence real errors; use it only to improve diagnostics and debug experience.
+			@example
+			@code{.cpp}
+			ATTR_ARTIFICIAL static inline void wrapper_for_debug() { helper(); }
+			@endcode
+		*/
+		#define ATTR_ARTIFICIAL __attribute__((artificial))
+	#else
+		#define ATTR_ARTIFICIAL
+	#endif
+
+	#if __has_attribute(assume_aligned)
+		/*! @def ATTR_ASSUME_ALIGNED
+			@brief Portable macro for supplying an `assume_aligned` annotation.
+			@details When supported by the compiler, use `ATTR_ASSUME_ALIGNED(alignment)` to indicate that a pointer or object
+			is assumed to be aligned to `alignment` bytes. When an explicit byte `offset` is required, the helper macro
+			`ATTR_ASSUME_ALIGNED_EX(alignment, offset)` is provided. On compilers that support the attribute this expands to
+			`__attribute__((assume_aligned(alignment, offset)))` (or the single-argument form when using `ATTR_ASSUME_ALIGNED`).
+			This annotation allows the optimizer to assume stronger alignment, which can enable vectorized loads/stores and other
+			optimizations.
+			@warning Incorrect alignment annotations can lead to undefined behavior if the actual pointer/object is less aligned
+			than claimed. Only apply when you can guarantee the runtime alignment.
+			@example
+			@code{.cpp}
+			int * ATTR_ASSUME_ALIGNED(16) ptr = get_aligned_ptr(); // assume ptr is 16-byte aligned
+			// when an offset is required:
+			int * ATTR_ASSUME_ALIGNED_EX(16, 8) ptr2 = ...; // assume ptr2 + 8 is 16-byte aligned
+			@endcode
+		*/
+		#define ATTR_ASSUME_ALIGNED_EX(alignment, offset) __attribute__((assume_aligned(alignment, offset)))
+		#define ATTR_ASSUME_ALIGNED(alignment)			  ATTR_ASSUME_ALIGNED_EX(alignment, 0)
+	#else
+		#define ATTR_ASSUME_ALIGNED_EX(alignment, offset)
+		#define ATTR_ASSUME_ALIGNED(alignment)
+	#endif
+
+	#if __has_attribute(cold)
+		/*! @def ATTR_COLD
+			@brief Portable macro for the compiler `cold` attribute.
+			@details Expands to `__attribute__((cold))` on Clang and GCC, and to an empty token on other compilers.
+			The `cold` attribute indicates that a function or code path is unlikely to be executed. Compilers may use this hint to
+			optimize for code size and locality of hot paths (for example, placing cold functions out-of-line or reducing inlining
+			pressure in hot paths). Use this macro for error handlers, rare cleanup paths, diagnostics, and other code that is
+			rarely executed.
+			@warning Marking hot or performance-sensitive functions as cold can degrade performance. Use only when the rarity of
+			execution is well-understood.
+			@example
+			@code{.cpp}
+			ATTR_COLD void handle_error(int code) { // infrequent error path  }
+			@endcode
+		*/
+		#define ATTR_COLD __attribute__((cold))
+	#else
+		#define ATTR_COLD
+	#endif
+
+	#if __has_attribute(hot)
+		/*! @def ATTR_HOT
+			@brief Portable macro for the compiler `hot` attribute.
+			@details Expands to `__attribute__((hot))` on Clang and GCC, and to an empty token on other compilers.
+			The `hot` attribute indicates that a function or code path is expected to be executed frequently. Compilers may use this
+			hint to optimize for throughput and locality (for example, favoring inlining or placing the function in a hot section).
+			Use this macro for small, performance-critical functions or tight inner loops where the execution frequency is high and
+			profiling shows benefit.
+			@warning Overusing `ATTR_HOT` can increase code size and hurt instruction-cache behavior. Apply only to proven hot
+			paths backed by profiling data.
+			@example
+			@code{.cpp}
+			ATTR_HOT inline int inner_compute(int x) { return x * 2; }
+			@endcode
+		*/
+		#define ATTR_HOT __attribute__((hot))
+	#else
+		#define ATTR_HOT
+	#endif
+
+	#if __has_attribute(nonnull)
+		/*! @def ATTR_NONNULL
+			@brief Portable macro for the compiler `nonnull` attribute.
+			@details Expands to `__attribute__((nonnull))` or `__attribute__((nonnull(N1, N2, ...)))` on Clang and GCC, and to an empty
+			token on compilers that do not support the attribute. The `nonnull` attribute indicates that one or more function
+			pointer parameters must not be null; using it lets the compiler emit warnings or perform optimizations.
+			@warning Misusing the attribute (annotating parameters that may be null) can lead to incorrect diagnostics or
+			unsound optimizations.
+			@example
+			@code{.cpp}
+			// Both parameters must be non-null (indices are 1-based):
+			int copy_strings(const char *src, char *dst) ATTR_NONNULL(1, 2);
+			@endcode
+		*/
+		#define ATTR_NONNULL(...) __attribute__((nonnull(__VA_ARGS__)))
+	#else
+		#define ATTR_NONNULL(...)
+	#endif
 #endif
 
 #if defined(ATTR_CLANG)
@@ -222,6 +346,82 @@
 		#define ATTR_USING_IF_EXISTS
 	#endif
 
+	#if __has_attribute(noderef)
+		/*! @def ATTR_NODEREF
+			@brief Portable macro for the Clang `noderef` attribute.
+			@details Expands to `__attribute__((noderef))` on Clang, and to an empty token on other compilers. The `noderef`
+			attribute is used to mark pointer-typed declarations whose dereference should be diagnosed by the compiler. When a
+			pointer type is annotated with `noderef`, attempts to dereference that pointer (directly or indirectly) will typically
+			produce a diagnostic warning indicating the dereference is unsafe or not intended. This attribute is intended for use
+			with special pointer-like types or tools that need to flag unsafe dereferences; it does not change runtime semantics.
+			@warning Use `ATTR_NODEREF` only on pointer types where dereferencing is intentionally unsafe or should be diagnosed.
+			Incorrectly annotating ordinary pointers may produce noisy diagnostics.
+			@example
+			@code{.cpp}
+			int __attribute__((noderef)) *p;
+			int x = *p;  // warning
+
+			int __attribute__((noderef)) **p2;
+			x = **p2;  // warning
+
+			int * __attribute__((noderef)) *p3;
+			p = *p3;  // warning
+
+			struct S {
+			int a;
+			};
+			struct S __attribute__((noderef)) *s;
+			x = s->a;    // warning
+			x = (*s).a;  // warning
+			@endcode
+		*/
+		#define ATTR_NODEREF __attribute__((noderef))
+	#else
+		#define ATTR_NODEREF
+	#endif
+
+	#if __has_attribute(called_once)
+		/*! @def ATTR_CALLED_ONCE
+			@brief Portable macro for the Clang `called_once` attribute.
+			@details Expands to `__attribute__((called_once))` on Clang, and to an empty token on other compilers. The
+			`called_once` attribute applies to parameters with function-like types (function pointers or Objective-C/C blocks)
+			and indicates that the callable is expected to be invoked exactly once on every execution path. Clang performs
+			static checks for violations such as: the parameter is not called, is called more than once, or is not called on some
+			execution paths. This attribute is analysis-only and does not affect runtime behavior.
+			@warning Use `ATTR_CALLED_ONCE` only for callbacks that must be invoked exactly once; incorrect use can generate
+			noisy or spurious diagnostics from static analysis.T
+			@example
+			@code{.cpp}
+			void fooWithCallback(void (^callback)(void) __attribute__((called_once))) {
+			if (somePredicate()) {
+				...
+				callback();
+			} else {
+				callback(); // OK: callback is called on every path
+			}
+			}
+
+			void barWithCallback(void (^callback)(void) __attribute__((called_once))) {
+			if (somePredicate()) {
+				...
+				callback(); // note: previous call is here
+			}
+			callback(); // warning: callback is called twice
+			}
+
+			void foobarWithCallback(void (^callback)(void) __attribute__((called_once))) {
+			if (somePredicate()) {  // warning: callback is not called when condition is false
+				...
+				callback();
+			}
+			}
+			@endcode
+		*/
+		#define ATTR_CALLED_ONCE __attribute__((called_once))
+	#else
+		#define ATTR_CALLED_ONCE
+	#endif
+
 	#if __has_cpp_attribute(clang::no_specializations)
 		/*! @def ATTR_NO_SPECIALIZATIONS
 			@brief Portable macro for the Clang `[[clang::no_specializations]]` attribute.
@@ -270,8 +470,8 @@
 			};
 
 			struct S {
-				[[clang::preferred_type(Colors)]] unsigned ColorVal : 2;
-				[[clang::preferred_type(bool)]] unsigned UseAlternateColorSpace : 1;
+				ATTR_PREFERRED_TYPE(Colors) unsigned ColorVal : 2;
+				ATTR_PREFERRED_TYPE(bool) unsigned UseAlternateColorSpace : 1;
 			} s = { Green, false };
 			@endcode
 		*/
@@ -279,12 +479,40 @@
 	#else
 		#define ATTR_PREFERRED_TYPE(param)
 	#endif
+
+	#if __has_cpp_attribute(clang::reinitializes)
+		/*! @def ATTR_REINITIALIZES
+			@brief Portable macro for the Clang `[[clang::reinitializes]]` attribute.
+			@details Expands to `[[clang::reinitializes]]` on Clang, and to an empty token on other compilers.
+			The `[[clang::reinitializes]]` attribute indicates that a non-static, non-const C++ member
+			function reinitializes the entire object to a known, valid state regardless of its
+			prior state. Static analysis tools can use this information to treat moved-from
+			objects as reinitialized after the call. This attribute is for analysis only and does
+			not affect code generation.
+			@warning Do not annotate member functions that only partially reinitialize an object;
+			misuse may cause static analysis to miss real issues or produce misleading results.
+			@example
+			@code{.cpp}
+			class Container {
+				public:
+					// Clear() restores the container to a valid empty state even if it was moved-from.
+					ATTR_REINITIALIZES void Clear();
+			};
+			@endcode
+		*/
+		#define ATTR_REINITIALIZES [[clang::reinitializes]]
+	#else
+		#define ATTR_REINITIALIZES
+	#endif
 #else
 	#define ATTR_ENUM_EXTENSIBILITY_OPEN
 	#define ATTR_ENUM_EXTENSIBILITY_CLOSED
 	#define ATTR_USING_IF_EXISTS
+	#define ATTR_NODEREF
+	#define ATTR_CALLED_ONCE
 	#define ATTR_NO_SPECIALIZATIONS
 	#define ATTR_PREFERRED_TYPE(param)
+	#define ATTR_REINITIALIZES
 #endif
 
 #if __has_cpp_attribute(nodiscard)
