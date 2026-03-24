@@ -2,7 +2,7 @@
 	@brief Google Test unit tests for the static Logger wrapper.
 	@details Exercises initialization, level get/set, name/file replacement, and all seven logging-level template methods. Each test writes
    to a temporary file that is cleaned up in TearDown.
-	@date --/--/----
+	@date 03/11/2026
 	@version x.x.x
 	@since x.x.x
 	@author Matthew Moore
@@ -22,6 +22,7 @@
 
 #include <spdlog/common.h>
 #include <spdlog/logger.h>
+#include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/spdlog.h>
 
 using Project::Utility::Debug::Logging::Logger;
@@ -97,7 +98,7 @@ namespace // NOSONAR
 
 	TEST_F(LoggerTest, GivenAlreadyInitializedWhenReInitializedThenSucceeds)
 	{
-		std::string secondFile = "logger_test_reinit.log";
+		std::string secondFile{"logger_test_reinit.log"};
 		EXPECT_NO_THROW(Logger::initialize("reinit_logger", secondFile));
 
 		Logger::info("after reinit");
@@ -121,7 +122,7 @@ namespace // NOSONAR
 	TEST_F(LoggerTest, GivenDefaultLevelWhenGetLevelCalledThenReturnsInfoLevel)
 	{
 		// spdlog's default level is info
-		spdlog::level::level_enum level = Logger::getLevel();
+		spdlog::level::level_enum level{Logger::getLevel()};
 		EXPECT_EQ(level, spdlog::level::info);
 	}
 
@@ -159,7 +160,7 @@ namespace // NOSONAR
 
 	TEST_F(LoggerTest, GivenNewFileWhenSetFileNameCalledThenLogsToNewFile)
 	{
-		std::string newFile = "logger_test_newfile.log";
+		std::string newFile{"logger_test_newfile.log"};
 		static_cast<void>(std::filesystem::remove(newFile));
 
 		Logger::setFileName(newFile);
@@ -183,7 +184,7 @@ namespace // NOSONAR
 
 	TEST_F(LoggerTest, GivenNewNameAndFileWhenSetLoggerAndFileNameCalledThenLogsToNewFile)
 	{
-		std::string newFile = "logger_test_both.log";
+		std::string newFile{"logger_test_both.log"};
 		static_cast<void>(std::filesystem::remove(newFile));
 
 		Logger::setLoggerAndFileName("both_logger", newFile);
@@ -302,6 +303,73 @@ namespace // NOSONAR
 
 		const std::string contents{readLogFile()};
 		EXPECT_NE(contents.find("no format args"), std::string::npos);
+	}
+
+	// ────────────────────────────────────────────────────────────
+	// truncateFile parameter
+	// ────────────────────────────────────────────────────────────
+
+	TEST_F(LoggerTest, GivenExistingContentWhenInitializedWithTruncateThenFileIsCleared)
+	{
+		// Write some content through the logger so the file is non-empty
+		Logger::info("pre-existing content");
+		spdlog::apply_all([](const std::shared_ptr<spdlog::logger> &logger) { logger->flush(); });
+
+		std::string contents{readLogFile()};
+		ASSERT_FALSE(contents.empty());
+
+		// Re-initialize with truncateFile = true
+		spdlog::drop_all();
+		Logger::initialize(getLoggerName(), getLogFileName(), true);
+
+		Logger::info("after truncate");
+		contents = readLogFile();
+
+		EXPECT_EQ(contents.find("pre-existing content"), std::string::npos);
+		EXPECT_NE(contents.find("after truncate"), std::string::npos);
+	}
+
+	TEST_F(LoggerTest, GivenExistingContentWhenInitializedWithoutTruncateThenFileIsPreserved)
+	{
+		Logger::info("keep this content");
+		spdlog::apply_all([](const std::shared_ptr<spdlog::logger> &logger) { logger->flush(); });
+
+		// Re-initialize without truncation (default)
+		spdlog::drop_all();
+		Logger::initialize("preserve_logger", getLogFileName(), false);
+
+		Logger::info("appended content");
+		spdlog::apply_all([](const std::shared_ptr<spdlog::logger> &logger) { logger->flush(); });
+
+		std::string contents{readLogFile()};
+		EXPECT_NE(contents.find("keep this content"), std::string::npos);
+		EXPECT_NE(contents.find("appended content"), std::string::npos);
+	}
+
+	TEST_F(LoggerTest, GivenInvalidPathWhenInitializedWithTruncateThenThrowsRuntimeError)
+	{
+		spdlog::drop_all();
+		// A path under a non-existent directory should fail to open for truncation
+		EXPECT_THROW(Logger::initialize("trunc_fail_logger", "/no_such_dir/no_such_subdir/fail.log", true), std::runtime_error);
+	}
+
+	// ────────────────────────────────────────────────────────────
+	// spdlog initialization failure (duplicate name without drop)
+	// ────────────────────────────────────────────────────────────
+
+	TEST_F(LoggerTest, GivenDuplicateRegistryNameWhenInitializedThenThrowsRuntimeError)
+	{
+		// Manually register a logger with the same name so spdlog::basic_logger_mt throws
+		std::string duplicateName{"duplicate_logger"};
+		std::string tempFile{"logger_test_dup.log"};
+		const std::shared_ptr<spdlog::logger> manualLogger{spdlog::basic_logger_mt(duplicateName, tempFile)};
+
+		// initialize will reset its own internal state but cannot drop the manually registered logger,
+		// causing spdlog to throw spdlog_ex which is caught and re-thrown as runtime_error.
+		EXPECT_THROW(Logger::initialize(duplicateName, getLogFileName()), std::runtime_error);
+
+		spdlog::drop(duplicateName);
+		static_cast<void>(std::filesystem::remove(tempFile));
 	}
 } // namespace
 
