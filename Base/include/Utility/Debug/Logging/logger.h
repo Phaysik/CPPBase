@@ -103,9 +103,11 @@ namespace Project::Utility::Debug::Logging
 			   logging methods (trace, debug, info, etc.).
 				@param[in] loggerName The name used to identify the logger within spdlog's registry.
 				@param[in] fileName The path to the log output file.
-				@throws std::runtime_error If spdlog initialization fails.
+				@param[in] truncateFile If true, the file at `fileName` will be truncated (cleared) before the logger is created. Defaults
+			   to false.
+				@throws std::runtime_error If spdlog initialization or file truncation fails.
 			*/
-			static void initialize(std::string_view loggerName, std::string_view fileName);
+			static void initialize(std::string_view loggerName, std::string_view fileName, const bool truncateFile = false);
 
 			// MARK: Static Template Member Functions
 

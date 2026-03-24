@@ -8,6 +8,7 @@
 
 #include "Utility/Debug/Logging/logger.h"
 
+#include <fstream>
 #include <memory>
 #include <stdexcept>
 #include <string>
@@ -53,7 +54,7 @@ namespace Utility::Debug::Logging
 
 	// MARK: Static Member Function
 
-	void Logger::initialize(std::string_view loggerName, std::string_view fileName)
+	void Logger::initialize(std::string_view loggerName, std::string_view fileName, const bool truncateFile)
 	{
 		const std::string convertedLoggerName{loggerName};
 		const std::string convertedFileName{fileName};
@@ -67,6 +68,15 @@ namespace Utility::Debug::Logging
 
 		getLoggerName() = convertedLoggerName;
 		getFileNameStore() = convertedFileName;
+
+		if (truncateFile)
+		{
+			std::ofstream ofs(convertedFileName, std::ofstream::out | std::ofstream::trunc);
+			if (!ofs.is_open())
+			{
+				throw std::runtime_error(std::string("Failed to truncate log file: ") + convertedFileName);
+			}
+		}
 
 		try
 		{
