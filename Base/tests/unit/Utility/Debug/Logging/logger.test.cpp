@@ -670,6 +670,7 @@ namespace // NOSONAR
 		std::optional<std::string_view> result{Logger::log(spdlog::level::info, "{} {}", 77)};
 
 		ASSERT_TRUE(result.has_value());
+		// NOLINTNEXTLINE(bugprone-unchecked-optional-access)
 		EXPECT_EQ(result.value(), Project::Utility::Debug::Logging::LOG_LOG_FAILURE);
 
 		spdlog::set_error_handler([](const std::string & /*msg*/) {});
@@ -683,6 +684,7 @@ namespace // NOSONAR
 		std::optional<std::string_view> result{Logger::trace("{} {}", 42)};
 
 		ASSERT_TRUE(result.has_value());
+		// NOLINTNEXTLINE(bugprone-unchecked-optional-access)
 		EXPECT_EQ(result.value(), Project::Utility::Debug::Logging::TRACE_LOG_FAILURE);
 
 		spdlog::set_error_handler([](const std::string & /*msg*/) {});
@@ -696,6 +698,7 @@ namespace // NOSONAR
 		std::optional<std::string_view> result{Logger::debug("{} {}", "hello")};
 
 		ASSERT_TRUE(result.has_value());
+		// NOLINTNEXTLINE(bugprone-unchecked-optional-access)
 		EXPECT_EQ(result.value(), Project::Utility::Debug::Logging::DEBUG_LOG_FAILURE);
 
 		spdlog::set_error_handler([](const std::string & /*msg*/) {});
@@ -708,6 +711,7 @@ namespace // NOSONAR
 		std::optional<std::string_view> result{Logger::info("{} {}", 100)};
 
 		ASSERT_TRUE(result.has_value());
+		// NOLINTNEXTLINE(bugprone-unchecked-optional-access)
 		EXPECT_EQ(result.value(), Project::Utility::Debug::Logging::INFO_LOG_FAILURE);
 
 		spdlog::set_error_handler([](const std::string & /*msg*/) {});
@@ -720,6 +724,7 @@ namespace // NOSONAR
 		std::optional<std::string_view> result{Logger::warn("{} {}", 3.14)};
 
 		ASSERT_TRUE(result.has_value());
+		// NOLINTNEXTLINE(bugprone-unchecked-optional-access)
 		EXPECT_EQ(result.value(), Project::Utility::Debug::Logging::WARN_LOG_FAILURE);
 
 		spdlog::set_error_handler([](const std::string & /*msg*/) {});
@@ -732,6 +737,7 @@ namespace // NOSONAR
 		std::optional<std::string_view> result{Logger::error("{} {}", "failure")};
 
 		ASSERT_TRUE(result.has_value());
+		// NOLINTNEXTLINE(bugprone-unchecked-optional-access)
 		EXPECT_EQ(result.value(), Project::Utility::Debug::Logging::ERROR_LOG_FAILURE);
 
 		spdlog::set_error_handler([](const std::string & /*msg*/) {});
@@ -744,6 +750,7 @@ namespace // NOSONAR
 		std::optional<std::string_view> result{Logger::critical("{} {}", 999)};
 
 		ASSERT_TRUE(result.has_value());
+		// NOLINTNEXTLINE(bugprone-unchecked-optional-access)
 		EXPECT_EQ(result.value(), Project::Utility::Debug::Logging::CRITICAL_LOG_FAILURE);
 
 		spdlog::set_error_handler([](const std::string & /*msg*/) {});
