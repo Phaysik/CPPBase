@@ -126,6 +126,7 @@ GENHTML_OUTPUT_FOLDER = .\/coverage
 
 CLANG_SOURCES = ${SOURCES} ${TEST_SOURCES}
 TIDY_COMPILE_FLAGS = --config-file=.clang-tidy
+RUN_TIDY_COMPILE_FLAGS = -config-file=.clang-tidy -j 4 -p=.vscode -use-color=true -extra-arg-before=-Wno-unknown-warning-option
 FORMAT_COMPILE_FLAGS = -i -style=file:.clang-format
 
 CPPCHECK_FOLDER = cppcheck
@@ -304,6 +305,9 @@ coverage: genhtml
 
 tidy: ${CLANG_SOURCES}
 	clang-tidy ${TIDY_COMPILE_FLAGS} $^ -- ${INCLUDE_ARGUMENT} ${TEST_INCLUDE_ARGUMENT}
+
+run_tidy: ${CLANG_SOURCES}
+	run-clang-tidy ${RUN_TIDY_COMPILE_FLAGS} $^ -- ${INCLUDE_ARGUMENT} ${TEST_INCLUDE_ARGUMENT}
 
 check: ${CLANG_SOURCES}
 	mkdir -p ${CPPCHECK_FOLDER}
