@@ -241,7 +241,7 @@
 	#endif
 #endif
 
-#if defined(ATTR_CLANG)
+#ifdef ATTR_CLANG
 	#if __has_attribute(enum_extensibility)
 		/*! @def ATTR_ENUM_EXTENSIBILITY_OPEN
 			@brief Portable macro for the Clang `enum_extensibility(open)` attribute.

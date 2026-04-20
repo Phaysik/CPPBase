@@ -1,6 +1,6 @@
 /*! @file contiguousSequence.test.cpp
 	@brief Google Test unit tests for `Containers::ContiguousSequence` utilities.
-	@date 01/23/2026
+	@date --/--/----
 	@version 0.0.1
 	@since 0.0.1
 	@author Matthew Moore

@@ -15,6 +15,7 @@
 #include <utility>
 
 #include "Core/attributeMacros.h"
+#include "Utility/Debug/Logging/constants.h"
 
 #include <spdlog/logger.h>
 
@@ -75,7 +76,7 @@ namespace Project::Utility::Debug::Logging
 				@param[in] loggerName The new name for the logger.
 				@throws std::runtime_error If spdlog re-initialization fails.
 			*/
-			static void setLoggerName(const std::string &loggerName);
+			ATTR_NODISCARD static bool setLoggerName(const std::string &loggerName);
 
 			/*! @brief Replaces the logger with a new one writing to the given file, keeping the current name.
 				@details Destroys the existing spdlog logger and creates a new one via @ref initializeLogger.
@@ -84,7 +85,7 @@ namespace Project::Utility::Debug::Logging
 				@param[in] fileName The new file path for log output.
 				@throws std::runtime_error If spdlog re-initialization fails.
 			*/
-			static void setFileName(const std::string &fileName);
+			ATTR_NODISCARD static bool setFileName(const std::string &fileName);
 
 			/*! @brief Replaces the logger with a new one using the given name and file, keeping the current settings.
 				@details Destroys the existing spdlog logger and creates a new one via @ref initializeLogger.
@@ -94,7 +95,7 @@ namespace Project::Utility::Debug::Logging
 				@param[in] fileName The new file path for log output.
 				@throws std::runtime_error If spdlog re-initialization fails.
 			*/
-			static void setLoggerAndFileName(const std::string &loggerName, const std::string &fileName);
+			ATTR_NODISCARD static bool setLoggerAndFileName(const std::string &loggerName, const std::string &fileName);
 
 			// MARK: Static Member Function
 
@@ -107,7 +108,7 @@ namespace Project::Utility::Debug::Logging
 			   to false.
 				@throws std::runtime_error If spdlog initialization or file truncation fails.
 			*/
-			static void initialize(std::string_view loggerName, std::string_view fileName, const bool truncateFile = false);
+			ATTR_NODISCARD static bool initialize(std::string_view loggerName, std::string_view fileName, const bool truncateFile = false);
 
 			// MARK: Static Template Member Functions
 
@@ -119,9 +120,21 @@ namespace Project::Utility::Debug::Logging
 				@param[in] level The spdlog level to log at (defaults to spdlog::level::info).
 			*/
 			template <typename... Args>
-			static void log(const std::string_view &format, Args &&...args, spdlog::level::level_enum level = spdlog::level::info)
+			ATTR_NODISCARD static std::optional<std::string_view> log(spdlog::level::level_enum level, const std::string_view &format,
+																	  Args &&...args)
 			{
-				getLoggerInstance()->log(level, fmt::runtime(format), std::forward<Args>(args)...);
+				const std::shared_ptr<spdlog::logger> &logger = getLoggerInstance();
+
+				try
+				{
+					logger->log(level, fmt::runtime(format), std::forward<Args>(args)...);
+				}
+				catch (const spdlog::spdlog_ex &ex)
+				{
+					return LOG_LOG_FAILURE;
+				}
+
+				return std::nullopt;
 			}
 
 			/*! @brief Logs a message at the trace level.
@@ -131,9 +144,20 @@ namespace Project::Utility::Debug::Logging
 				@param[in] args The arguments to format into the message.
 			*/
 			template <typename... Args>
-			static void trace(const std::string_view &format, Args &&...args)
+			ATTR_NODISCARD static std::optional<std::string_view> trace(const std::string_view &format, Args &&...args)
 			{
-				getLoggerInstance()->trace(fmt::runtime(format), std::forward<Args>(args)...);
+				const std::shared_ptr<spdlog::logger> &logger = getLoggerInstance();
+
+				try
+				{
+					logger->trace(fmt::runtime(format), std::forward<Args>(args)...);
+				}
+				catch (const spdlog::spdlog_ex &ex)
+				{
+					return TRACE_LOG_FAILURE;
+				}
+
+				return std::nullopt;
 			}
 
 			/*! @brief Logs a message at the debug level.
@@ -143,9 +167,20 @@ namespace Project::Utility::Debug::Logging
 				@param[in] args The arguments to format into the message.
 			*/
 			template <typename... Args>
-			static void debug(const std::string_view &format, Args &&...args)
+			ATTR_NODISCARD static std::optional<std::string_view> debug(const std::string_view &format, Args &&...args)
 			{
-				getLoggerInstance()->debug(fmt::runtime(format), std::forward<Args>(args)...);
+				const std::shared_ptr<spdlog::logger> &logger = getLoggerInstance();
+
+				try
+				{
+					logger->debug(fmt::runtime(format), std::forward<Args>(args)...);
+				}
+				catch (const spdlog::spdlog_ex &ex)
+				{
+					return DEBUG_LOG_FAILURE;
+				}
+
+				return std::nullopt;
 			}
 
 			/*! @brief Logs a message at the info level.
@@ -155,9 +190,20 @@ namespace Project::Utility::Debug::Logging
 				@param[in] args The arguments to format into the message.
 			*/
 			template <typename... Args>
-			static void info(const std::string_view &format, Args &&...args)
+			ATTR_NODISCARD static std::optional<std::string_view> info(const std::string_view &format, Args &&...args)
 			{
-				getLoggerInstance()->info(fmt::runtime(format), std::forward<Args>(args)...);
+				const std::shared_ptr<spdlog::logger> &logger = getLoggerInstance();
+
+				try
+				{
+					logger->info(fmt::runtime(format), std::forward<Args>(args)...);
+				}
+				catch (const spdlog::spdlog_ex &ex)
+				{
+					return INFO_LOG_FAILURE;
+				}
+
+				return std::nullopt;
 			}
 
 			/*! @brief Logs a message at the warn level.
@@ -167,9 +213,20 @@ namespace Project::Utility::Debug::Logging
 				@param[in] args The arguments to format into the message.
 			*/
 			template <typename... Args>
-			static void warn(const std::string_view &format, Args &&...args)
+			ATTR_NODISCARD static std::optional<std::string_view> warn(const std::string_view &format, Args &&...args)
 			{
-				getLoggerInstance()->warn(fmt::runtime(format), std::forward<Args>(args)...);
+				const std::shared_ptr<spdlog::logger> &logger = getLoggerInstance();
+
+				try
+				{
+					logger->warn(fmt::runtime(format), std::forward<Args>(args)...);
+				}
+				catch (const spdlog::spdlog_ex &ex)
+				{
+					return WARN_LOG_FAILURE;
+				}
+
+				return std::nullopt;
 			}
 
 			/*! @brief Logs a message at the error level.
@@ -179,9 +236,20 @@ namespace Project::Utility::Debug::Logging
 				@param[in] args The arguments to format into the message.
 			*/
 			template <typename... Args>
-			static void error(const std::string_view &format, Args &&...args)
+			ATTR_NODISCARD static std::optional<std::string_view> error(const std::string_view &format, Args &&...args)
 			{
-				getLoggerInstance()->error(fmt::runtime(format), std::forward<Args>(args)...);
+				const std::shared_ptr<spdlog::logger> &logger = getLoggerInstance();
+
+				try
+				{
+					logger->error(fmt::runtime(format), std::forward<Args>(args)...);
+				}
+				catch (const spdlog::spdlog_ex &ex)
+				{
+					return ERROR_LOG_FAILURE;
+				}
+
+				return std::nullopt;
 			}
 
 			/*! @brief Logs a message at the critical level.
@@ -191,9 +259,20 @@ namespace Project::Utility::Debug::Logging
 				@param[in] args The arguments to format into the message.
 			*/
 			template <typename... Args>
-			static void critical(const std::string_view &format, Args &&...args)
+			ATTR_NODISCARD static std::optional<std::string_view> critical(const std::string_view &format, Args &&...args)
 			{
-				getLoggerInstance()->critical(fmt::runtime(format), std::forward<Args>(args)...);
+				const std::shared_ptr<spdlog::logger> &logger = getLoggerInstance();
+
+				try
+				{
+					logger->critical(fmt::runtime(format), std::forward<Args>(args)...);
+				}
+				catch (const spdlog::spdlog_ex &ex)
+				{
+					return CRITICAL_LOG_FAILURE;
+				}
+
+				return std::nullopt;
 			}
 
 		private:

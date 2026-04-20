@@ -24,6 +24,11 @@ using Project::Utility::OverflowProtection::WillMultiplyOverflow;
 TEST(OverflowProtectionBasicChecks, ZeroAndSmallValues)
 {
 	EXPECT_FALSE(WillMultiplyOverflow<ui>(0U, 12'345U));
+
+	ui nonZero{12'345U};
+	ui zero{0U};
+	EXPECT_FALSE(WillMultiplyOverflow<ui>(static_cast<ui>(nonZero), static_cast<ui>(zero)));
+	
 	EXPECT_FALSE(WillMultiplyOverflow<ui>(1U, std::numeric_limits<ui>::max()));
 
 	EXPECT_EQ(SafeMultiply<ui>(0U, 12'345U), 0U);

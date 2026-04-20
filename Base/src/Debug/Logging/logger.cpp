@@ -1,6 +1,6 @@
 /*! \file logger.cpp
 	\brief Contains the function definitions for creating a logger
-	\date 03/11/2026
+	\date --/--/----
 	\version x.x.x
 	\since x.x.x
 	\author Matthew Moore
@@ -10,7 +10,6 @@
 
 #include <fstream>
 #include <memory>
-#include <stdexcept>
 #include <string>
 #include <string_view>
 
@@ -21,7 +20,7 @@
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/spdlog.h>
 
-namespace Utility::Debug::Logging
+namespace Project::Utility::Debug::Logging
 {
 	// MARK: Getter
 
@@ -37,55 +36,71 @@ namespace Utility::Debug::Logging
 		getLoggerInstance()->set_level(level);
 	}
 
-	void Logger::setLoggerName(const std::string &loggerName)
+	ATTR_NODISCARD bool Logger::setLoggerName(const std::string &loggerName)
 	{
-		initialize(loggerName, getFileNameStore());
+		return initialize(loggerName, getFileNameStore());
 	}
 
-	void Logger::setFileName(const std::string &fileName)
+	ATTR_NODISCARD bool Logger::setFileName(const std::string &fileName)
 	{
-		initialize(getLoggerName(), fileName);
+		return initialize(getLoggerName(), fileName);
 	}
 
-	void Logger::setLoggerAndFileName(const std::string &loggerName, const std::string &fileName)
+	ATTR_NODISCARD bool Logger::setLoggerAndFileName(const std::string &loggerName, const std::string &fileName)
 	{
-		initialize(loggerName, fileName);
+		return initialize(loggerName, fileName);
 	}
 
 	// MARK: Static Member Function
 
-	void Logger::initialize(std::string_view loggerName, std::string_view fileName, const bool truncateFile)
+	bool Logger::initialize(std::string_view loggerName, std::string_view fileName, const bool truncateFile)
 	{
-		const std::string convertedLoggerName{loggerName};
-		const std::string convertedFileName{fileName};
+		const std::string convertedLoggerName{loggerName}; // LCOV_EXCL_BR_LINE — uncovered branch is the compiler-generated throw edge from
+														   // std::string construction (std::bad_alloc)
+		const std::string convertedFileName{fileName};	   // LCOV_EXCL_BR_LINE — uncovered branch is the compiler-generated throw edge from
+														   // std::string construction (std::bad_alloc)
 
-		if (getLoggerInstance())
+		if (getLoggerInstance()) // LCOV_EXCL_BR_LINE — uncovered branch is the compiler-generated throw edge from shared_ptr bool
+								 // conversion
 		{
-			spdlog::drop(getLoggerName());
+			spdlog::drop(getLoggerName()); // LCOV_EXCL_BR_LINE — uncovered branches are compiler-generated throw edges from getLoggerName()
+										   // and spdlog::drop()
 		}
 
-		getLoggerInstance().reset();
+		getLoggerInstance().reset(); // LCOV_EXCL_BR_LINE — uncovered branch is the compiler-generated throw edge from the accessor call
 
-		getLoggerName() = convertedLoggerName;
-		getFileNameStore() = convertedFileName;
+		getLoggerName() = convertedLoggerName;	// LCOV_EXCL_BR_LINE — uncovered branches are compiler-generated throw edges from accessor
+												// call and string assignment
+		getFileNameStore() = convertedFileName; // LCOV_EXCL_BR_LINE — uncovered branches are compiler-generated throw edges from accessor
+												// call and string assignment
 
 		if (truncateFile)
 		{
+			// LCOV_EXCL_BR_START — uncovered branch is the compiler-generated throw edge from ofstream construction
 			std::ofstream ofs(convertedFileName, std::ofstream::out | std::ofstream::trunc);
+			// LCOV_EXCL_BR_STOP
+			
 			if (!ofs.is_open())
 			{
-				throw std::runtime_error(std::string("Failed to truncate log file: ") + convertedFileName);
+				return false;
 			}
 		}
 
 		try
 		{
+			// LCOV_EXCL_BR_START — uncovered branch is the compiler-generated throw edge from shared_ptr assignment
 			getLoggerInstance() = spdlog::basic_logger_mt(convertedLoggerName, convertedFileName);
+			// LCOV_EXCL_BR_STOP
 		}
+		// LCOV_EXCL_BR_START — uncovered branch is the catch-clause type-mismatch fallthrough; only reachable if a non-spdlog_ex escapes
+		// basic_logger_mt (e.g. std::bad_alloc)
 		catch (const spdlog::spdlog_ex &ex)
 		{
-			throw std::runtime_error(std::string("Log initialization failed: ") + ex.what());
+			return false;
 		}
+		// LCOV_EXCL_BR_STOP
+
+		return true;
 	}
 
 // GCC incorrectly suggests returns_nonnull for reference-returning functions; suppress since references are inherently non-null.
@@ -96,23 +111,26 @@ namespace Utility::Debug::Logging
 
 	std::shared_ptr<spdlog::logger> &Logger::getLoggerInstance()
 	{
-		static std::shared_ptr<spdlog::logger> logger;
+		static std::shared_ptr<spdlog::logger>
+			logger; // LCOV_EXCL_BR_LINE — fourth branch is the __cxa_atexit destructor-registration failure path, only reachable on OOM
 		return logger;
 	}
 
 	std::string &Logger::getLoggerName()
 	{
-		static std::string loggerName;
+		static std::string loggerName; // LCOV_EXCL_BR_LINE — fourth branch is the __cxa_atexit destructor-registration failure path,
+									   // only reachable on OOM
 		return loggerName;
 	}
 
 	std::string &Logger::getFileNameStore()
 	{
-		static std::string fileName;
+		static std::string fileName; // LCOV_EXCL_BR_LINE — fourth branch is the __cxa_atexit destructor-registration failure path, only
+									 // reachable on OOM
 		return fileName;
 	}
 
 #if defined(ATTR_GCC) && !defined(ATTR_CLANG)
 	#pragma GCC diagnostic pop
 #endif
-} // namespace Utility::Debug::Logging
+} // namespace Project::Utility::Debug::Logging

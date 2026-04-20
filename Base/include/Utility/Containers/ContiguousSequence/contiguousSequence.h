@@ -25,7 +25,7 @@
 	@note All functions take `std::span<const T>` and therefore do not modify
 		  the underlying sequence; callers should use `std::span` conversions
 		  to pass containers or raw arrays.
-	@date 01/23/2026
+	@date --/--/----
 	@version 0.0.1
 	@since 0.0.1
 	@author Matthew Moore
