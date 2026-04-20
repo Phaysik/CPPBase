@@ -190,8 +190,7 @@ $(SHADER_DIR)/%.spv: $(SHADER_DIR)/%.slang
 shaders: $(SPV_FILES)
 
 ${OUTPUT_FOLDER_RELEASE}/%.o: ${SOURCE_FOLDER}/%.cpp
-	@dir=$(dir $@); \
-	mkdir -p $$dir;
+	@mkdir -p $(dir $@)
 	${COMPILER} ${COMPILER_FLAGS_RELEASE} ${WARNINGS} ${RELEASE_WARNINGS} ${INCLUDE_ARGUMENT} -MMD -MP -c $< -o $@
 
 -include $(DEPS_RELEASE)
@@ -206,8 +205,7 @@ release: compile
 	${OUTPUT_FOLDER_RELEASE}/${OUTPUT_FILE_RELEASE}
 
 ${OUTPUT_FOLDER_DEV}/%.o: ${SOURCE_FOLDER}/%.cpp
-	@dir=$(dir $@); \
-	mkdir -p $$dir;
+	@mkdir -p $(dir $@)
 	${COMPILER} ${COMPILER_FLAGS_DEV} ${WARNINGS} ${DEBUG_WARNINGS} ${INCLUDE_ARGUMENT} -MMD -MP -c $< -o $@
 
 -include $(DEPS_DEV)
@@ -223,8 +221,7 @@ dev: debug
 	rm -rf gmon.out
 
 ${OUTPUT_FOLDER_VALGRIND}/%.o: ${SOURCE_FOLDER}/%.cpp
-	@dir=$(dir $@); \
-	mkdir -p $$dir;
+	@mkdir -p $(dir $@)
 	${COMPILER} ${COMPILER_FLAGS_VALGRIND} ${WARNINGS} ${INCLUDE_ARGUMENT} -MMD -MP -c $< -o $@
 
 -include $(DEPS_VALGRIND)
@@ -239,13 +236,11 @@ valgrind: val
 	valgrind ${VALGRIND_FLAGS} ${OUTPUT_FOLDER_VALGRIND}/${OUTPUT_FILE_VALGRIND}
 
 ${OUTPUT_FOLDER_BENCHMARK}/%.o: ${BENCHMARK_FOLDER}/%.cpp
-	@dir=$(dir $@); \
-	mkdir -p $$dir;
+	@mkdir -p $(dir $@)
 	${COMPILER} ${COMPILER_FLAGS_BENCHMARK} ${WARNINGS} ${INCLUDE_ARGUMENT} ${BENCHMARK_INCLUDE_ARGUMENT} -MMD -MP -c $< -o $@
 
 ${OUTPUT_FOLDER_BENCHMARK}/%.o: ${SOURCE_FOLDER}/%.cpp
-	@dir=$(dir $@); \
-	mkdir -p $$dir;
+	@mkdir -p $(dir $@)
 	${COMPILER} ${COMPILER_FLAGS_BENCHMARK} ${WARNINGS} ${INCLUDE_ARGUMENT} ${BENCHMARK_INCLUDE_ARGUMENT} -MMD -MP -c $< -o $@
 
 -include $(DEPS_BENCHMARK_ALL)
@@ -255,33 +250,27 @@ benchmarks: $(OBJECTS_BENCHMARK_ALL)
 	${OUTPUT_FOLDER_BENCHMARK}/${OUTPUT_FILE_BENCHMARK}
 
 ${OUTPUT_FOLDER_TEST}/%.o: ${TEST_FOLDER}/%.cpp
-	@dir=$(dir $@); \
-	mkdir -p $$dir;
+	@mkdir -p $(dir $@)
 	${COMPILER} ${COMPILER_FLAGS_TEST} ${WARNINGS} ${INCLUDE_ARGUMENT} ${TEST_INCLUDE_ARGUMENT} -MMD -MP -c $< -o $@
 
 ${OUTPUT_FOLDER_TEST}/%.o: ${TEST_INTEGRATIONS_FOLDER}/%.cpp
-	@dir=$(dir $@); \
-	mkdir -p $$dir;
+	@mkdir -p $(dir $@)
 	${COMPILER} ${COMPILER_FLAGS_TEST} ${WARNINGS} ${INCLUDE_ARGUMENT} ${TEST_INTEGRATIONS_INCLUDE_ARUGMENT} -MMD -MP -c $< -o $@
 
 ${OUTPUT_FOLDER_TEST}/%.o: ${TEST_MOCKS_FOLDER}/%.cpp
-	@dir=$(dir $@); \
-	mkdir -p $$dir;
+	@mkdir -p $(dir $@)
 	${COMPILER} ${COMPILER_FLAGS_TEST} ${WARNINGS} ${INCLUDE_ARGUMENT} ${TEST_MOCKS_INCLUDE_ARUGMENT} -MMD -MP -c $< -o $@
 
 ${OUTPUT_FOLDER_TEST}/%.o: ${TEST_UNITS_FOLDER}/%.cpp
-	@dir=$(dir $@); \
-	mkdir -p $$dir;
+	@mkdir -p $(dir $@)
 	${COMPILER} ${COMPILER_FLAGS_TEST} ${WARNINGS} ${INCLUDE_ARGUMENT} ${TEST_UNITS_INCLUDE_ARUGMENT} -MMD -MP -c $< -o $@
 
 ${OUTPUT_FOLDER_TEST}/%.o: ${TEST_MAIN_FOLDER}/%.cpp
-	@dir=$(dir $@); \
-	mkdir -p $$dir;
+	@mkdir -p $(dir $@)
 	${COMPILER} ${COMPILER_FLAGS_TEST} ${WARNINGS} ${INCLUDE_ARGUMENT} ${TEST_MAIN_INCLUDE_ARUGMENT} -MMD -MP -c $< -o $@
 
 ${OUTPUT_FOLDER_TEST}/%.o: ${SOURCE_FOLDER}/%.cpp
-	@dir=$(dir $@); \
-	mkdir -p $$dir;
+	@mkdir -p $(dir $@)
 	${COMPILER} ${COMPILER_FLAGS_TEST} ${WARNINGS} ${INCLUDE_ARGUMENT} ${TEST_INCLUDE_ARGUMENT} -MMD -MP -c $< -o $@
 
 copy_and_run_tests:
@@ -336,8 +325,7 @@ docs: run_doxygen
 	sphinx-autobuild -b html -Dbreathe_projects.documentation=docs/xml . docs/sphinx/
 
 ${OUTPUT_FOLDER_TRACY}/%.o: ${SOURCE_FOLDER}/%.cpp
-	@dir=$(dir $@); \
-	mkdir -p $$dir;
+	@mkdir -p $(dir $@)
 	${COMPILER} ${TRACY_FLAGS} ${COMPILER_FLAGS_RELEASE} ${INCLUDE_ARGUMENT} -MMD -MP -c $< -o $@
 
 -include $(DEPS_TRACY)
