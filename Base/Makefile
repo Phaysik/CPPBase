@@ -115,7 +115,7 @@ OBJECTS_BENCHMARK_ALL = $(OBJECTS_BENCHMARK_FULL) $(OBJECTS_BENCHMARK_SRC)
 DEPS_BENCHMARK_ALL = $(OBJECTS_BENCHMARK_ALL:.o=.d)
 
 BRANCH_COVERAGE = --rc branch_coverage=true
-LCOV_EXCLUDE_ASSERT = --rc lcov_excl_br_line=assert
+LCOV_EXCLUDE_ASSERT = --rc 'lcov_excl_br_line=assert|LCOV_EXCL_BR'
 
 LCOV_FILES = $(shell find . -name '*.gcno' -o -name '*.gcda' -o -name '*.info')
 LCOV_FLAGS = --no-external -c ${BRANCH_COVERAGE} ${LCOV_EXCLUDE_ASSERT} -d . --ignore-errors mismatch,mismatch
