@@ -319,9 +319,9 @@ namespace // NOSONAR
 
 	TEST_F(LoggerTest, GivenMultipleInfoCallsWhenReadThenAllMessagesPresent)
 	{
-		auto result1{Logger::info("first message")};
-		auto result2{Logger::info("second message")};
-		auto result3{Logger::info("third message")};
+		std::optional<std::string_view> result1{Logger::info("first message")};
+		std::optional<std::string_view> result2{Logger::info("second message")};
+		std::optional<std::string_view> result3{Logger::info("third message")};
 		EXPECT_FALSE(result1.has_value());
 		EXPECT_FALSE(result2.has_value());
 		EXPECT_FALSE(result3.has_value());
@@ -586,7 +586,7 @@ namespace // NOSONAR
 	TEST_F(LoggerTest, GivenExistingContentWhenInitializedWithTruncateThenFileIsCleared)
 	{
 		// Write some content through the logger so the file is non-empty
-		auto preResult{Logger::info("pre-existing content")};
+		std::optional<std::string_view> preResult{Logger::info("pre-existing content")};
 		EXPECT_FALSE(preResult.has_value());
 		spdlog::apply_all([](const std::shared_ptr<spdlog::logger> &logger) { logger->flush(); });
 
@@ -598,7 +598,7 @@ namespace // NOSONAR
 		bool initResult{Logger::initialize(getLoggerName(), getLogFileName(), true)};
 		EXPECT_TRUE(initResult);
 
-		auto postResult{Logger::info("after truncate")};
+		std::optional<std::string_view> postResult{Logger::info("after truncate")};
 		EXPECT_FALSE(postResult.has_value());
 		contents = readLogFile();
 
@@ -608,7 +608,7 @@ namespace // NOSONAR
 
 	TEST_F(LoggerTest, GivenExistingContentWhenInitializedWithoutTruncateThenFileIsPreserved)
 	{
-		auto keepResult{Logger::info("keep this content")};
+		std::optional<std::string_view> keepResult{Logger::info("keep this content")};
 		EXPECT_FALSE(keepResult.has_value());
 		spdlog::apply_all([](const std::shared_ptr<spdlog::logger> &logger) { logger->flush(); });
 
@@ -617,7 +617,7 @@ namespace // NOSONAR
 		bool initResult{Logger::initialize("preserve_logger", getLogFileName(), false)};
 		EXPECT_TRUE(initResult);
 
-		auto appendResult{Logger::info("appended content")};
+		std::optional<std::string_view> appendResult{Logger::info("appended content")};
 		EXPECT_FALSE(appendResult.has_value());
 		spdlog::apply_all([](const std::shared_ptr<spdlog::logger> &logger) { logger->flush(); });
 
