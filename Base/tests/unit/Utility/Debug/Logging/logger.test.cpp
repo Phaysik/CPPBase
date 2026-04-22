@@ -33,9 +33,9 @@ using Project::Utility::Debug::Logging::Logger;
 
 // NOLINTBEGIN(misc-const-correctness,cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
 
-namespace // NOSONAR
+namespace
 {
-	class LoggerTest : public ::testing::Test // NOSONAR
+	class LoggerTest : public ::testing::Test
 	{
 		protected:
 			void SetUp() override
