@@ -1,4 +1,4 @@
-# project-name
+# pocketcore
 
 ## Program Requirements
 
@@ -26,8 +26,10 @@ Do not change any of the variables in the Makefile as it may cause the executabl
 | build_tests        | Compiles a test executable with Google Test flags. Runs the copy_and_test command.                                                                                                                                                      |
 | lcov               | Runs the build_test command. Creates lcov files on the entire codebase. Then removes the lcov files associated with the lcov folder.                                                                                                    |
 | genhtml            | Runs the lcov command. Deletes and recreates the genhtml output folder. Creates a set of web pages to view the code coverage of the codebase in the genhtml output folder.                                                              |
-| coverage           | Runs the genhtml command. Deletes the test output and lcov output folders.                                                                                                                                                              |
-| tidy               | Runs clang tidy on the code base.                                                                                                                                                                                                       |
+| clean_coverage     | Finds and deletes all .gcda files since they accumulate counters across runs.                                                                                                                                                           |
+| coverage           | Runs the genhtml and clean_coverage command. Deletes the test output and lcov output folders.                                                                                                                                           |
+| tidy               | Runs clang tidy on the code base. This one is serial but operates best with the g++ compiler.                                                                                                                                           |
+| run_tidy           | Runs run-clang-tidy on the code base. This one is parallel but operates best with the clang compiler.                                                                                                                                   |
 | check              | Runs cppcheck on the code base.                                                                                                                                                                                                         |
 | flawfinder         | Runs flawfinder on the code base.                                                                                                                                                                                                       |
 | analysis           | Runs flawfinder, check, and clang-tidy on the code base.                                                                                                                                                                                |

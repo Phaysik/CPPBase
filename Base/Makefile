@@ -123,7 +123,7 @@ OUTPUT_FOLDER_LCOV = ${OUTPUT_FOLDER_TEST}
 OUTPUT_FILE_LCOV = coverage.info
 LCOV_REMOVE_FILES = '*/${TEST_FOLDER}/*'
 
-GENHTML_OUTPUT_FOLDER = .\/coverage
+GENHTML_OUTPUT_FOLDER = coverage
 
 CLANG_SOURCES = ${SOURCES} ${TEST_SOURCES}
 TIDY_COMPILE_FLAGS = --config-file=.clang-tidy
@@ -133,7 +133,7 @@ FORMAT_COMPILE_FLAGS = -i -style=file:.clang-format
 CPPCHECK_FOLDER = cppcheck
 CPPCHECK_COMPILE_FLAGS = --cppcheck-build-dir=${CPPCHECK_FOLDER} --check-level=exhaustive
 
-PROFILE_FOLDER = .\/profiling
+PROFILE_FOLDER = profiling
 PROFILE_ANNOTATIONS_FOLDER = ${PROFILE_FOLDER}/annotations
 
 ANNOTATION_FILES = $(shell find . -maxdepth 1 -type f -name '*-ann')
@@ -301,7 +301,10 @@ genhtml: lcov
 	mkdir -p ${GENHTML_OUTPUT_FOLDER}
 	genhtml ${OUTPUT_FOLDER_LCOV}/${OUTPUT_FILE_LCOV} ${BRANCH_COVERAGE} ${LCOV_EXCLUDE_ASSERT} --output-directory ${GENHTML_OUTPUT_FOLDER}
 
-coverage: genhtml
+clean_coverage:
+	find ${OUTPUT_FOLDER_TEST} -name '*.gcda' -delete
+
+coverage: genhtml clean_coverage
 	cp ${OUTPUT_FOLDER_TEST}/coverage.info ${GENHTML_OUTPUT_FOLDER}/lcov.info
 
 tidy: ${CLANG_SOURCES}
@@ -361,4 +364,4 @@ initialize_repo:
 	chmod +x .git/hooks/pre-commit
 	chmod +x .git/hooks/commit-msg
 
-.PHONY: tidy run_doxygen initialize_repo copy_and_run_test
+.PHONY: tidy run_doxygen initialize_repo copy_and_run_test clean_coverage
