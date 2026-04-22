@@ -115,9 +115,10 @@ OBJECTS_BENCHMARK_ALL = $(OBJECTS_BENCHMARK_FULL) $(OBJECTS_BENCHMARK_SRC)
 DEPS_BENCHMARK_ALL = $(OBJECTS_BENCHMARK_ALL:.o=.d)
 
 BRANCH_COVERAGE = --rc branch_coverage=true
+LCOV_EXCLUDE_ASSERT = --rc lcov_excl_br_line=assert
 
 LCOV_FILES = $(shell find . -name '*.gcno' -o -name '*.gcda' -o -name '*.info')
-LCOV_FLAGS = --no-external -c ${BRANCH_COVERAGE} -d . --ignore-errors mismatch,mismatch
+LCOV_FLAGS = --no-external -c ${BRANCH_COVERAGE} ${LCOV_EXCLUDE_ASSERT} -d . --ignore-errors mismatch,mismatch
 OUTPUT_FOLDER_LCOV = ${OUTPUT_FOLDER_TEST}
 OUTPUT_FILE_LCOV = coverage.info
 LCOV_REMOVE_FILES = '*/${TEST_FOLDER}/*'
@@ -293,12 +294,12 @@ build_tests: $(OBJECTS_TEST_USING)
 lcov: build_tests
 	mkdir -p ${OUTPUT_FOLDER_LCOV}
 	lcov ${LCOV_FLAGS} -o ${OUTPUT_FOLDER_LCOV}/${OUTPUT_FILE_LCOV}
-	lcov --remove ${OUTPUT_FOLDER_LCOV}/${OUTPUT_FILE_LCOV} ${LCOV_REMOVE_FILES} ${BRANCH_COVERAGE} -o ${OUTPUT_FOLDER_LCOV}/${OUTPUT_FILE_LCOV}
+	lcov --remove ${OUTPUT_FOLDER_LCOV}/${OUTPUT_FILE_LCOV} ${LCOV_REMOVE_FILES} ${BRANCH_COVERAGE} ${LCOV_EXCLUDE_ASSERT} -o ${OUTPUT_FOLDER_LCOV}/${OUTPUT_FILE_LCOV}
 
 genhtml: lcov
 	rm -rf ${GENHTML_OUTPUT_FOLDER}
 	mkdir -p ${GENHTML_OUTPUT_FOLDER}
-	genhtml ${OUTPUT_FOLDER_LCOV}/${OUTPUT_FILE_LCOV} ${BRANCH_COVERAGE} --output-directory ${GENHTML_OUTPUT_FOLDER}
+	genhtml ${OUTPUT_FOLDER_LCOV}/${OUTPUT_FILE_LCOV} ${BRANCH_COVERAGE} ${LCOV_EXCLUDE_ASSERT} --output-directory ${GENHTML_OUTPUT_FOLDER}
 
 coverage: genhtml
 	cp ${OUTPUT_FOLDER_TEST}/coverage.info ${GENHTML_OUTPUT_FOLDER}/lcov.info
@@ -307,7 +308,7 @@ tidy: ${CLANG_SOURCES}
 	clang-tidy ${TIDY_COMPILE_FLAGS} $^ -- ${INCLUDE_ARGUMENT} ${TEST_INCLUDE_ARGUMENT}
 
 run_tidy: ${CLANG_SOURCES}
-	run-clang-tidy ${RUN_TIDY_COMPILE_FLAGS} $^ -- ${INCLUDE_ARGUMENT} ${TEST_INCLUDE_ARGUMENT}`
+	run-clang-tidy ${RUN_TIDY_COMPILE_FLAGS} $^ -- ${INCLUDE_ARGUMENT} ${TEST_INCLUDE_ARGUMENT}
 
 check: ${CLANG_SOURCES}
 	mkdir -p ${CPPCHECK_FOLDER}
