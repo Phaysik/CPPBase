@@ -1,8 +1,8 @@
-/*! @file logger.test.cpp
-	@brief Google Test unit tests for the static Logger wrapper.
-	@details Exercises initialization, level get/set, name/file replacement, and all seven logging-level template methods. Each test writes
-   to a temporary file that is cleaned up in TearDown.
-	@date --/--/----
+/*! @file logger.test2.cpp
+	@brief Catch2 BDD unit tests for the static Logger wrapper.
+	@details Exercises initialization, level get/set, name/file replacement, and all seven logging-level template methods using Catch2's BDD
+   syntax. Each test scenario manages temporary files that are cleaned up after the scenario completes.
+	@date 03/11/2026
 	@version x.x.x
 	@since x.x.x
 	@author Matthew Moore
@@ -23,8 +23,7 @@
 #include "Core/typedefs.h"
 #include "Utility/Debug/Logging/constants.h"
 
-#include <gtest/gtest.h>
-
+#include <catch2/catch_test_macros.hpp>
 #include <spdlog/common.h>
 #include <spdlog/logger.h>
 #include <spdlog/sinks/basic_file_sink.h>
@@ -35,823 +34,799 @@ namespace Logging = Project::Utility::Debug::Logging;
 using Logging::Logger;
 using Project::Core::ub;
 
-// NOLINTBEGIN(misc-const-correctness,cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+// NOLINTBEGIN(misc-const-correctness,cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers,readability-function-cognitive-complexity)
 
 namespace
 {
-	class LoggerTest : public ::testing::Test
+	/*! @brief Flushes spdlog and reads the full contents of a log file.
+		@param fileName Optional path to a specific log file. If nullptr, uses the default test log file.
+		@return The file contents as a string.
+	*/
+	std::string readLogFile(const std::string *fileName = nullptr) // NOLINT(llvm-prefer-static-over-anonymous-namespace)
 	{
-		protected:
-			void SetUp() override
-			{
-				spdlog::drop_all();
-
-				// Remove any leftover log file from a previous test run
-				static_cast<void>(std::filesystem::remove(mLogFileName));
-
-				static_cast<void>(Logger::initialize(mLoggerName, mLogFileName));
-			}
-
-			void TearDown() override
-			{
-				spdlog::drop_all();
-
-				static_cast<void>(std::filesystem::remove(mLogFileName));
-			}
-
-			/*! @brief Gets the logger name used for tests.
-				@return The logger name string.
-			*/
-			ATTR_NODISCARD const std::string &getLoggerName() const
-			{
-				return mLoggerName;
-			}
-
-			/*! @brief Gets the log file name used for tests.
-				@return The log file name string.
-			*/
-			ATTR_NODISCARD const std::string &getLogFileName() const
-			{
-				return mLogFileName;
-			}
-
-			/*! @brief Reads the full contents of the current log file.
-				@details Flushes the spdlog logger before reading to ensure all buffered output is written.
-				@return The file contents as a string.
-			*/
-			ATTR_NODISCARD std::string readLogFile(const std::string *fileName = nullptr) const
-			{
-				// Flush spdlog to ensure all output is written before reading
-				spdlog::apply_all([](const std::shared_ptr<spdlog::logger> &logger) { logger->flush(); });
-
-				std::ifstream file(fileName != nullptr ? *fileName : mLogFileName);
-				std::ostringstream contents;
-				contents << file.rdbuf();
-				return contents.str();
-			}
-
-		private:
-			std::string mLoggerName{"test_logger"};
-			std::string mLogFileName{"logger_test_output.log"};
-	};
-
-	// ────────────────────────────────────────────────────────────
-	// Initialization
-	// ────────────────────────────────────────────────────────────
-
-	TEST_F(LoggerTest, GivenValidArgumentsWhenInitializedThenLoggerIsUsable)
-	{
-		// Logger was initialized in SetUp; logging should succeed
-		std::optional<std::string_view> result{Logger::info("initialization smoke test")};
-		EXPECT_FALSE(result.has_value());
-	}
-
-	TEST_F(LoggerTest, GivenAlreadyInitializedWhenReInitializedThenSucceeds)
-	{
-		std::string secondFile{"logger_test_reinit.log"};
-		bool initResult{Logger::initialize("reinit_logger", secondFile)};
-		EXPECT_TRUE(initResult);
-
-		std::optional<std::string_view> result{Logger::info("after reinit")};
-		EXPECT_FALSE(result.has_value());
-
-		// The new logger writes to secondFile, not logFileName
-		// Clean up the second file
-		spdlog::drop_all();
-		static_cast<void>(std::filesystem::remove(secondFile));
-	}
-
-	TEST_F(LoggerTest, GivenSameNameWhenReInitializedThenSucceeds)
-	{
-		// Re-initializing with the same name should succeed because initialize drops the old registry entry.
-		bool initResult{Logger::initialize(getLoggerName(), getLogFileName())};
-		EXPECT_TRUE(initResult);
-
-		std::optional<std::string_view> result{Logger::info("after same-name reinit")};
-		EXPECT_FALSE(result.has_value());
-	}
-
-	// ────────────────────────────────────────────────────────────
-	// getLevel / setLevel
-	// ────────────────────────────────────────────────────────────
-
-	TEST_F(LoggerTest, GivenDefaultLevelWhenGetLevelCalledThenReturnsInfoLevel)
-	{
-		// spdlog's default level is info
-		EXPECT_EQ(Logger::getLevel(), spdlog::level::info);
-	}
-
-	TEST_F(LoggerTest, GivenDebugLevelWhenSetLevelCalledThenGetLevelReturnsDebug)
-	{
-		Logger::setLevel(spdlog::level::debug);
-		EXPECT_EQ(Logger::getLevel(), spdlog::level::debug);
-	}
-
-	TEST_F(LoggerTest, GivenTraceLevelWhenSetLevelCalledThenGetLevelReturnsTrace)
-	{
-		Logger::setLevel(spdlog::level::trace);
-		EXPECT_EQ(Logger::getLevel(), spdlog::level::trace);
-	}
-
-	TEST_F(LoggerTest, GivenCriticalLevelWhenSetLevelCalledThenGetLevelReturnsCritical)
-	{
-		Logger::setLevel(spdlog::level::critical);
-		EXPECT_EQ(Logger::getLevel(), spdlog::level::critical);
-	}
-
-	// ────────────────────────────────────────────────────────────
-	// setLoggerName
-	// ────────────────────────────────────────────────────────────
-
-	TEST_F(LoggerTest, GivenNewNameWhenSetLoggerNameCalledThenLoggerStillWorks)
-	{
-		const bool setResult{Logger::setLoggerName("renamed_logger")};
-		EXPECT_TRUE(setResult);
-
-		std::optional<std::string_view> result{Logger::info("after rename")};
-		EXPECT_FALSE(result.has_value());
-	}
-
-	// ────────────────────────────────────────────────────────────
-	// setFileName
-	// ────────────────────────────────────────────────────────────
-
-	TEST_F(LoggerTest, GivenNewFileWhenSetFileNameCalledThenLogsToNewFile)
-	{
-		std::string newFile{"logger_test_newfile.log"};
-		static_cast<void>(std::filesystem::remove(newFile));
-
-		const bool setResult{Logger::setFileName(newFile)};
-		EXPECT_TRUE(setResult);
-
-		std::optional<std::string_view> result{Logger::info("written to new file")};
-		EXPECT_FALSE(result.has_value());
-
-		const std::string contents{readLogFile(&newFile)};
-		EXPECT_NE(contents.find("written to new file"), std::string::npos);
-
-		spdlog::drop_all();
-		static_cast<void>(std::filesystem::remove(newFile));
-	}
-
-	// ────────────────────────────────────────────────────────────
-	// setLoggerAndFileName
-	// ────────────────────────────────────────────────────────────
-
-	TEST_F(LoggerTest, GivenNewNameAndFileWhenSetLoggerAndFileNameCalledThenLogsToNewFile)
-	{
-		std::string newFile{"logger_test_both.log"};
-		static_cast<void>(std::filesystem::remove(newFile));
-
-		const bool setResult{Logger::setLoggerAndFileName("both_logger", newFile)};
-		EXPECT_TRUE(setResult);
-
-		std::optional<std::string_view> result{Logger::info("both changed")};
-		EXPECT_FALSE(result.has_value());
-
-		const std::string contents{readLogFile(&newFile)};
-		EXPECT_NE(contents.find("both changed"), std::string::npos);
-
-		spdlog::drop_all();
-		static_cast<void>(std::filesystem::remove(newFile));
-	}
-
-	// ────────────────────────────────────────────────────────────
-	// Template logging methods — verify output is written
-	// ────────────────────────────────────────────────────────────
-
-	TEST_F(LoggerTest, GivenInfoLevelWhenLogCalledThenMessageAppearsInLog)
-	{
-		std::optional<std::string_view> result{Logger::log(spdlog::level::info, "log message {}", 77)};
-		EXPECT_FALSE(result.has_value());
-
-		const std::string contents{readLogFile()};
-		EXPECT_NE(contents.find("log message 77"), std::string::npos);
-	}
-
-	TEST_F(LoggerTest, GivenTraceLevelEnabledWhenTraceCalledThenMessageAppearsInLog)
-	{
-		Logger::setLevel(spdlog::level::trace);
-		std::optional<std::string_view> result{Logger::trace("trace message {}", 42)};
-		EXPECT_FALSE(result.has_value());
-
-		const std::string contents{readLogFile()};
-		EXPECT_NE(contents.find("trace message 42"), std::string::npos);
-	}
-
-	TEST_F(LoggerTest, GivenDebugLevelEnabledWhenDebugCalledThenMessageAppearsInLog)
-	{
-		Logger::setLevel(spdlog::level::debug);
-		std::optional<std::string_view> result{Logger::debug("debug message {}", "hello")};
-		EXPECT_FALSE(result.has_value());
-
-		const std::string contents{readLogFile()};
-		EXPECT_NE(contents.find("debug message hello"), std::string::npos);
-	}
-
-	TEST_F(LoggerTest, GivenInfoLevelWhenInfoCalledThenMessageAppearsInLog)
-	{
-		std::optional<std::string_view> result{Logger::info("info message {}", 100)};
-		EXPECT_FALSE(result.has_value());
-
-		const std::string contents{readLogFile()};
-		EXPECT_NE(contents.find("info message 100"), std::string::npos);
-	}
-
-	TEST_F(LoggerTest, GivenInfoLevelWhenWarnCalledThenMessageAppearsInLog)
-	{
-		std::optional<std::string_view> result{Logger::warn("warn message {}", 3.14)};
-		EXPECT_FALSE(result.has_value());
-
-		const std::string contents{readLogFile()};
-		EXPECT_NE(contents.find("warn message 3.14"), std::string::npos);
-	}
-
-	TEST_F(LoggerTest, GivenInfoLevelWhenErrorCalledThenMessageAppearsInLog)
-	{
-		std::optional<std::string_view> result{Logger::error("error message {}", "failure")};
-		EXPECT_FALSE(result.has_value());
-
-		const std::string contents{readLogFile()};
-		EXPECT_NE(contents.find("error message failure"), std::string::npos);
-	}
-
-	TEST_F(LoggerTest, GivenInfoLevelWhenCriticalCalledThenMessageAppearsInLog)
-	{
-		std::optional<std::string_view> result{Logger::critical("critical message {}", 999)};
-		EXPECT_FALSE(result.has_value());
-
-		const std::string contents{readLogFile()};
-		EXPECT_NE(contents.find("critical message 999"), std::string::npos);
-	}
-
-	// ────────────────────────────────────────────────────────────
-	// Level filtering — messages below threshold are suppressed
-	// ────────────────────────────────────────────────────────────
-
-	TEST_F(LoggerTest, GivenErrorLevelWhenInfoCalledThenMessageIsNotWritten)
-	{
-		Logger::setLevel(spdlog::level::err);
-		std::optional<std::string_view> result{Logger::info("should not appear")};
-		EXPECT_FALSE(result.has_value());
-
-		const std::string contents{readLogFile()};
-		EXPECT_EQ(contents.find("should not appear"), std::string::npos);
-	}
-
-	TEST_F(LoggerTest, GivenCriticalLevelWhenWarnCalledThenMessageIsNotWritten)
-	{
-		Logger::setLevel(spdlog::level::critical);
-		std::optional<std::string_view> result{Logger::warn("suppressed warning")};
-		EXPECT_FALSE(result.has_value());
-
-		const std::string contents{readLogFile()};
-		EXPECT_EQ(contents.find("suppressed warning"), std::string::npos);
-	}
-
-	// ────────────────────────────────────────────────────────────
-	// Multiple messages accumulate in the same log file
-	// ────────────────────────────────────────────────────────────
-
-	TEST_F(LoggerTest, GivenMultipleInfoCallsWhenReadThenAllMessagesPresent)
-	{
-		std::optional<std::string_view> result1{Logger::info("first message")};
-		std::optional<std::string_view> result2{Logger::info("second message")};
-		std::optional<std::string_view> result3{Logger::info("third message")};
-		EXPECT_FALSE(result1.has_value());
-		EXPECT_FALSE(result2.has_value());
-		EXPECT_FALSE(result3.has_value());
-
-		const std::string contents{readLogFile()};
-		EXPECT_NE(contents.find("first message"), std::string::npos);
-		EXPECT_NE(contents.find("second message"), std::string::npos);
-		EXPECT_NE(contents.find("third message"), std::string::npos);
-	}
-
-	// ───────────────────────
-	// Template instantiations
-	// ───────────────────────
-
-	TEST_F(LoggerTest, GivenInfoLevelWhenInfoCalledWithStringViewArgThenMessageAppearsInLog)
-	{
-		const std::string_view arg{"type_name"};
-		std::optional<std::string_view> result{Logger::info("registered {}", arg)};
-		EXPECT_FALSE(result.has_value());
-
-		const std::string contents{readLogFile()};
-		EXPECT_NE(contents.find("registered type_name"), std::string::npos);
-	}
-
-	TEST_F(LoggerTest, GivenInfoLevelWhenInfoCalledWithTwoStringViewArgsThenMessageAppearsInLog)
-	{
-		const std::string_view arg1{"fire"};
-		const std::string_view arg2{"water"};
-		std::optional<std::string_view> result{Logger::info("{} vs {}", arg1, arg2)};
-		EXPECT_FALSE(result.has_value());
-
-		const std::string contents{readLogFile()};
-		EXPECT_NE(contents.find("fire vs water"), std::string::npos);
-	}
-
-	TEST_F(LoggerTest, GivenInfoLevelWhenInfoCalledWithUnsignedCharArgThenMessageAppearsInLog)
-	{
-		const ub arg{5};
-		std::optional<std::string_view> result{Logger::info("type id {}", arg)};
-		EXPECT_FALSE(result.has_value());
-
-		const std::string contents{readLogFile()};
-		EXPECT_NE(contents.find("type id 5"), std::string::npos);
-	}
-
-	TEST_F(LoggerTest, GivenInfoLevelWhenWarnCalledWithStringViewArgThenMessageAppearsInLog)
-	{
-		const std::string_view arg{"warning_detail"};
-		std::optional<std::string_view> result{Logger::warn("issue: {}", arg)};
-		EXPECT_FALSE(result.has_value());
-
-		const std::string contents{readLogFile()};
-		EXPECT_NE(contents.find("issue: warning_detail"), std::string::npos);
-	}
-
-	TEST_F(LoggerTest, GivenInfoLevelWhenWarnCalledWithTwoStringViewArgsThenMessageAppearsInLog)
-	{
-		const std::string_view arg1{"expected"};
-		const std::string_view arg2{"actual"};
-		std::optional<std::string_view> result{Logger::warn("{} != {}", arg1, arg2)};
-		EXPECT_FALSE(result.has_value());
-
-		const std::string contents{readLogFile()};
-		EXPECT_NE(contents.find("expected != actual"), std::string::npos);
-	}
-
-	TEST_F(LoggerTest, GivenInfoLevelWhenWarnCalledWithUnsignedCharAndStringViewArgsThenMessageAppearsInLog)
-	{
-		const ub userID{3};
-		const std::string_view name{"grass"};
-		std::optional<std::string_view> result{Logger::warn("id {} name {}", userID, name)};
-		EXPECT_FALSE(result.has_value());
-
-		const std::string contents{readLogFile()};
-		EXPECT_NE(contents.find("id 3 name grass"), std::string::npos);
-	}
-
-	TEST_F(LoggerTest, GivenInfoLevelWhenWarnCalledWithTwoUnsignedCharArgsThenMessageAppearsInLog)
-	{
-		const ub id1{1};
-		const ub id2{2};
-		std::optional<std::string_view> result{Logger::warn("ids {} {}", id1, id2)};
-		EXPECT_FALSE(result.has_value());
-
-		const std::string contents{readLogFile()};
-		EXPECT_NE(contents.find("ids 1 2"), std::string::npos);
-	}
-
-	TEST_F(LoggerTest, GivenInfoLevelWhenWarnCalledWithUnsignedLongAndUnsignedCharArgsThenMessageAppearsInLog)
-	{
-		const ub userID{7};
-		std::optional<std::string_view> result{Logger::warn("size {} id {}", 20UL, userID)};
-		EXPECT_FALSE(result.has_value());
-
-		const std::string contents{readLogFile()};
-		EXPECT_NE(contents.find("size 20 id 7"), std::string::npos);
-	}
-
-	// Failure coverage for template instantiations
-
-	TEST_F(LoggerTest, GivenSpdlogExWhenInfoCalledWithStringViewArgThenReturnsFailure)
-	{
-		spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw spdlog::spdlog_ex(msg); });
-		const std::string_view arg{"x"};
-
-		std::optional<std::string_view> result{Logger::info("{} {}", arg)};
-		ASSERT_TRUE(result.has_value());
-
-		spdlog::set_error_handler([](const std::string & /*msg*/) {});
-	}
-
-	TEST_F(LoggerTest, GivenSpdlogExWhenInfoCalledWithTwoStringViewArgsThenReturnsFailure)
-	{
-		spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw spdlog::spdlog_ex(msg); });
-		const std::string_view arg1{"a"};
-		const std::string_view arg2{"b"};
-
-		std::optional<std::string_view> result{Logger::info("{} {} {}", arg1, arg2)};
-		ASSERT_TRUE(result.has_value());
-
-		spdlog::set_error_handler([](const std::string & /*msg*/) {});
-	}
-
-	TEST_F(LoggerTest, GivenSpdlogExWhenInfoCalledWithUnsignedCharArgThenReturnsFailure)
-	{
-		spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw spdlog::spdlog_ex(msg); });
-		const ub arg{1};
-
-		std::optional<std::string_view> result{Logger::info("{} {}", arg)};
-		ASSERT_TRUE(result.has_value());
-
-		spdlog::set_error_handler([](const std::string & /*msg*/) {});
-	}
-
-	TEST_F(LoggerTest, GivenSpdlogExWhenWarnCalledWithStringViewArgThenReturnsFailure)
-	{
-		spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw spdlog::spdlog_ex(msg); });
-		const std::string_view arg{"x"};
-
-		std::optional<std::string_view> result{Logger::warn("{} {}", arg)};
-		ASSERT_TRUE(result.has_value());
-
-		spdlog::set_error_handler([](const std::string & /*msg*/) {});
-	}
-
-	TEST_F(LoggerTest, GivenSpdlogExWhenWarnCalledWithTwoStringViewArgsThenReturnsFailure)
-	{
-		spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw spdlog::spdlog_ex(msg); });
-		const std::string_view arg1{"a"};
-		const std::string_view arg2{"b"};
-
-		std::optional<std::string_view> result{Logger::warn("{} {} {}", arg1, arg2)};
-		ASSERT_TRUE(result.has_value());
-
-		spdlog::set_error_handler([](const std::string & /*msg*/) {});
-	}
-
-	TEST_F(LoggerTest, GivenSpdlogExWhenWarnCalledWithUnsignedCharAndStringViewArgsThenReturnsFailure)
-	{
-		spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw spdlog::spdlog_ex(msg); });
-		const ub userID{1};
-		const std::string_view name{"x"};
-
-		std::optional<std::string_view> result{Logger::warn("{} {} {}", userID, name)};
-		ASSERT_TRUE(result.has_value());
-
-		spdlog::set_error_handler([](const std::string & /*msg*/) {});
-	}
-
-	TEST_F(LoggerTest, GivenSpdlogExWhenWarnCalledWithTwoUnsignedCharArgsThenReturnsFailure)
-	{
-		spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw spdlog::spdlog_ex(msg); });
-		const ub id1{1};
-		const ub id2{2};
-
-		std::optional<std::string_view> result{Logger::warn("{} {} {}", id1, id2)};
-		ASSERT_TRUE(result.has_value());
-
-		spdlog::set_error_handler([](const std::string & /*msg*/) {});
-	}
-
-	TEST_F(LoggerTest, GivenSpdlogExWhenWarnCalledWithUnsignedLongAndUnsignedCharArgsThenReturnsFailure)
-	{
-		spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw spdlog::spdlog_ex(msg); });
-		const ub userID{1};
-
-		std::optional<std::string_view> result{Logger::warn("{} {} {}", 20UL, userID)};
-		ASSERT_TRUE(result.has_value());
-
-		spdlog::set_error_handler([](const std::string & /*msg*/) {});
-	}
-
-	TEST_F(LoggerTest, GivenNonSpdlogExWhenInfoCalledWithStringViewArgThenExceptionPropagates)
-	{
-		spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw std::runtime_error(msg); });
-		const std::string_view arg{"x"};
-
-		EXPECT_THROW(static_cast<void>(Logger::info("{} {}", arg)), std::runtime_error);
-
-		spdlog::set_error_handler([](const std::string & /*msg*/) {});
-	}
-
-	TEST_F(LoggerTest, GivenNonSpdlogExWhenInfoCalledWithTwoStringViewArgsThenExceptionPropagates)
-	{
-		spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw std::runtime_error(msg); });
-		const std::string_view arg1{"a"};
-		const std::string_view arg2{"b"};
-
-		EXPECT_THROW(static_cast<void>(Logger::info("{} {} {}", arg1, arg2)), std::runtime_error);
-
-		spdlog::set_error_handler([](const std::string & /*msg*/) {});
-	}
-
-	TEST_F(LoggerTest, GivenNonSpdlogExWhenInfoCalledWithUnsignedCharArgThenExceptionPropagates)
-	{
-		spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw std::runtime_error(msg); });
-		const ub arg{1};
-
-		EXPECT_THROW(static_cast<void>(Logger::info("{} {}", arg)), std::runtime_error);
-
-		spdlog::set_error_handler([](const std::string & /*msg*/) {});
-	}
-
-	TEST_F(LoggerTest, GivenNonSpdlogExWhenWarnCalledWithStringViewArgThenExceptionPropagates)
-	{
-		spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw std::runtime_error(msg); });
-		const std::string_view arg{"x"};
-
-		EXPECT_THROW(static_cast<void>(Logger::warn("{} {}", arg)), std::runtime_error);
-
-		spdlog::set_error_handler([](const std::string & /*msg*/) {});
-	}
-
-	TEST_F(LoggerTest, GivenNonSpdlogExWhenWarnCalledWithTwoStringViewArgsThenExceptionPropagates)
-	{
-		spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw std::runtime_error(msg); });
-		const std::string_view arg1{"a"};
-		const std::string_view arg2{"b"};
-
-		EXPECT_THROW(static_cast<void>(Logger::warn("{} {} {}", arg1, arg2)), std::runtime_error);
-
-		spdlog::set_error_handler([](const std::string & /*msg*/) {});
-	}
-
-	TEST_F(LoggerTest, GivenNonSpdlogExWhenWarnCalledWithUnsignedCharAndStringViewArgsThenExceptionPropagates)
-	{
-		spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw std::runtime_error(msg); });
-		const ub userID{1};
-		const std::string_view name{"x"};
-
-		EXPECT_THROW(static_cast<void>(Logger::warn("{} {} {}", userID, name)), std::runtime_error);
-
-		spdlog::set_error_handler([](const std::string & /*msg*/) {});
-	}
-
-	TEST_F(LoggerTest, GivenNonSpdlogExWhenWarnCalledWithTwoUnsignedCharArgsThenExceptionPropagates)
-	{
-		spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw std::runtime_error(msg); });
-		const ub id1{1};
-		const ub id2{2};
-
-		EXPECT_THROW(static_cast<void>(Logger::warn("{} {} {}", id1, id2)), std::runtime_error);
-
-		spdlog::set_error_handler([](const std::string & /*msg*/) {});
-	}
-
-	TEST_F(LoggerTest, GivenNonSpdlogExWhenWarnCalledWithUnsignedLongAndUnsignedCharArgsThenExceptionPropagates)
-	{
-		spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw std::runtime_error(msg); });
-		const ub userID{1};
-
-		EXPECT_THROW(static_cast<void>(Logger::warn("{} {} {}", 20UL, userID)), std::runtime_error);
-
-		spdlog::set_error_handler([](const std::string & /*msg*/) {});
-	}
-
-	// ────────────────────────────────────────────────────────────
-	// truncateFile parameter
-	// ────────────────────────────────────────────────────────────
-
-	TEST_F(LoggerTest, GivenExistingContentWhenInitializedWithTruncateThenFileIsCleared)
-	{
-		// Write some content through the logger so the file is non-empty
-		std::optional<std::string_view> preResult{Logger::info("pre-existing content")};
-		EXPECT_FALSE(preResult.has_value());
-
+		std::string defaultFileName{"logger_test_output.log"};
+		// Flush spdlog to ensure all output is written before reading
 		spdlog::apply_all([](const std::shared_ptr<spdlog::logger> &logger) { logger->flush(); });
 
-		std::string contents{readLogFile()};
-		ASSERT_FALSE(contents.empty());
-
-		// Re-initialize with truncateFile {tru}e
-		spdlog::drop_all();
-		bool initResult{Logger::initialize(getLoggerName(), getLogFileName(), true)};
-		EXPECT_TRUE(initResult);
-
-		std::optional<std::string_view> postResult{Logger::info("after truncate")};
-		EXPECT_FALSE(postResult.has_value());
-		contents = readLogFile();
-
-		EXPECT_EQ(contents.find("pre-existing content"), std::string::npos);
-		EXPECT_NE(contents.find("after truncate"), std::string::npos);
-	}
-
-	TEST_F(LoggerTest, GivenExistingContentWhenInitializedWithoutTruncateThenFileIsPreserved)
-	{
-		std::optional<std::string_view> keepResult{Logger::info("keep this content")};
-		EXPECT_FALSE(keepResult.has_value());
-
-		spdlog::apply_all([](const std::shared_ptr<spdlog::logger> &logger) { logger->flush(); });
-
-		// Re-initialize without truncation (default)
-		spdlog::drop_all();
-		bool initResult{Logger::initialize("preserve_logger", getLogFileName(), false)};
-		EXPECT_TRUE(initResult);
-
-		std::optional<std::string_view> appendResult{Logger::info("appended content")};
-		EXPECT_FALSE(appendResult.has_value());
-		spdlog::apply_all([](const std::shared_ptr<spdlog::logger> &logger) { logger->flush(); });
-
-		std::string contents{readLogFile()};
-		EXPECT_NE(contents.find("keep this content"), std::string::npos);
-		EXPECT_NE(contents.find("appended content"), std::string::npos);
-	}
-
-	TEST_F(LoggerTest, GivenInvalidPathWhenInitializedWithTruncateThenReturnsFalse)
-	{
-		spdlog::drop_all();
-
-		// A path under a non-existent directory should fail to open for truncation
-		bool initResult{Logger::initialize("trunc_fail_logger", "/no_such_dir/no_such_subdir/fail.log", true)};
-		EXPECT_FALSE(initResult);
-	}
-
-	// ────────────────────────────────────────────────────────────
-	// spdlog initialization failure (duplicate name without drop)
-	// ────────────────────────────────────────────────────────────
-
-	TEST_F(LoggerTest, GivenDuplicateRegistryNameWhenInitializedThenReturnsFalse)
-	{
-		// Manually register a logger with the same name so spdlog::basic_logger_mt throws
-		std::string duplicateName{"duplicate_logger"};
-		std::string tempFile{"logger_test_dup.log"};
-		const std::shared_ptr<spdlog::logger> manualLogger{spdlog::basic_logger_mt(duplicateName, tempFile)};
-
-		// initialize will reset its own internal state but cannot drop the manually registered logger,
-		// causing spdlog to throw spdlog_ex which is caught internally and returns false.
-		bool initResult{Logger::initialize(duplicateName, getLogFileName())};
-		EXPECT_FALSE(initResult);
-
-		spdlog::drop(duplicateName);
-		static_cast<void>(std::filesystem::remove(tempFile));
-	}
-
-	// ────────────────────────────────────────────────────────────
-	// Logging failure — returns error string_view on spdlog_ex
-	// ────────────────────────────────────────────────────────────
-	// spdlog internally catches all std::exception in its log methods
-	// and calls its error handler. To make spdlog_ex propagate out
-	// to Logger's catch blocks, we set a custom error handler that
-	// re-throws as spdlog_ex, then trigger a format error with a
-	// mismatched format string (placeholder with no arguments).
-
-	TEST_F(LoggerTest, GivenSpdlogExWhenLogCalledThenReturnsLogLogFailure)
-	{
-		spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw spdlog::spdlog_ex(msg); });
-
-		std::optional<std::string_view> result{Logger::log(spdlog::level::info, "{} {}", 77)};
-
-		ASSERT_TRUE(result.has_value());
-
-		// NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-		EXPECT_EQ(result.value(), Logging::LOG_LOG_FAILURE);
-
-		spdlog::set_error_handler([](const std::string & /*msg*/) {});
-	}
-
-	TEST_F(LoggerTest, GivenSpdlogExWhenTraceCalledThenReturnsTraceLogFailure)
-	{
-		Logger::setLevel(spdlog::level::trace);
-		spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw spdlog::spdlog_ex(msg); });
-
-		std::optional<std::string_view> result{Logger::trace("{} {}", 42)};
-
-		ASSERT_TRUE(result.has_value());
-
-		// NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-		EXPECT_EQ(result.value(), Logging::TRACE_LOG_FAILURE);
-
-		spdlog::set_error_handler([](const std::string & /*msg*/) {});
-	}
-
-	TEST_F(LoggerTest, GivenSpdlogExWhenDebugCalledThenReturnsDebugLogFailure)
-	{
-		Logger::setLevel(spdlog::level::debug);
-		spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw spdlog::spdlog_ex(msg); });
-
-		std::optional<std::string_view> result{Logger::debug("{} {}", "hello")};
-
-		ASSERT_TRUE(result.has_value());
-
-		// NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-		EXPECT_EQ(result.value(), Logging::DEBUG_LOG_FAILURE);
-
-		spdlog::set_error_handler([](const std::string & /*msg*/) {});
-	}
-
-	TEST_F(LoggerTest, GivenSpdlogExWhenInfoCalledThenReturnsInfoLogFailure)
-	{
-		spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw spdlog::spdlog_ex(msg); });
-
-		std::optional<std::string_view> result{Logger::info("{} {}", 100)};
-
-		ASSERT_TRUE(result.has_value());
-
-		// NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-		EXPECT_EQ(result.value(), Logging::INFO_LOG_FAILURE);
-
-		spdlog::set_error_handler([](const std::string & /*msg*/) {});
-	}
-
-	TEST_F(LoggerTest, GivenSpdlogExWhenWarnCalledThenReturnsWarnLogFailure)
-	{
-		spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw spdlog::spdlog_ex(msg); });
-
-		std::optional<std::string_view> result{Logger::warn("{} {}", 3.14)};
-
-		ASSERT_TRUE(result.has_value());
-
-		// NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-		EXPECT_EQ(result.value(), Logging::WARN_LOG_FAILURE);
-
-		spdlog::set_error_handler([](const std::string & /*msg*/) {});
-	}
-
-	TEST_F(LoggerTest, GivenSpdlogExWhenErrorCalledThenReturnsErrorLogFailure)
-	{
-		spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw spdlog::spdlog_ex(msg); });
-
-		std::optional<std::string_view> result{Logger::error("{} {}", "failure")};
-
-		ASSERT_TRUE(result.has_value());
-
-		// NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-		EXPECT_EQ(result.value(), Logging::ERROR_LOG_FAILURE);
-
-		spdlog::set_error_handler([](const std::string & /*msg*/) {});
-	}
-
-	TEST_F(LoggerTest, GivenSpdlogExWhenCriticalCalledThenReturnsCriticalLogFailure)
-	{
-		spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw spdlog::spdlog_ex(msg); });
-
-		std::optional<std::string_view> result{Logger::critical("{} {}", 999)};
-
-		ASSERT_TRUE(result.has_value());
-		
-		// NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-		EXPECT_EQ(result.value(), Logging::CRITICAL_LOG_FAILURE);
-
-		spdlog::set_error_handler([](const std::string & /*msg*/) {});
-	}
-
-	// ────────────────────────────────────────────────────────────
-	// Logging failure — non-spdlog_ex propagates past the catch
-	// ────────────────────────────────────────────────────────────
-	// GCC generates a branch on each catch clause for "exception
-	// does not match this handler". Throwing std::runtime_error
-	// exercises that path.
-
-	TEST_F(LoggerTest, GivenNonSpdlogExWhenLogCalledThenExceptionPropagates)
-	{
-		spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw std::runtime_error(msg); });
-
-		EXPECT_THROW(static_cast<void>(Logger::log(spdlog::level::info, "{} {}", 77)), std::runtime_error);
-
-		spdlog::set_error_handler([](const std::string & /*msg*/) {});
-	}
-
-	TEST_F(LoggerTest, GivenNonSpdlogExWhenTraceCalledThenExceptionPropagates)
-	{
-		Logger::setLevel(spdlog::level::trace);
-		spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw std::runtime_error(msg); });
-
-		EXPECT_THROW(static_cast<void>(Logger::trace("{} {}", 42)), std::runtime_error);
-
-		spdlog::set_error_handler([](const std::string & /*msg*/) {});
-	}
-
-	TEST_F(LoggerTest, GivenNonSpdlogExWhenDebugCalledThenExceptionPropagates)
-	{
-		Logger::setLevel(spdlog::level::debug);
-		spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw std::runtime_error(msg); });
-
-		EXPECT_THROW(static_cast<void>(Logger::debug("{} {}", "hello")), std::runtime_error);
-
-		spdlog::set_error_handler([](const std::string & /*msg*/) {});
-	}
-
-	TEST_F(LoggerTest, GivenNonSpdlogExWhenInfoCalledThenExceptionPropagates)
-	{
-		spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw std::runtime_error(msg); });
-
-		EXPECT_THROW(static_cast<void>(Logger::info("{} {}", 100)), std::runtime_error);
-
-		spdlog::set_error_handler([](const std::string & /*msg*/) {});
-	}
-
-	TEST_F(LoggerTest, GivenNonSpdlogExWhenWarnCalledThenExceptionPropagates)
-	{
-		spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw std::runtime_error(msg); });
-
-		EXPECT_THROW(static_cast<void>(Logger::warn("{} {}", 3.14)), std::runtime_error);
-
-		spdlog::set_error_handler([](const std::string & /*msg*/) {});
-	}
-
-	TEST_F(LoggerTest, GivenNonSpdlogExWhenErrorCalledThenExceptionPropagates)
-	{
-		spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw std::runtime_error(msg); });
-
-		EXPECT_THROW(static_cast<void>(Logger::error("{} {}", "failure")), std::runtime_error);
-
-		spdlog::set_error_handler([](const std::string & /*msg*/) {});
-	}
-
-	TEST_F(LoggerTest, GivenNonSpdlogExWhenCriticalCalledThenExceptionPropagates)
-	{
-		spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw std::runtime_error(msg); });
-
-		EXPECT_THROW(static_cast<void>(Logger::critical("{} {}", 999)), std::runtime_error);
-
-		spdlog::set_error_handler([](const std::string & /*msg*/) {});
+		std::ifstream file(fileName != nullptr ? *fileName : defaultFileName);
+		std::ostringstream contents;
+		contents << file.rdbuf();
+		return contents.str();
 	}
 } // namespace
 
-// NOLINTEND(misc-const-correctness,cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+SCENARIO("Logger")
+{
+	// Scenario-level setup: initialize a fresh logger for testing
+	const std::string loggerName{"test_logger"};
+	const std::string logFileName{"logger_test_output.log"};
+
+	spdlog::drop_all();
+	static_cast<void>(std::filesystem::remove(logFileName));
+	static_cast<void>(Logger::initialize(loggerName, logFileName));
+
+	GIVEN("Logger initialization")
+	{
+		THEN("logger is usable after initialization")
+		{
+			// Logger was initialized above; logging should succeed
+			std::optional<std::string_view> result{Logger::info("initialization smoke test")};
+			CHECK_FALSE(result.has_value());
+		}
+
+		THEN("re-initialization with different name and file succeeds")
+		{
+			std::string secondFile{"logger_test_reinit.log"};
+			bool initResult{Logger::initialize("reinit_logger", secondFile)};
+			CHECK(initResult);
+
+			std::optional<std::string_view> result{Logger::info("after reinit")};
+			CHECK_FALSE(result.has_value());
+
+			// Clean up the second file
+			spdlog::drop_all();
+			static_cast<void>(std::filesystem::remove(secondFile));
+			static_cast<void>(Logger::initialize(loggerName, logFileName));
+		}
+
+		THEN("re-initialization with same name succeeds")
+		{
+			// Re-initializing with the same name should succeed because initialize drops the old registry entry.
+			bool initResult{Logger::initialize(loggerName, logFileName)};
+			CHECK(initResult);
+
+			std::optional<std::string_view> result{Logger::info("after same-name reinit")};
+			CHECK_FALSE(result.has_value());
+		}
+	}
+
+	GIVEN("getLevel and setLevel operations")
+	{
+		THEN("default level is info")
+		{
+			// spdlog's default level is info
+			CHECK((Logger::getLevel() == spdlog::level::info));
+		}
+
+		THEN("setting debug level returns debug when queried")
+		{
+			Logger::setLevel(spdlog::level::debug);
+			CHECK((Logger::getLevel() == spdlog::level::debug));
+			Logger::setLevel(spdlog::level::info);
+		}
+
+		THEN("setting trace level returns trace when queried")
+		{
+			Logger::setLevel(spdlog::level::trace);
+			CHECK((Logger::getLevel() == spdlog::level::trace));
+			Logger::setLevel(spdlog::level::info);
+		}
+
+		THEN("setting critical level returns critical when queried")
+		{
+			Logger::setLevel(spdlog::level::critical);
+			CHECK((Logger::getLevel() == spdlog::level::critical));
+			Logger::setLevel(spdlog::level::info);
+		}
+	}
+
+	GIVEN("setLoggerName operation")
+	{
+		THEN("logger works after renaming")
+		{
+			bool result{Logger::setLoggerName("renamed_logger")};
+			REQUIRE(result);
+
+			std::optional<std::string_view> infoResult{Logger::info("after rename")};
+			CHECK_FALSE(infoResult.has_value());
+
+			result = Logger::setLoggerName(loggerName);
+
+			CHECK(result);
+		}
+	}
+
+	GIVEN("setFileName operation")
+	{
+		THEN("logs are written to new file after setFileName")
+		{
+			std::string newFile{"logger_test_newfile.log"};
+			static_cast<void>(std::filesystem::remove(newFile));
+
+			const bool setResult{Logger::setFileName(newFile)};
+			CHECK(setResult);
+
+			std::optional<std::string_view> result{Logger::info("written to new file")};
+			CHECK_FALSE(result.has_value());
+
+			const std::string contents{readLogFile(&newFile)};
+			CHECK(contents.contains("written to new file"));
+
+			spdlog::drop_all();
+			static_cast<void>(std::filesystem::remove(newFile));
+			static_cast<void>(Logger::initialize(loggerName, logFileName));
+		}
+	}
+
+	GIVEN("setLoggerAndFileName operation")
+	{
+		THEN("logger works with both name and file changed")
+		{
+			std::string newFile{"logger_test_both.log"};
+			static_cast<void>(std::filesystem::remove(newFile));
+
+			const bool setResult{Logger::setLoggerAndFileName("both_logger", newFile)};
+			CHECK(setResult);
+
+			std::optional<std::string_view> result{Logger::info("both changed")};
+			CHECK_FALSE(result.has_value());
+
+			const std::string contents{readLogFile(&newFile)};
+			CHECK(contents.contains("both changed"));
+
+			spdlog::drop_all();
+			static_cast<void>(std::filesystem::remove(newFile));
+			static_cast<void>(Logger::initialize(loggerName, logFileName));
+		}
+	}
+
+	GIVEN("Template logging methods at info level")
+	{
+		THEN("log at info level writes to file")
+		{
+			std::optional<std::string_view> result{Logger::log(spdlog::level::info, "log message {}", 77)};
+			CHECK_FALSE(result.has_value());
+
+			const std::string contents{readLogFile()};
+			CHECK(contents.contains("log message 77"));
+		}
+
+		THEN("info writes message to log")
+		{
+			std::optional<std::string_view> result{Logger::info("info message {}", 100)};
+			CHECK_FALSE(result.has_value());
+
+			const std::string contents{readLogFile()};
+			CHECK(contents.contains("info message 100"));
+		}
+
+		THEN("warn writes message to log at info level")
+		{
+			std::optional<std::string_view> result{Logger::warn("warn message {}", 3.14)};
+			CHECK_FALSE(result.has_value());
+
+			const std::string contents{readLogFile()};
+			CHECK(contents.contains("warn message 3.14"));
+		}
+
+		THEN("error writes message to log at info level")
+		{
+			std::optional<std::string_view> result{Logger::error("error message {}", "failure")};
+			CHECK_FALSE(result.has_value());
+
+			const std::string contents{readLogFile()};
+			CHECK(contents.contains("error message failure"));
+		}
+
+		THEN("critical writes message to log at info level")
+		{
+			std::optional<std::string_view> result{Logger::critical("critical message {}", 999)};
+			CHECK_FALSE(result.has_value());
+
+			const std::string contents{readLogFile()};
+			CHECK(contents.contains("critical message 999"));
+		}
+	}
+
+	GIVEN("Trace level enabled")
+	{
+		Logger::setLevel(spdlog::level::trace);
+
+		THEN("trace writes message to log")
+		{
+			std::optional<std::string_view> result{Logger::trace("trace message {}", 42)};
+			CHECK_FALSE(result.has_value());
+
+			const std::string contents{readLogFile()};
+			CHECK(contents.contains("trace message 42"));
+		}
+
+		Logger::setLevel(spdlog::level::info);
+	}
+
+	GIVEN("Debug level enabled")
+	{
+		Logger::setLevel(spdlog::level::debug);
+
+		THEN("debug writes message to log")
+		{
+			std::optional<std::string_view> result{Logger::debug("debug message {}", "hello")};
+			CHECK_FALSE(result.has_value());
+
+			const std::string contents{readLogFile()};
+			CHECK(contents.contains("debug message hello"));
+		}
+
+		Logger::setLevel(spdlog::level::info);
+	}
+
+	GIVEN("Level filtering")
+	{
+		THEN("info level messages are suppressed when level is set to error")
+		{
+			Logger::setLevel(spdlog::level::err);
+			std::optional<std::string_view> result{Logger::info("should not appear")};
+			CHECK_FALSE(result.has_value());
+
+			const std::string contents{readLogFile()};
+			CHECK_FALSE(contents.contains("should not appear"));
+
+			Logger::setLevel(spdlog::level::info);
+		}
+
+		THEN("warn level messages are suppressed when level is set to critical")
+		{
+			Logger::setLevel(spdlog::level::critical);
+			std::optional<std::string_view> result{Logger::warn("suppressed warning")};
+			CHECK_FALSE(result.has_value());
+
+			const std::string contents{readLogFile()};
+			CHECK_FALSE(contents.contains("suppressed warning"));
+
+			Logger::setLevel(spdlog::level::info);
+		}
+	}
+
+	GIVEN("Multiple messages at info level")
+	{
+		THEN("all messages accumulate in the log file")
+		{
+			std::optional<std::string_view> result1{Logger::info("first message")};
+			std::optional<std::string_view> result2{Logger::info("second message")};
+			std::optional<std::string_view> result3{Logger::info("third message")};
+			CHECK_FALSE(result1.has_value());
+			CHECK_FALSE(result2.has_value());
+			CHECK_FALSE(result3.has_value());
+
+			const std::string contents{readLogFile()};
+			CHECK(contents.contains("first message"));
+			CHECK(contents.contains("second message"));
+			CHECK(contents.contains("third message"));
+		}
+	}
+
+	GIVEN("Template instantiations with string_view arguments")
+	{
+		THEN("info with single string_view argument")
+		{
+			const std::string_view arg{"type_name"};
+			std::optional<std::string_view> result{Logger::info("registered {}", arg)};
+			CHECK_FALSE(result.has_value());
+
+			const std::string contents{readLogFile()};
+			CHECK(contents.contains("registered type_name"));
+		}
+
+		THEN("info with two string_view arguments")
+		{
+			const std::string_view arg1{"fire"};
+			const std::string_view arg2{"water"};
+			std::optional<std::string_view> result{Logger::info("{} vs {}", arg1, arg2)};
+			CHECK_FALSE(result.has_value());
+
+			const std::string contents{readLogFile()};
+			CHECK(contents.contains("fire vs water"));
+		}
+
+		THEN("warn with single string_view argument")
+		{
+			const std::string_view arg{"warning_detail"};
+			std::optional<std::string_view> result{Logger::warn("issue: {}", arg)};
+			CHECK_FALSE(result.has_value());
+
+			const std::string contents{readLogFile()};
+			CHECK(contents.contains("issue: warning_detail"));
+		}
+
+		THEN("warn with two string_view arguments")
+		{
+			const std::string_view arg1{"expected"};
+			const std::string_view arg2{"actual"};
+			std::optional<std::string_view> result{Logger::warn("{} != {}", arg1, arg2)};
+			CHECK_FALSE(result.has_value());
+
+			const std::string contents{readLogFile()};
+			CHECK(contents.contains("expected != actual"));
+		}
+	}
+
+	GIVEN("Template instantiations with unsigned char arguments")
+	{
+		THEN("info with single unsigned char argument")
+		{
+			const ub arg{5};
+			std::optional<std::string_view> result{Logger::info("type id {}", arg)};
+			CHECK_FALSE(result.has_value());
+
+			const std::string contents{readLogFile()};
+			CHECK(contents.contains("type id 5"));
+		}
+
+		THEN("warn with unsigned char and string_view arguments")
+		{
+			const ub userID{3};
+			const std::string_view name{"grass"};
+			std::optional<std::string_view> result{Logger::warn("id {} name {}", userID, name)};
+			CHECK_FALSE(result.has_value());
+
+			const std::string contents{readLogFile()};
+			CHECK(contents.contains("id 3 name grass"));
+		}
+
+		THEN("warn with two unsigned char arguments")
+		{
+			const ub id1{1};
+			const ub id2{2};
+			std::optional<std::string_view> result{Logger::warn("ids {} {}", id1, id2)};
+			CHECK_FALSE(result.has_value());
+
+			const std::string contents{readLogFile()};
+			CHECK(contents.contains("ids 1 2"));
+		}
+
+		THEN("warn with unsigned long and unsigned char arguments")
+		{
+			const ub userID{7};
+			std::optional<std::string_view> result{Logger::warn("size {} id {}", 20UL, userID)};
+			CHECK_FALSE(result.has_value());
+
+			const std::string contents{readLogFile()};
+			CHECK(contents.contains("size 20 id 7"));
+		}
+	}
+
+	GIVEN("Failure coverage for template instantiations with spdlog_ex")
+	{
+		THEN("info with single string_view argument throws spdlog_ex")
+		{
+			spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw spdlog::spdlog_ex(msg); });
+			const std::string_view arg{"x"};
+
+			std::optional<std::string_view> result{Logger::info("{} {}", arg)};
+			REQUIRE(result.has_value());
+
+			spdlog::set_error_handler([](const std::string & /*msg*/) {});
+		}
+
+		THEN("info with two string_view arguments throws spdlog_ex")
+		{
+			spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw spdlog::spdlog_ex(msg); });
+			const std::string_view arg1{"a"};
+			const std::string_view arg2{"b"};
+
+			std::optional<std::string_view> result{Logger::info("{} {} {}", arg1, arg2)};
+			REQUIRE(result.has_value());
+
+			spdlog::set_error_handler([](const std::string & /*msg*/) {});
+		}
+
+		THEN("info with single unsigned char argument throws spdlog_ex")
+		{
+			spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw spdlog::spdlog_ex(msg); });
+			const ub arg{1};
+
+			std::optional<std::string_view> result{Logger::info("{} {}", arg)};
+			REQUIRE(result.has_value());
+
+			spdlog::set_error_handler([](const std::string & /*msg*/) {});
+		}
+
+		THEN("warn with single string_view argument throws spdlog_ex")
+		{
+			spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw spdlog::spdlog_ex(msg); });
+			const std::string_view arg{"x"};
+
+			std::optional<std::string_view> result{Logger::warn("{} {}", arg)};
+			REQUIRE(result.has_value());
+
+			spdlog::set_error_handler([](const std::string & /*msg*/) {});
+		}
+
+		THEN("warn with two string_view arguments throws spdlog_ex")
+		{
+			spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw spdlog::spdlog_ex(msg); });
+			const std::string_view arg1{"a"};
+			const std::string_view arg2{"b"};
+
+			std::optional<std::string_view> result{Logger::warn("{} {} {}", arg1, arg2)};
+			REQUIRE(result.has_value());
+
+			spdlog::set_error_handler([](const std::string & /*msg*/) {});
+		}
+
+		THEN("warn with unsigned char and string_view arguments throws spdlog_ex")
+		{
+			spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw spdlog::spdlog_ex(msg); });
+			const ub userID{1};
+			const std::string_view name{"x"};
+
+			std::optional<std::string_view> result{Logger::warn("{} {} {}", userID, name)};
+			REQUIRE(result.has_value());
+
+			spdlog::set_error_handler([](const std::string & /*msg*/) {});
+		}
+
+		THEN("warn with two unsigned char arguments throws spdlog_ex")
+		{
+			spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw spdlog::spdlog_ex(msg); });
+			const ub id1{1};
+			const ub id2{2};
+
+			std::optional<std::string_view> result{Logger::warn("{} {} {}", id1, id2)};
+			REQUIRE(result.has_value());
+
+			spdlog::set_error_handler([](const std::string & /*msg*/) {});
+		}
+
+		THEN("warn with unsigned long and unsigned char arguments throws spdlog_ex")
+		{
+			spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw spdlog::spdlog_ex(msg); });
+			const ub userID{1};
+
+			std::optional<std::string_view> result{Logger::warn("{} {} {}", 20UL, userID)};
+			REQUIRE(result.has_value());
+
+			spdlog::set_error_handler([](const std::string & /*msg*/) {});
+		}
+	}
+
+	GIVEN("Non-spdlog exception handling for template instantiations")
+	{
+		THEN("info with single string_view argument propagates non-spdlog_ex")
+		{
+			spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw std::runtime_error(msg); });
+			const std::string_view arg{"x"};
+
+			CHECK_THROWS_AS(static_cast<void>(Logger::info("{} {}", arg)), std::runtime_error);
+
+			spdlog::set_error_handler([](const std::string & /*msg*/) {});
+		}
+
+		THEN("info with two string_view arguments propagates non-spdlog_ex")
+		{
+			spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw std::runtime_error(msg); });
+			const std::string_view arg1{"a"};
+			const std::string_view arg2{"b"};
+
+			CHECK_THROWS_AS(static_cast<void>(Logger::info("{} {} {}", arg1, arg2)), std::runtime_error);
+
+			spdlog::set_error_handler([](const std::string & /*msg*/) {});
+		}
+
+		THEN("info with single unsigned char argument propagates non-spdlog_ex")
+		{
+			spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw std::runtime_error(msg); });
+			const ub arg{1};
+
+			CHECK_THROWS_AS(static_cast<void>(Logger::info("{} {}", arg)), std::runtime_error);
+
+			spdlog::set_error_handler([](const std::string & /*msg*/) {});
+		}
+
+		THEN("warn with single string_view argument propagates non-spdlog_ex")
+		{
+			spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw std::runtime_error(msg); });
+			const std::string_view arg{"x"};
+
+			CHECK_THROWS_AS(static_cast<void>(Logger::warn("{} {}", arg)), std::runtime_error);
+
+			spdlog::set_error_handler([](const std::string & /*msg*/) {});
+		}
+
+		THEN("warn with two string_view arguments propagates non-spdlog_ex")
+		{
+			spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw std::runtime_error(msg); });
+			const std::string_view arg1{"a"};
+			const std::string_view arg2{"b"};
+
+			CHECK_THROWS_AS(static_cast<void>(Logger::warn("{} {} {}", arg1, arg2)), std::runtime_error);
+
+			spdlog::set_error_handler([](const std::string & /*msg*/) {});
+		}
+
+		THEN("warn with unsigned char and string_view arguments propagates non-spdlog_ex")
+		{
+			spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw std::runtime_error(msg); });
+			const ub userID{1};
+			const std::string_view name{"x"};
+
+			CHECK_THROWS_AS(static_cast<void>(Logger::warn("{} {} {}", userID, name)), std::runtime_error);
+
+			spdlog::set_error_handler([](const std::string & /*msg*/) {});
+		}
+
+		THEN("warn with two unsigned char arguments propagates non-spdlog_ex")
+		{
+			spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw std::runtime_error(msg); });
+			const ub id1{1};
+			const ub id2{2};
+
+			CHECK_THROWS_AS(static_cast<void>(Logger::warn("{} {} {}", id1, id2)), std::runtime_error);
+
+			spdlog::set_error_handler([](const std::string & /*msg*/) {});
+		}
+
+		THEN("warn with unsigned long and unsigned char arguments propagates non-spdlog_ex")
+		{
+			spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw std::runtime_error(msg); });
+			const ub userID{1};
+
+			CHECK_THROWS_AS(static_cast<void>(Logger::warn("{} {} {}", 20UL, userID)), std::runtime_error);
+
+			spdlog::set_error_handler([](const std::string & /*msg*/) {});
+		}
+	}
+
+	GIVEN("truncateFile parameter")
+	{
+		THEN("existing content is cleared when initialized with truncate")
+		{
+			// Write some content through the logger so the file is non-empty
+			std::optional<std::string_view> preResult{Logger::info("pre-existing content")};
+			CHECK_FALSE(preResult.has_value());
+
+			spdlog::apply_all([](const std::shared_ptr<spdlog::logger> &logger) { logger->flush(); });
+
+			std::string contents{readLogFile()};
+			REQUIRE_FALSE(contents.empty());
+
+			// Re-initialize with truncateFile true
+			spdlog::drop_all();
+			bool initResult{Logger::initialize(loggerName, logFileName, true)};
+			CHECK(initResult);
+
+			std::optional<std::string_view> postResult{Logger::info("after truncate")};
+			CHECK_FALSE(postResult.has_value());
+			contents = readLogFile();
+
+			CHECK_FALSE(contents.contains("pre-existing content"));
+			CHECK(contents.contains("after truncate"));
+		}
+
+		THEN("existing content is preserved when initialized without truncate")
+		{
+			std::optional<std::string_view> keepResult{Logger::info("keep this content")};
+			CHECK_FALSE(keepResult.has_value());
+
+			spdlog::apply_all([](const std::shared_ptr<spdlog::logger> &logger) { logger->flush(); });
+
+			// Re-initialize without truncation (default)
+			spdlog::drop_all();
+			bool initResult{Logger::initialize("preserve_logger", logFileName, false)};
+			CHECK(initResult);
+
+			std::optional<std::string_view> appendResult{Logger::info("appended content")};
+			CHECK_FALSE(appendResult.has_value());
+			spdlog::apply_all([](const std::shared_ptr<spdlog::logger> &logger) { logger->flush(); });
+
+			std::string contents{readLogFile()};
+			CHECK(contents.contains("keep this content"));
+			CHECK(contents.contains("appended content"));
+		}
+
+		THEN("initialization fails for invalid path with truncate")
+		{
+			spdlog::drop_all();
+
+			// A path under a non-existent directory should fail to open for truncation
+			bool initResult{Logger::initialize("trunc_fail_logger", "/no_such_dir/no_such_subdir/fail.log", true)};
+			CHECK_FALSE(initResult);
+		}
+	}
+
+	GIVEN("spdlog initialization with duplicate registry name")
+	{
+		THEN("initialization fails when duplicate name exists")
+		{
+			// Manually register a logger with a different name so spdlog::basic_logger_mt throws
+			std::string duplicateName{"duplicate_logger"};
+			std::string tempFile{"logger_test_dup.log"};
+			const std::shared_ptr<spdlog::logger> manualLogger{spdlog::basic_logger_mt(duplicateName, tempFile)};
+
+			// initialize will reset its own internal state but cannot drop the manually registered logger,
+			// causing spdlog to throw spdlog_ex which is caught internally and returns false.
+			bool initResult{Logger::initialize(duplicateName, logFileName)};
+			CHECK_FALSE(initResult);
+
+			spdlog::drop(duplicateName);
+			static_cast<void>(std::filesystem::remove(tempFile));
+		}
+	}
+
+	GIVEN("Logging failure returning error string_view on spdlog_ex")
+	{
+		THEN("log returns error string when spdlog_ex is thrown")
+		{
+			spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw spdlog::spdlog_ex(msg); });
+
+			std::optional<std::string_view> result{Logger::log(spdlog::level::info, "{} {}", 77)};
+
+			REQUIRE(result.has_value());
+			CHECK((result.value() == Logging::LOG_LOG_FAILURE));
+
+			spdlog::set_error_handler([](const std::string & /*msg*/) {});
+		}
+
+		THEN("trace returns error string when spdlog_ex is thrown")
+		{
+			Logger::setLevel(spdlog::level::trace);
+			spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw spdlog::spdlog_ex(msg); });
+
+			std::optional<std::string_view> result{Logger::trace("{} {}", 42)};
+
+			REQUIRE(result.has_value());
+			CHECK((result.value() == Logging::TRACE_LOG_FAILURE));
+
+			spdlog::set_error_handler([](const std::string & /*msg*/) {});
+			Logger::setLevel(spdlog::level::info);
+		}
+
+		THEN("debug returns error string when spdlog_ex is thrown")
+		{
+			Logger::setLevel(spdlog::level::debug);
+			spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw spdlog::spdlog_ex(msg); });
+
+			std::optional<std::string_view> result{Logger::debug("{} {}", "hello")};
+
+			REQUIRE(result.has_value());
+			CHECK((result.value() == Logging::DEBUG_LOG_FAILURE));
+
+			spdlog::set_error_handler([](const std::string & /*msg*/) {});
+			Logger::setLevel(spdlog::level::info);
+		}
+
+		THEN("info returns error string when spdlog_ex is thrown")
+		{
+			spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw spdlog::spdlog_ex(msg); });
+
+			std::optional<std::string_view> result{Logger::info("{} {}", 100)};
+
+			REQUIRE(result.has_value());
+			CHECK((result.value() == Logging::INFO_LOG_FAILURE));
+
+			spdlog::set_error_handler([](const std::string & /*msg*/) {});
+		}
+
+		THEN("warn returns error string when spdlog_ex is thrown")
+		{
+			spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw spdlog::spdlog_ex(msg); });
+
+			std::optional<std::string_view> result{Logger::warn("{} {}", 3.14)};
+
+			REQUIRE(result.has_value());
+			CHECK((result.value() == Logging::WARN_LOG_FAILURE));
+
+			spdlog::set_error_handler([](const std::string & /*msg*/) {});
+		}
+
+		THEN("error returns error string when spdlog_ex is thrown")
+		{
+			spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw spdlog::spdlog_ex(msg); });
+
+			std::optional<std::string_view> result{Logger::error("{} {}", "failure")};
+
+			REQUIRE(result.has_value());
+			CHECK((result.value() == Logging::ERROR_LOG_FAILURE));
+
+			spdlog::set_error_handler([](const std::string & /*msg*/) {});
+		}
+
+		THEN("critical returns error string when spdlog_ex is thrown")
+		{
+			spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw spdlog::spdlog_ex(msg); });
+
+			std::optional<std::string_view> result{Logger::critical("{} {}", 999)};
+
+			REQUIRE(result.has_value());
+			CHECK((result.value() == Logging::CRITICAL_LOG_FAILURE));
+
+			spdlog::set_error_handler([](const std::string & /*msg*/) {});
+		}
+	}
+
+	GIVEN("Logging failure propagating non-spdlog_ex")
+	{
+		THEN("log propagates non-spdlog_ex")
+		{
+			spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw std::runtime_error(msg); });
+
+			CHECK_THROWS_AS(static_cast<void>(Logger::log(spdlog::level::info, "{} {}", 77)), std::runtime_error);
+
+			spdlog::set_error_handler([](const std::string & /*msg*/) {});
+		}
+
+		THEN("trace propagates non-spdlog_ex")
+		{
+			Logger::setLevel(spdlog::level::trace);
+			spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw std::runtime_error(msg); });
+
+			CHECK_THROWS_AS(static_cast<void>(Logger::trace("{} {}", 42)), std::runtime_error);
+
+			spdlog::set_error_handler([](const std::string & /*msg*/) {});
+			Logger::setLevel(spdlog::level::info);
+		}
+
+		THEN("debug propagates non-spdlog_ex")
+		{
+			Logger::setLevel(spdlog::level::debug);
+			spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw std::runtime_error(msg); });
+
+			CHECK_THROWS_AS(static_cast<void>(Logger::debug("{} {}", "hello")), std::runtime_error);
+
+			spdlog::set_error_handler([](const std::string & /*msg*/) {});
+			Logger::setLevel(spdlog::level::info);
+		}
+
+		THEN("info propagates non-spdlog_ex")
+		{
+			spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw std::runtime_error(msg); });
+
+			CHECK_THROWS_AS(static_cast<void>(Logger::info("{} {}", 100)), std::runtime_error);
+
+			spdlog::set_error_handler([](const std::string & /*msg*/) {});
+		}
+
+		THEN("warn propagates non-spdlog_ex")
+		{
+			spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw std::runtime_error(msg); });
+
+			CHECK_THROWS_AS(static_cast<void>(Logger::warn("{} {}", 3.14)), std::runtime_error);
+
+			spdlog::set_error_handler([](const std::string & /*msg*/) {});
+		}
+
+		THEN("error propagates non-spdlog_ex")
+		{
+			spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw std::runtime_error(msg); });
+
+			CHECK_THROWS_AS(static_cast<void>(Logger::error("{} {}", "failure")), std::runtime_error);
+
+			spdlog::set_error_handler([](const std::string & /*msg*/) {});
+		}
+
+		THEN("critical propagates non-spdlog_ex")
+		{
+			spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw std::runtime_error(msg); });
+
+			CHECK_THROWS_AS(static_cast<void>(Logger::critical("{} {}", 999)), std::runtime_error);
+
+			spdlog::set_error_handler([](const std::string & /*msg*/) {});
+		}
+	}
+
+	// Scenario-level cleanup
+	spdlog::drop_all();
+	static_cast<void>(std::filesystem::remove(logFileName));
+}
+
+// NOLINTEND(misc-const-correctness,cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers,readability-function-cognitive-complexity)

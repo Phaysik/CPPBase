@@ -9,65 +9,71 @@
 #include "Utility/Containers/ContiguousSequence/contiguousSequence.h"
 
 #include <array>
-#include <cstdint>
 #include <span>
 #include <vector>
 
-#include <gtest/gtest.h>
+#include "Core/typedefs.h"
 
+#include <catch2/catch_test_macros.hpp>
+
+using Project::Core::si;
+using Project::Core::sl;
 using Project::Utility::Containers::ContiguousSequence::computeContiguousSequenceSum;
 
-// NOLINTBEGIN(misc-const-correctness,cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+// NOLINTBEGIN(misc-const-correctness,cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers,readability-function-cognitive-complexity)
 
-namespace // NOSONAR
+SCENARIO("ContiguousSequence")
 {
-	class ContiguousSequenceTest : public ::testing::Test // NOSONAR
+	GIVEN("computerContiguousSequenceSum")
 	{
-		protected:
-			std::vector<int> vec{1, 2, 3, 4, 5};
-			std::array<int64_t, 4> arrll{10'000'000'000LL, 20'000'000'000LL, 30'000'000'000LL, 40'000'000'000LL};
-	};
-} // namespace
+		std::vector<si> vec{1, 2, 3, 4, 5};
+		std::array<sl, 4> arrll{10'000'000'000LL, 20'000'000'000LL, 30'000'000'000LL, 40'000'000'000LL};
 
-TEST_F(ContiguousSequenceTest, GivenVectorWhenSummingWholeRangeReturnsSum)
-{
-	std::span<const int> sequence(vec);
+		GIVEN("A vector of integers")
+		{
+			std::span<const si> sequence(vec);
 
-	EXPECT_EQ(computeContiguousSequenceSum<int>(sequence, 0, static_cast<int>(vec.size())), 15);
-	// Two-arg overload should forward to the three-arg overload for full range
-	EXPECT_EQ(computeContiguousSequenceSum<int>(sequence, 0), 15);
+			THEN("summing the whole range returns the total sum")
+			{
+				REQUIRE((computeContiguousSequenceSum<si>(sequence, 0, static_cast<si>(vec.size())) == 15));
+				// Two-arg overload should forward to the three-arg overload for full range
+				CHECK((computeContiguousSequenceSum<si>(sequence, 0) == 15));
+			}
+
+			THEN("summing a subrange returns the correct sum")
+			{
+				// sum of elements at indices 1,2,3 => 2 + 3 + 4 == 9
+				CHECK((computeContiguousSequenceSum<si>(sequence, 1, 3) == 9));
+			}
+
+			THEN("start index at or beyond end returns zero")
+			{
+				CHECK((computeContiguousSequenceSum<si>(sequence, static_cast<si>(vec.size())) == 0));
+				CHECK((computeContiguousSequenceSum<si>(sequence, static_cast<si>(vec.size()) + 5) == 0));
+			}
+
+			THEN("length too large returns zero")
+			{
+				// startIndex + length > size -> should return zero per contract
+				CHECK((computeContiguousSequenceSum<si>(sequence, 1, 10) == 0));
+			}
+		}
+
+		GIVEN("A vector of integers with a large sum that exceeds 32-bit limits")
+		{
+			std::span<const sl> sequence(arrll);
+
+			THEN("summing the whole range returns the correct total sum without overflow")
+			{
+				sl expected{10'000'000'000LL + 20'000'000'000LL + 30'000'000'000LL + 40'000'000'000LL};
+
+				REQUIRE((computeContiguousSequenceSum<sl>(sequence, 0, static_cast<si>(arrll.size())) == expected));
+
+				// Two-arg overload should forward to the three-arg overload for full range
+				CHECK((computeContiguousSequenceSum<sl>(sequence, 0) == expected));
+			}
+		}
+	}
 }
 
-TEST_F(ContiguousSequenceTest, GivenVectorWhenSummingSubrangeReturnsSum)
-{
-	std::span<const int> sequence(vec);
-
-	// sum of elements at indices 1,2,3 => 2 + 3 + 4 == 9
-	EXPECT_EQ(computeContiguousSequenceSum<int>(sequence, 1, 3), 9);
-}
-
-TEST_F(ContiguousSequenceTest, GivenStartIndexAtOrBeyondEndReturnsZero)
-{
-	std::span<const int> sequence(vec);
-
-	EXPECT_EQ(computeContiguousSequenceSum<int>(sequence, static_cast<int>(vec.size())), 0);
-	EXPECT_EQ(computeContiguousSequenceSum<int>(sequence, static_cast<int>(vec.size()) + 5), 0);
-}
-
-TEST_F(ContiguousSequenceTest, GivenLengthTooLargeReturnsZero)
-{
-	std::span<const int> sequence(vec);
-
-	// startIndex + length > size -> should return zero per contract
-	EXPECT_EQ(computeContiguousSequenceSum<int>(sequence, 1, 10), 0);
-}
-
-TEST_F(ContiguousSequenceTest, WorksWithDifferentIntegralTypes)
-{
-	std::span<const int64_t> sequence(arrll);
-	const int64_t expected = 10'000'000'000LL + 20'000'000'000LL + 30'000'000'000LL + 40'000'000'000LL;
-
-	EXPECT_EQ(computeContiguousSequenceSum<int64_t>(sequence, 0), expected);
-}
-
-// NOLINTEND(misc-const-correctness,cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+// NOLINTEND(misc-const-correctness,cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers,readability-function-cognitive-complexity)
