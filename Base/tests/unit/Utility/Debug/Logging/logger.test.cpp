@@ -2,7 +2,7 @@
 	@brief Catch2 BDD unit tests for the static Logger wrapper.
 	@details Exercises initialization, level get/set, name/file replacement, and all seven logging-level template methods using Catch2's BDD
    syntax. Each test scenario manages temporary files that are cleaned up after the scenario completes.
-	@date 03/11/2026
+	@date --/--/----
 	@version x.x.x
 	@since x.x.x
 	@author Matthew Moore
@@ -42,7 +42,7 @@ namespace
 		@param fileName Optional path to a specific log file. If nullptr, uses the default test log file.
 		@return The file contents as a string.
 	*/
-	std::string readLogFile(const std::string *fileName = nullptr) // NOLINT(llvm-prefer-static-over-anonymous-namespace)
+	ATTR_NODISCARD std::string readLogFile(const std::string *fileName = nullptr) // NOLINT(llvm-prefer-static-over-anonymous-namespace)
 	{
 		std::string defaultFileName{"logger_test_output.log"};
 		// Flush spdlog to ensure all output is written before reading
@@ -62,10 +62,14 @@ SCENARIO("Logger")
 	const std::string logFileName{"logger_test_output.log"};
 
 	spdlog::drop_all();
-	static_cast<void>(std::filesystem::remove(logFileName));
-	static_cast<void>(Logger::initialize(loggerName, logFileName));
 
-	GIVEN("Logger initialization")
+	bool fileRemoved{std::filesystem::remove(logFileName)};
+	REQUIRE(!fileRemoved);
+
+	bool loggerInitialized{Logger::initialize(loggerName, logFileName)};
+	REQUIRE(loggerInitialized);
+
+	GIVEN("initialization")
 	{
 		THEN("logger is usable after initialization")
 		{
@@ -85,8 +89,12 @@ SCENARIO("Logger")
 
 			// Clean up the second file
 			spdlog::drop_all();
-			static_cast<void>(std::filesystem::remove(secondFile));
-			static_cast<void>(Logger::initialize(loggerName, logFileName));
+
+			bool secondFileRemoved{std::filesystem::remove(secondFile)};
+			REQUIRE(secondFileRemoved);
+
+			bool loggerReinitialized{Logger::initialize(loggerName, logFileName)};
+			CHECK(loggerReinitialized);
 		}
 
 		THEN("re-initialization with same name succeeds")
@@ -112,6 +120,7 @@ SCENARIO("Logger")
 		{
 			Logger::setLevel(spdlog::level::debug);
 			CHECK((Logger::getLevel() == spdlog::level::debug));
+
 			Logger::setLevel(spdlog::level::info);
 		}
 
@@ -119,6 +128,7 @@ SCENARIO("Logger")
 		{
 			Logger::setLevel(spdlog::level::trace);
 			CHECK((Logger::getLevel() == spdlog::level::trace));
+
 			Logger::setLevel(spdlog::level::info);
 		}
 
@@ -126,13 +136,14 @@ SCENARIO("Logger")
 		{
 			Logger::setLevel(spdlog::level::critical);
 			CHECK((Logger::getLevel() == spdlog::level::critical));
+
 			Logger::setLevel(spdlog::level::info);
 		}
 	}
 
-	GIVEN("setLoggerName operation")
+	GIVEN("setLoggerName")
 	{
-		THEN("logger works after renaming")
+		THEN("works after renaming")
 		{
 			bool result{Logger::setLoggerName("renamed_logger")};
 			REQUIRE(result);
@@ -146,12 +157,14 @@ SCENARIO("Logger")
 		}
 	}
 
-	GIVEN("setFileName operation")
+	GIVEN("setFileName")
 	{
-		THEN("logs are written to new file after setFileName")
+		THEN("works after file name changed")
 		{
 			std::string newFile{"logger_test_newfile.log"};
-			static_cast<void>(std::filesystem::remove(newFile));
+			fileRemoved = std::filesystem::remove(newFile);
+
+			REQUIRE(!fileRemoved);
 
 			const bool setResult{Logger::setFileName(newFile)};
 			CHECK(setResult);
@@ -163,17 +176,21 @@ SCENARIO("Logger")
 			CHECK(contents.contains("written to new file"));
 
 			spdlog::drop_all();
-			static_cast<void>(std::filesystem::remove(newFile));
-			static_cast<void>(Logger::initialize(loggerName, logFileName));
+			fileRemoved = std::filesystem::remove(newFile);
+			REQUIRE(fileRemoved);
+
+			loggerInitialized = Logger::initialize(loggerName, logFileName);
+			REQUIRE(loggerInitialized);
 		}
 	}
 
-	GIVEN("setLoggerAndFileName operation")
+	GIVEN("setLoggerAndFileName")
 	{
-		THEN("logger works with both name and file changed")
+		THEN("works with both name and file changed")
 		{
 			std::string newFile{"logger_test_both.log"};
-			static_cast<void>(std::filesystem::remove(newFile));
+			fileRemoved = std::filesystem::remove(newFile);
+			REQUIRE(!fileRemoved);
 
 			const bool setResult{Logger::setLoggerAndFileName("both_logger", newFile)};
 			CHECK(setResult);
@@ -185,20 +202,49 @@ SCENARIO("Logger")
 			CHECK(contents.contains("both changed"));
 
 			spdlog::drop_all();
-			static_cast<void>(std::filesystem::remove(newFile));
-			static_cast<void>(Logger::initialize(loggerName, logFileName));
+			fileRemoved = std::filesystem::remove(newFile);
+			REQUIRE(fileRemoved);
+
+			loggerInitialized = Logger::initialize(loggerName, logFileName);
+			REQUIRE(loggerInitialized);
 		}
 	}
 
-	GIVEN("Template logging methods at info level")
+	GIVEN("Template logging methods")
 	{
-		THEN("log at info level writes to file")
+		THEN("specifying logging level writes to file")
 		{
 			std::optional<std::string_view> result{Logger::log(spdlog::level::info, "log message {}", 77)};
 			CHECK_FALSE(result.has_value());
 
 			const std::string contents{readLogFile()};
 			CHECK(contents.contains("log message 77"));
+		}
+
+		THEN("trace writes message to log")
+		{
+			Logger::setLevel(spdlog::level::trace);
+
+			std::optional<std::string_view> result{Logger::trace("trace message {}", 250)};
+			CHECK_FALSE(result.has_value());
+
+			const std::string contents{readLogFile()};
+			CHECK(contents.contains("trace message 250"));
+
+			Logger::setLevel(spdlog::level::info);
+		}
+
+		THEN("debug writes message to log")
+		{
+			Logger::setLevel(spdlog::level::debug);
+
+			std::optional<std::string_view> result{Logger::debug("debug message {}", 489)};
+			CHECK_FALSE(result.has_value());
+
+			const std::string contents{readLogFile()};
+			CHECK(contents.contains("debug message 489"));
+
+			Logger::setLevel(spdlog::level::info);
 		}
 
 		THEN("info writes message to log")
@@ -210,7 +256,7 @@ SCENARIO("Logger")
 			CHECK(contents.contains("info message 100"));
 		}
 
-		THEN("warn writes message to log at info level")
+		THEN("warn writes message to log")
 		{
 			std::optional<std::string_view> result{Logger::warn("warn message {}", 3.14)};
 			CHECK_FALSE(result.has_value());
@@ -219,7 +265,7 @@ SCENARIO("Logger")
 			CHECK(contents.contains("warn message 3.14"));
 		}
 
-		THEN("error writes message to log at info level")
+		THEN("error writes message to log")
 		{
 			std::optional<std::string_view> result{Logger::error("error message {}", "failure")};
 			CHECK_FALSE(result.has_value());
@@ -228,7 +274,7 @@ SCENARIO("Logger")
 			CHECK(contents.contains("error message failure"));
 		}
 
-		THEN("critical writes message to log at info level")
+		THEN("critical writes message to log")
 		{
 			std::optional<std::string_view> result{Logger::critical("critical message {}", 999)};
 			CHECK_FALSE(result.has_value());
@@ -236,38 +282,6 @@ SCENARIO("Logger")
 			const std::string contents{readLogFile()};
 			CHECK(contents.contains("critical message 999"));
 		}
-	}
-
-	GIVEN("Trace level enabled")
-	{
-		Logger::setLevel(spdlog::level::trace);
-
-		THEN("trace writes message to log")
-		{
-			std::optional<std::string_view> result{Logger::trace("trace message {}", 42)};
-			CHECK_FALSE(result.has_value());
-
-			const std::string contents{readLogFile()};
-			CHECK(contents.contains("trace message 42"));
-		}
-
-		Logger::setLevel(spdlog::level::info);
-	}
-
-	GIVEN("Debug level enabled")
-	{
-		Logger::setLevel(spdlog::level::debug);
-
-		THEN("debug writes message to log")
-		{
-			std::optional<std::string_view> result{Logger::debug("debug message {}", "hello")};
-			CHECK_FALSE(result.has_value());
-
-			const std::string contents{readLogFile()};
-			CHECK(contents.contains("debug message hello"));
-		}
-
-		Logger::setLevel(spdlog::level::info);
 	}
 
 	GIVEN("Level filtering")
@@ -602,8 +616,8 @@ SCENARIO("Logger")
 
 			// Re-initialize with truncateFile true
 			spdlog::drop_all();
-			bool initResult{Logger::initialize(loggerName, logFileName, true)};
-			CHECK(initResult);
+			loggerInitialized = Logger::initialize(loggerName, logFileName, true);
+			REQUIRE(loggerInitialized);
 
 			std::optional<std::string_view> postResult{Logger::info("after truncate")};
 			CHECK_FALSE(postResult.has_value());
@@ -622,8 +636,8 @@ SCENARIO("Logger")
 
 			// Re-initialize without truncation (default)
 			spdlog::drop_all();
-			bool initResult{Logger::initialize("preserve_logger", logFileName, false)};
-			CHECK(initResult);
+			loggerInitialized = Logger::initialize("preserve_logger", logFileName, false);
+			REQUIRE(loggerInitialized);
 
 			std::optional<std::string_view> appendResult{Logger::info("appended content")};
 			CHECK_FALSE(appendResult.has_value());
@@ -639,8 +653,8 @@ SCENARIO("Logger")
 			spdlog::drop_all();
 
 			// A path under a non-existent directory should fail to open for truncation
-			bool initResult{Logger::initialize("trunc_fail_logger", "/no_such_dir/no_such_subdir/fail.log", true)};
-			CHECK_FALSE(initResult);
+			loggerInitialized = Logger::initialize("trunc_fail_logger", "/no_such_dir/no_such_subdir/fail.log", true);
+			CHECK_FALSE(loggerInitialized);
 		}
 	}
 
@@ -655,11 +669,13 @@ SCENARIO("Logger")
 
 			// initialize will reset its own internal state but cannot drop the manually registered logger,
 			// causing spdlog to throw spdlog_ex which is caught internally and returns false.
-			bool initResult{Logger::initialize(duplicateName, logFileName)};
-			CHECK_FALSE(initResult);
+			loggerInitialized = Logger::initialize(duplicateName, logFileName);
+			CHECK_FALSE(loggerInitialized);
 
 			spdlog::drop(duplicateName);
-			static_cast<void>(std::filesystem::remove(tempFile));
+			fileRemoved = std::filesystem::remove(tempFile);
+
+			REQUIRE(fileRemoved);
 		}
 	}
 
@@ -826,7 +842,9 @@ SCENARIO("Logger")
 
 	// Scenario-level cleanup
 	spdlog::drop_all();
-	static_cast<void>(std::filesystem::remove(logFileName));
+	fileRemoved = std::filesystem::remove(logFileName);
+
+	REQUIRE(fileRemoved);
 }
 
 // NOLINTEND(misc-const-correctness,cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers,readability-function-cognitive-complexity)
