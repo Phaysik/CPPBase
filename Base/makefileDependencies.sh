@@ -318,19 +318,21 @@ main() {
 		sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-14 14
 		sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 10
 
-		setUpConfigCat
-
 		desired_version="15.2.0"
 		gpp_priority="15"
 		echo "Setting up g++"
 
 		if [[ "$(command g++ --version | grep -oP '\d+\.\d+\.\d+' || true)" == "${desired_version}" ]]; then
 			echo "g++-${desired_version} exists"
-		elif [[ ${1,,} != "a" ]] || [[ ${response,,} != "a" ]] && [[ ${response,,} != "n" ]]; then
-			setUpGCC "${desired_version}" "${gpp_priority}"
 		else
-			sudo apt-get install -y g++-13 # For automated running
-			sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 13
+			setUpGCC "${desired_version}" "${gpp_priority}"
+		fi
+
+		if [[ -f "/usr/lib/libconfigcat.a" ]]; then
+			echo "Config Cat already exists"
+		else
+			echo "Setting up Config Cat"
+			setUpConfigCat
 		fi
 
 		if [[ -f "/usr/lib/libgtest.a" ]] && [[ -f "/usr/lib/libgtest_main.a" ]]; then
