@@ -32,6 +32,7 @@ setUpGCC() {
 	sudo update-alternatives --install /usr/bin/g++ g++ "${directory}"/bin/g++ "$2"
 	sudo update-alternatives --install /usr/bin/gcc gcc "${directory}"/bin/gcc "$2"
 	sudo update-alternatives --install /usr/bin/gcov gcov "${directory}"/bin/gcov "$2"
+	sudo update-alternatives --install /usr/bin/c++ c++ "${directory}"/bin/c++ "$2"
 
 	cd ..
 
