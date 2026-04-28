@@ -1,4 +1,4 @@
-name: "Run Google Test Suite"
+name: 'Run Google Test Suite'
 
 on:
   push:
@@ -16,7 +16,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Cache Site
         run: mkdir -p ./cache
@@ -46,9 +46,13 @@ jobs:
           mkdir -p ./cache/hash-library/lib
           mkdir -p ./cache/hash-library/include
 
+      - name: Set up GCC Cache Site
+        run: |
+          mkdir -p ./cache/gcc-latest
+
       - name: Cache Apt Packages
         id: cache-apt-packages
-        uses: actions/cache@v3
+        uses: actions/cache@v5
         with:
           path: ./cache/apt-packages
           key: ${{ runner.os }}-apt-packages-${{ hashFiles('makefileDependencies.sh') }}
@@ -57,7 +61,7 @@ jobs:
 
       - name: Cache Apt Package Lists
         id: cache-apt-lists
-        uses: actions/cache@v3
+        uses: actions/cache@v5
         with:
           path: ./cache/apt-lists
           key: ${{ runner.os }}-apt-lists-${{ hashFiles('makefileDependencies.sh') }}
@@ -66,7 +70,7 @@ jobs:
 
       - name: Cache Google Test
         id: cache-google-tests
-        uses: actions/cache@v3
+        uses: actions/cache@v5
         with:
           path: |
             ./cache/gtest
@@ -76,7 +80,7 @@ jobs:
 
       - name: Cache Config Cat
         id: cache-config-cat
-        uses: actions/cache@v3
+        uses: actions/cache@v5
         with:
           path: |
             ./cache/configcat
@@ -86,7 +90,7 @@ jobs:
 
       - name: Cache Curl
         id: cache-curl
-        uses: actions/cache@v3
+        uses: actions/cache@v5
         with:
           path: |
             ./cache/curl
@@ -96,13 +100,23 @@ jobs:
 
       - name: Cache Hash Library
         id: cache-hash-library
-        uses: actions/cache@v3
+        uses: actions/cache@v5
         with:
           path: |
             ./cache/hash-library
           key: ${{ runner.os }}-hash-library-${{ hashFiles('makefileDependencies.sh') }}
           restore-keys: |
             ${{ runner.os }}-hash-library-
+
+      - name: Cache GCC
+        id: cache-gcc-latest
+        uses: actions/cache@v5
+        with:
+          path: |
+            ./cache/gcc-latest
+          key: ${{ runner.os }}-gcc-latest-${{ hashFiles('makefileDependencies.sh') }}
+          restore-keys: |
+            ${{ runner.os }}-gcc-latest-
 
       - name: Install Apt Packages From Cache
         if: steps.cache-apt-packages.outputs.cache-hit == 'true'
@@ -140,16 +154,25 @@ jobs:
           sudo mkdir -p /usr/include/hash-library
           sudo cp ./cache/hash-library/include/* /usr/include/hash-library/
 
+      - name: Install GCC From Cache
+        if: steps.cache-gcc-latest.outputs.cache-hit == 'true'
+        run: |
+          sudo mkdir -p /usr/local/gcc-latest
+          sudo cp ./cache/gcc-latest/* /usr/local/gcc-latest/
+          sudo update-alternatives --install /usr/bin/g++ g++ /usr/local/gcc-latest/bin/g++ 100
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/local/gcc-latest/bin/gcc 100
+          sudo update-alternatives --install /usr/bin/gcov gcov /usr/local/gcc-latest/bin/gcov 100
+
       - name: Install dependencies
-        if: steps.cache-apt-packages.outputs.cache-hit != 'true' || steps.cache-apt-lists.outputs.cache-hit != 'true' || steps.cache-google-tests.outputs.cache-hit != 'true' || steps.cache-config-cat.outputs.cache-hit != 'true' || steps.cache-curl.outputs.cache-hit != 'true' || steps.cache-hash-library.outputs.cache-hit != 'true'
+        if: steps.cache-apt-packages.outputs.cache-hit != 'true' || steps.cache-apt-lists.outputs.cache-hit != 'true' || steps.cache-google-tests.outputs.cache-hit != 'true' || steps.cache-config-cat.outputs.cache-hit != 'true' || steps.cache-curl.outputs.cache-hit != 'true' || steps.cache-hash-library.outputs.cache-hit != 'true' || steps.cache-gcc-latest.outputs.cache-hit != 'true'
         run: sudo bash $GITHUB_WORKSPACE/makefileDependencies.sh a
 
       - name: Install Google Mock
-        if: steps.cache-apt-packages.outputs.cache-hit == 'true' || steps.cache-apt-lists.outputs.cache-hit == 'true' || steps.cache-google-tests.outputs.cache-hit == 'true' || steps.cache-config-cat.outputs.cache-hit == 'true' || steps.cache-curl.outputs.cache-hit == 'true' || steps.cache-hash-library.outputs.cache-hit == 'true'
+        if: steps.cache-apt-packages.outputs.cache-hit == 'true' || steps.cache-apt-lists.outputs.cache-hit == 'true' || steps.cache-google-tests.outputs.cache-hit == 'true' || steps.cache-config-cat.outputs.cache-hit == 'true' || steps.cache-curl.outputs.cache-hit == 'true' || steps.cache-hash-library.outputs.cache-hit == 'true' || steps.cache-gcc-latest.outputs.cache-hit == 'true'
         run: sudo apt-get install libgmock-dev -y
 
       - name: Make project
-        run: make build_tests COMPILER_STANDARD=13
+        run: make build_tests
 
       - name: Save Apt Packages Cache
         run: |
@@ -178,6 +201,15 @@ jobs:
         run: |
           sudo cp /usr/lib/libhash-library.a ./cache/hash-library/lib
           sudo cp /usr/include/hash-library/* ./cache/hash-library/include
+
+      - name: Find latest GCC
+        run: |
+          latest_gcc=$(find /usr/local -maxdepth 1 -type d -name 'gcc-*' | sort -V | tail -n1)
+          echo "LATEST_GCC=$latest_gcc" >> "$GITHUB_ENV"
+
+      - name: Save GCC Cache
+        run: |
+          sudo cp -r "$LATEST_GCC"/* ./cache/gcc-latest
 
       - name: Give Read Access For Apt Folder
         run: sudo chown -R $USER:$USER ./cache/apt-packages/apt/archives/lock ./cache/apt-packages/apt/archives/partial ./cache/apt-lists/lists/lock ./cache/apt-lists/lists/partial

@@ -108,7 +108,7 @@ setUpTracy() {
 	sudo cp -r /usr/include/capstone/* /usr/include/
 	sudo cp -r /usr/include/dbus-1.0/* /usr/include/
 
-	sudo apt remove rustc cargo
+	sudo apt-get remove rustc cargo
 	sudo curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh || true
 	sudo sh -c source "${HOME}"/.cargo/env
 
@@ -308,7 +308,7 @@ main() {
 	# a or 'A' for automated running (For Github workflows ignoring long documentation, linting, and formatting installation)
 	if [[ ${response,,} == "y" ]] || [[ ${1,,} == "y" ]] || [[ ${response,,} == "a" ]] || [[ ${1,,} == "a" ]]; then
 		echo "Update and upgrading your packages (will require an elevated user's password)"
-		sudo apt update && sudo apt upgrade -y
+		sudo apt-get update && sudo apt-get upgrade -y
 
 		echo "Installing all the required packages for all commands used in the Makefile"
 
