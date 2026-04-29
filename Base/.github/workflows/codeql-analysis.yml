@@ -290,4 +290,4 @@ jobs:
         run: sudo chown -R $USER:$USER ./cache/apt-packages/apt/archives/lock ./cache/apt-packages/apt/archives/partial ./cache/apt-lists/lists/lock ./cache/apt-lists/lists/partial
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
+        uses: github/codeql-action/analyze@v4
