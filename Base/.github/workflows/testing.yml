@@ -183,7 +183,7 @@ jobs:
         if: steps.cache-gcc-latest.outputs.cache-hit == 'true'
         run: |
           sudo mkdir -p /usr/local/gcc-latest
-          sudo cp ./cache/gcc-latest/* /usr/local/gcc-latest/
+          sudo cp -r ./cache/gcc-latest/* /usr/local/gcc-latest/
           sudo update-alternatives --install /usr/bin/g++ g++ /usr/local/gcc-latest/bin/g++ 100
           sudo update-alternatives --install /usr/bin/gcc gcc /usr/local/gcc-latest/bin/gcc 100
           sudo update-alternatives --install /usr/bin/gcov gcov /usr/local/gcc-latest/bin/gcov 100
