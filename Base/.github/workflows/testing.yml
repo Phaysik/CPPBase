@@ -175,7 +175,9 @@ jobs:
         if: steps.cache-spdlog.outputs.cache-hit == 'true'
         run: |
           sudo cp ./cache/spdlog/lib/libspdlog* /usr/local/lib
-          sudo cp -r ./cache/spdlog/lib/cmake/spdlog /usr/local/lib/cmake/
+
+          sudo mkdir -p /usr/local/lib/cmake/spdlog
+          sudo cp -r ./cache/spdlog/lib/cmake/spdlog/* /usr/local/lib/cmake/spdlog/
 
           sudo mkdir -p /usr/local/lib/pkgconfig
           sudo cp ./cache/spdlog/lib/pkgconfig/spdlog* /usr/local/lib/pkgconfig/
