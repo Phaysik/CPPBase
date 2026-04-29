@@ -267,6 +267,14 @@ jobs:
       - name: Make project
         run: make
 
+      - name: Ensure CodeQL TRAP directory exists
+        if: always()
+        run: |
+          CODEQL_DB="$RUNNER_TEMP/codeql_databases/cpp"
+          if [ -d "$CODEQL_DB" ]; then
+            mkdir -p "$CODEQL_DB/trap/cpp/tarballs"
+          fi
+
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4
         with:
