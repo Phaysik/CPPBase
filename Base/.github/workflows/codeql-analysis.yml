@@ -215,7 +215,7 @@ jobs:
           sudo cp ./cache/spdlog/lib/libspdlog* /usr/local/lib
           sudo cp -r ./cache/spdlog/lib/cmake/spdlog /usr/local/lib/cmake/
 
-          mkdir -p /usr/local/lib/pkgconfig
+          sudo mkdir -p /usr/local/lib/pkgconfig
           sudo cp ./cache/spdlog/lib/pkgconfig/spdlog* /usr/local/lib/pkgconfig/
 
           sudo cp -r ./cache/spdlog/include/spdlog* /usr/local/include
