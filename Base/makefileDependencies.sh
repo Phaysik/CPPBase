@@ -288,9 +288,9 @@ installSpdlog() {
 	sudo make install
 
 	sudo cp /usr/local/lib/libspdlog* /usr/lib/
-	sudo cp -r /usr/local/include/spdlog* /usr/include
-	sudo cp /usr/local/lib/pkgconfig/spdlog* /usr/lib/pkgconfig/
 	sudo cp -r /usr/local/lib/cmake/spdlog /usr/lib/cmake/
+	sudo cp /usr/local/lib/pkgconfig/spdlog* /usr/lib/pkgconfig/
+	sudo cp -r /usr/local/include/spdlog* /usr/include
 
 	cd ..
 	cd ..

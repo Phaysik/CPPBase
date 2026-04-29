@@ -46,6 +46,13 @@ jobs:
           mkdir -p ./cache/hash-library/lib
           mkdir -p ./cache/hash-library/include
 
+      - name: Set up Spdlog Cache Site
+        run: |
+          mkdir -p ./cache/spdlog/lib
+          mkdir -p ./cache/spdlog/lib/cmake
+          mkdir -p ./cache/spdlog/lib/pkgconfig
+          mkdir -p ./cache/spdlog/include
+
       - name: Set up GCC Cache Site
         run: |
           mkdir -p ./cache/gcc-latest
@@ -108,6 +115,16 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-hash-library-
 
+      - name: Cache Spdlog
+        id: cache-spdlog
+        uses: actions/cache@v5
+        with:
+          path: |
+            ./cache/spdlog
+          key: ${{ runner.os }}-spdlog-${{ hashFiles('makefileDependencies.sh') }}
+          restore-keys: |
+            ${{ runner.os }}-spdlog-
+
       - name: Cache GCC
         id: cache-gcc-latest
         uses: actions/cache@v5
@@ -154,6 +171,14 @@ jobs:
           sudo mkdir -p /usr/include/hash-library
           sudo cp ./cache/hash-library/include/* /usr/include/hash-library/
 
+      - name: Install Spdlog From Cache
+        if: steps.cache-spdlog.outputs.cache-hit == 'true'
+        run: |
+          sudo cp ./cache/spdlog/lib/libspdlog* /usr/lib
+          sudo cp -r ./cache/spdlog/lib/cmake/spdlog /usr/lib/cmake/
+          sudo cp ./cache/spdlog/lib/pkgconfig/spdlog* /usr/lib/pkgconfig/
+          sudo cp -r ./cache/spdlog/include/spdlog* /usr/include
+
       - name: Install GCC From Cache
         if: steps.cache-gcc-latest.outputs.cache-hit == 'true'
         run: |
@@ -164,11 +189,11 @@ jobs:
           sudo update-alternatives --install /usr/bin/gcov gcov /usr/local/gcc-latest/bin/gcov 100
 
       - name: Install dependencies
-        if: steps.cache-apt-packages.outputs.cache-hit != 'true' || steps.cache-apt-lists.outputs.cache-hit != 'true' || steps.cache-google-tests.outputs.cache-hit != 'true' || steps.cache-config-cat.outputs.cache-hit != 'true' || steps.cache-curl.outputs.cache-hit != 'true' || steps.cache-hash-library.outputs.cache-hit != 'true' || steps.cache-gcc-latest.outputs.cache-hit != 'true'
+        if: steps.cache-apt-packages.outputs.cache-hit != 'true' || steps.cache-apt-lists.outputs.cache-hit != 'true' || steps.cache-google-tests.outputs.cache-hit != 'true' || steps.cache-config-cat.outputs.cache-hit != 'true' || steps.cache-curl.outputs.cache-hit != 'true' || steps.cache-hash-library.outputs.cache-hit != 'true' || steps.cache-gcc-latest.outputs.cache-hit != 'true' || steps.cache-spdlog.outputs.cache-hit != 'true'
         run: sudo bash $GITHUB_WORKSPACE/makefileDependencies.sh a
 
       - name: Install Google Mock
-        if: steps.cache-apt-packages.outputs.cache-hit == 'true' || steps.cache-apt-lists.outputs.cache-hit == 'true' || steps.cache-google-tests.outputs.cache-hit == 'true' || steps.cache-config-cat.outputs.cache-hit == 'true' || steps.cache-curl.outputs.cache-hit == 'true' || steps.cache-hash-library.outputs.cache-hit == 'true' || steps.cache-gcc-latest.outputs.cache-hit == 'true'
+        if: steps.cache-apt-packages.outputs.cache-hit == 'true' || steps.cache-apt-lists.outputs.cache-hit == 'true' || steps.cache-google-tests.outputs.cache-hit == 'true' || steps.cache-config-cat.outputs.cache-hit == 'true' || steps.cache-curl.outputs.cache-hit == 'true' || steps.cache-hash-library.outputs.cache-hit == 'true' || steps.cache-gcc-latest.outputs.cache-hit == 'true' || steps.cache-spdlog.outputs.cache-hit == 'true'
         run: sudo apt-get install libgmock-dev -y
 
       - name: Make project
@@ -201,6 +226,13 @@ jobs:
         run: |
           sudo cp /usr/lib/libhash-library.a ./cache/hash-library/lib
           sudo cp /usr/include/hash-library/* ./cache/hash-library/include
+
+      - name: Save Spdlog Cache
+        run: |
+          sudo cp /usr/local/lib/libspdlog* ./cache/spdlog/lib
+          sudo cp -r /usr/local/lib/cmake/spdlog ./cache/spdlog/lib/cmake
+          sudo cp /usr/local/lib/pkgconfig/spdlog* ./cache/spdlog/lib/pkgconfig
+          sudo cp -r /usr/local/include/spdlog* ./cache/spdlog/include
 
       - name: Find latest GCC
         run: |
