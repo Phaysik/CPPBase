@@ -326,8 +326,8 @@ main() {
 			setUpConfigCat
 		fi
 
-		desired_version="15.2.0"
-		gpp_priority="15"
+		desired_version="16.1.0"
+		gpp_priority="16"
 		echo "Setting up g++"
 
 		if [[ "$(command g++ --version | grep -oP '\d+\.\d+\.\d+' || true)" == "${desired_version}" ]]; then
