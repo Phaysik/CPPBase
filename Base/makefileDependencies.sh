@@ -362,7 +362,7 @@ main() {
 
 		# If not 'a' or 'A', set up documentation, formatting, and linting tools
 		if [[ ${response,,} == "y" ]] || [[ ${1,,} == "y" ]]; then
-			sudo apt-get install binutils valgrind graphviz flex bison libpcre3 libpcre3-dev lcov cppcheck xterm -y
+			sudo apt-get install binutils valgrind graphviz flex bison libpcre3 libpcre3-dev lcov cppcheck xterm bear -y
 
 			llvmVersionToDownload="22"
 
