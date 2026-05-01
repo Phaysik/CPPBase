@@ -239,6 +239,26 @@
 	#else
 		#define ATTR_NONNULL(...)
 	#endif
+
+	#if __has_attribute(noinline)
+		/*! @def ATTR_NOINLINE
+			@brief Portable macro for the compiler `noinline` attribute.
+			@details Expands to `__attribute__((noinline))` on Clang and GCC, and to an empty token on other compilers.
+			The `noinline` attribute prevents the compiler from inlining a function at its call sites. This is useful when inlining
+			a function would cause excessive code-size growth (e.g. exceeding `--param inline-unit-growth`) or when the function
+			should remain a discrete call for profiling or debugging purposes. The attribute is compatible with `constexpr`;
+			compile-time evaluation is unaffected.
+			@warning Preventing inlining of small, hot functions can degrade performance. Apply only when inlining is known to
+			cause problems (e.g. build failures due to inline-unit-growth limits or measurable code-size bloat).
+			@example
+			@code{.cpp}
+			ATTR_NOINLINE void expensive_path() { // large function body }
+			@endcode
+		*/
+		#define ATTR_NOINLINE __attribute__((noinline))
+	#else
+		#define ATTR_NOINLINE
+	#endif
 #endif
 
 #ifdef ATTR_CLANG
