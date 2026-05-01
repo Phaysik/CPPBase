@@ -10,7 +10,7 @@
 #define INCLUDE_TYPEDEFS_H
 
 // WHEN clang supports reflection then we can uncomment this. It will compile will g++, but since clangd is the linter, it will error on
-// everything due to the flag `-frelection`
+// everything due to the flag `-freflection`
 
 #include <cstdint>
 // #include <meta>
