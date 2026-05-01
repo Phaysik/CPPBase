@@ -199,8 +199,7 @@ Place at the top of source/header files:
 ### For Member Variables
 
 ```cpp
-/*! @var memberVariable
-    @brief Short, one-line summary in sentence form.
+/*! @brief Short, one-line summary in sentence form.
     @details Optional longer description that explains behavior, constraints,
     and important usage notes.
     @showinitializer
