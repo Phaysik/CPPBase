@@ -36,22 +36,22 @@ namespace Project::Utility::Debug::Logging
 	{
 		public:
 			/*! @brief Default constructor is deleted to prevent instantiation. */
-			Logger() = delete;
+			Logger() = delete ("Logger is not instantiable");
 
 			/*! @brief Copy constructor is deleted to prevent instantiation. */
-			Logger(const Logger &) = delete;
+			Logger(const Logger &) = delete ("Logger is not copyable");
 
 			/*! @brief Move constructor is deleted to prevent instantiation. */
-			Logger(Logger &&) = delete;
+			Logger(Logger &&) = delete ("Logger is not movable");
 
 			/*! @brief Copy assignment operator is deleted to prevent instantiation. */
-			Logger &operator=(const Logger &) = delete;
+			Logger &operator=(const Logger &) = delete ("Logger is not copyable");
 
 			/*! @brief Move assignment operator is deleted to prevent instantiation. */
-			Logger &operator=(Logger &&) = delete;
+			Logger &operator=(Logger &&) = delete ("Logger is not movable");
 
 			/*! @brief Destructor is deleted to prevent instantiation. */
-			~Logger() = delete;
+			~Logger() = delete ("Logger is not instantiable");
 
 			// MARK: Getter
 
