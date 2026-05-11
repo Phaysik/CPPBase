@@ -45,7 +45,7 @@ namespace Project::Utility::Clock
 		Seconds = 1,
 		Milliseconds = 1'000,
 		Microseconds = 1'000'000,
-		Nanoseconds = 1'000'000'000
+		Nanoseconds = 1'000'000'000,
 	};
 
 	/*! @class Timer timer.h "include/timer.h"
