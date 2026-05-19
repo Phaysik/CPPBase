@@ -58,7 +58,7 @@ SCENARIO("Timer")
 
 	GIVEN("timeFunction")
 	{
-		auto trivial = []() noexcept {
+		auto trivial = [] noexcept {
 			int counter = 0;
 			++counter;
 			(void) counter;
