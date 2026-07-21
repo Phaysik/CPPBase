@@ -19,7 +19,7 @@
 // #include <string_view>
 // #include <typedefs.h>
 
-namespace Pokemon::Core
+namespace Project::Core
 {
 	using ub = uint8_t;	 /*!< Shorthand for unsigned byte/char */
 	using us = uint16_t; /*!< Shorthand for unsigned short */
@@ -40,6 +40,6 @@ namespace Pokemon::Core
 	//   }
 	//   return "<unnamed>";
 	// }
-} // namespace Pokemon::Core
+} // namespace Project::Core
 
 #endif
