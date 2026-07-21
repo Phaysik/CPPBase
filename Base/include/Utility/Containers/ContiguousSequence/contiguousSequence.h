@@ -26,8 +26,8 @@
 		  the underlying sequence; callers should use `std::span` conversions
 		  to pass containers or raw arrays.
 	@date --/--/----
-	@version 0.0.1
-	@since 0.0.1
+	@version x.x.x
+	@since x.x.x
 	@author Matthew Moore
 */
 namespace Project::Utility::Containers::ContiguousSequence
