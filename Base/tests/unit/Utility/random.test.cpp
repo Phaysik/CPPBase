@@ -8,8 +8,11 @@
 
 #include "Utility/random.h"
 
+#include "Core/typedefs.h"
+
 #include <catch2/catch_test_macros.hpp>
 
+using Project::Core::us;
 using Project::Utility::Random;
 
 // NOLINTBEGIN(misc-const-correctness,cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers,bugprone-random-generator-seed,cert-msc51-cpp,cert-msc32-c)
@@ -50,7 +53,7 @@ SCENARIO("Random")
 	{
 		WHEN("get is called with an unsigned short type")
 		{
-			unsigned short result{Random::get<unsigned short>(0U, 100U)};
+			us result{Random::get<us>(0U, 100U)};
 
 			THEN("the result is within [0, 100]")
 			{
