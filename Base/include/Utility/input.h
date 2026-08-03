@@ -9,6 +9,7 @@
 #ifndef INCLUDE_INPUT_H
 #define INCLUDE_INPUT_H
 
+#include <algorithm>
 #include <cstdlib> // for std::exit
 #include <iostream>
 #include <limits> // for std::numeric_limits
@@ -192,15 +193,14 @@ namespace Project::Utility
 							  std::string_view errorMessage = mErrorMessage, const bool ignoreExtraneous = true,
 							  std::istream &input = std::cin, const bool afterFailureOnly = false)
 			{
-				using TValueType = T::value_type;
-				TValueType userInput{getInput<TValueType>(inputMessage, errorMessage, ignoreExtraneous, input, afterFailureOnly)};
+				T userInput{getInput<T>(inputMessage, errorMessage, ignoreExtraneous, input, afterFailureOnly)};
 
 				while (true)
 				{
 					if (std::ranges::find(array, userInput) == array.end())
 					{
 						std::println("{} within the provided array-like object.", userInput);
-						userInput = getInput<TValueType>(inputMessage, errorMessage, ignoreExtraneous, input, !afterFailureOnly);
+						userInput = getInput<T>(inputMessage, errorMessage, ignoreExtraneous, input, !afterFailureOnly);
 					}
 					else
 					{

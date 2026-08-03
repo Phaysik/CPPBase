@@ -53,16 +53,27 @@ namespace Project::Utility::Containers::ContiguousSequence
 	ATTR_NODISCARD constexpr Integral computeContiguousSequenceSum(const std::span<const Integral> &sequence, const Integral startIndex,
 																   const Integral length)
 	{
-		if (startIndex >= static_cast<Integral>(sequence.size()) || (startIndex + length) > static_cast<Integral>(sequence.size()))
+		if constexpr (std::is_signed_v<Integral>)
+		{
+			if (startIndex < 0 || length < 0)
+			{
+				return Integral{0};
+			}
+		}
+
+		const std::size_t start{static_cast<std::size_t>(startIndex)};
+		const std::size_t count{static_cast<std::size_t>(length)};
+
+		if (start >= sequence.size() || count > sequence.size() - start)
 		{
 			return Integral{0};
 		}
 
 		Integral sum{0};
 
-		for (Integral i{startIndex}; i < startIndex + length; ++i)
+		for (std::size_t index{start}; index < start + count; ++index)
 		{
-			sum += sequence.at(static_cast<std::size_t>(i));
+			sum += sequence.at(index);
 		}
 
 		return sum;
@@ -84,7 +95,22 @@ namespace Project::Utility::Containers::ContiguousSequence
 	template <Integral Integral>
 	ATTR_NODISCARD constexpr Integral computeContiguousSequenceSum(const std::span<const Integral> &sequence, const Integral startIndex = 0)
 	{
-		return computeContiguousSequenceSum<Integral>(sequence, startIndex, static_cast<Integral>(sequence.size()));
+		if constexpr (std::is_signed_v<Integral>)
+		{
+			if (startIndex < 0)
+			{
+				return Integral{0};
+			}
+		}
+
+		const std::size_t start{static_cast<std::size_t>(startIndex)};
+
+		if (start >= sequence.size())
+		{
+			return Integral{0};
+		}
+
+		return computeContiguousSequenceSum<Integral>(sequence, startIndex, static_cast<Integral>(sequence.size() - start));
 	}
 } // namespace Project::Utility::Containers::ContiguousSequence
 

@@ -9,6 +9,7 @@
 #include "Utility/Containers/ContiguousSequence/contiguousSequence.h"
 
 #include <array>
+#include <limits>
 #include <span>
 #include <vector>
 
@@ -44,6 +45,7 @@ SCENARIO("ContiguousSequence")
 			{
 				// sum of elements at indices 1,2,3 => 2 + 3 + 4 == 9
 				CHECK((computeContiguousSequenceSum<si>(sequence, 1, 3) == 9));
+				CHECK((computeContiguousSequenceSum<si>(sequence, 1) == 14));
 			}
 
 			THEN("start index at or beyond end returns zero")
@@ -56,6 +58,14 @@ SCENARIO("ContiguousSequence")
 			{
 				// startIndex + length > size -> should return zero per contract
 				CHECK((computeContiguousSequenceSum<si>(sequence, 1, 10) == 0));
+				CHECK((computeContiguousSequenceSum<si>(sequence, std::numeric_limits<si>::max(), 1) == 0));
+			}
+
+			THEN("negative indices and lengths return zero")
+			{
+				CHECK((computeContiguousSequenceSum<si>(sequence, -1, 1) == 0));
+				CHECK((computeContiguousSequenceSum<si>(sequence, 0, -1) == 0));
+				CHECK((computeContiguousSequenceSum<si>(sequence, -1) == 0));
 			}
 		}
 
