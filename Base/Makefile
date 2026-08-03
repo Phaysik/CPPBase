@@ -14,6 +14,7 @@ GCC_WARNINGS = $(if $(findstring g++,$(COMPILER)), -fdelete-null-pointer-checks 
 CLANG_WARNINGS = $(if $(findstring clang,$(COMPILER)), -fdelete-null-pointer-checks -fstrict-aliasing -pedantic -pedantic-errors -Wall -Wextra -Weffc++ -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Wformat-nonliteral -Wformat-security -Wformat-signedness -Wformat-y2k -Wmissing-declarations -Wmissing-include-dirs -Wnull-dereference -Woverloaded-virtual -Wredundant-decls -Wshadow -Wsign-conversion -Wsign-promo -Wswitch-default -Wswitch-enum -Wundef -Wunused -Wuninitialized -Wstrict-aliasing -Wfloat-equal -Wconversion -Winline -Wzero-as-null-pointer-constant -Wmissing-noreturn -Wmissing-format-attribute -Wpacked -Wunused-macros -Wvariadic-macros -Wdouble-promotion -Wsuggest-override -Winvalid-constexpr -Wold-style-cast -Wextra-semi -Wenum-conversion -Werror $(if $(filter-out 13,$(COMPILER_STANDARD)), -Wnrvo))
 
 WARNINGS = ${GCC_WARNINGS} ${CLANG_WARNINGS}
+BENCHMARK_WARNINGS = $(filter-out -Winline -Wsuggest-attribute=pure,$(WARNINGS))
 
 GCC_RELEASE_WARNINGS = $(if $(findstring g++,$(COMPILER)), $(if $(filter-out 13,$(COMPILER_STANDARD)), -fhardened -Whardened))
 
@@ -244,11 +245,11 @@ valgrind: val
 
 ${OUTPUT_FOLDER_BENCHMARK}/%.o: ${BENCHMARK_FOLDER}/%.cpp
 	@mkdir -p $(dir $@)
-	${COMPILER} ${COMPILER_FLAGS_BENCHMARK} ${WARNINGS} ${INCLUDE_ARGUMENT} ${BENCHMARK_INCLUDE_ARGUMENT} -MMD -MP -c $< -o $@
+	${COMPILER} ${COMPILER_FLAGS_BENCHMARK} ${BENCHMARK_WARNINGS} ${INCLUDE_ARGUMENT} ${BENCHMARK_INCLUDE_ARGUMENT} -MMD -MP -c $< -o $@
 
 ${OUTPUT_FOLDER_BENCHMARK}/%.o: ${SOURCE_FOLDER}/%.cpp
 	@mkdir -p $(dir $@)
-	${COMPILER} ${COMPILER_FLAGS_BENCHMARK} ${WARNINGS} ${INCLUDE_ARGUMENT} ${BENCHMARK_INCLUDE_ARGUMENT} -MMD -MP -c $< -o $@
+	${COMPILER} ${COMPILER_FLAGS_BENCHMARK} ${BENCHMARK_WARNINGS} ${INCLUDE_ARGUMENT} ${BENCHMARK_INCLUDE_ARGUMENT} -MMD -MP -c $< -o $@
 
 -include $(DEPS_BENCHMARK_ALL)
 
