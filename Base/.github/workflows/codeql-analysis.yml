@@ -237,7 +237,7 @@ jobs:
 
       - name: Install Testing Frameworks
         if: steps.cache-apt-packages.outputs.cache-hit == 'true' || steps.cache-apt-lists.outputs.cache-hit == 'true' || steps.cache-google-tests.outputs.cache-hit == 'true' || steps.cache-config-cat.outputs.cache-hit == 'true' || steps.cache-curl.outputs.cache-hit == 'true' || steps.cache-hash-library.outputs.cache-hit == 'true' || steps.cache-gcc-latest.outputs.cache-hit == 'true' || steps.cache-spdlog.outputs.cache-hit == 'true'
-        run: sudo apt-get install libgmock-dev catch2 ccache -y
+        run: sudo apt-get install libgmock-dev catch2 -y
 
       # Add any setup steps before running the `github/codeql-action/init` action.
       # This includes steps like installing compilers or runtimes (`actions/setup-node`
