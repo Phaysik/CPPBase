@@ -15,7 +15,7 @@
 using Project::Core::us;
 using Project::Utility::Random;
 
-// NOLINTBEGIN(misc-const-correctness,cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers,bugprone-random-generator-seed,cert-msc51-cpp,cert-msc32-c)
+// NOLINTBEGIN(misc-const-correctness,cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers,bugprone-random-generator-seed,cert-msc51-cpp,cert-msc32-c,readability-function-cognitive-complexity)
 
 SCENARIO("Random")
 {
@@ -105,4 +105,4 @@ SCENARIO("Random")
 	}
 }
 
-// NOLINTEND(misc-const-correctness,cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers,bugprone-random-generator-seed,cert-msc51-cpp,cert-msc32-c)
+// NOLINTEND(misc-const-correctness,cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers,bugprone-random-generator-seed,cert-msc51-cpp,cert-msc32-c,readability-function-cognitive-complexity)
