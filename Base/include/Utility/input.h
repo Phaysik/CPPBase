@@ -285,7 +285,7 @@ namespace Project::Utility
 					if (input.eof()) // If the stream was closed
 					{
 						// NOLINTNEXTLINE
-						exit(0); // Shut down the program now
+						exit(0); // LCOV_EXCL_LINE
 					}
 
 					// Let's handle the failure

@@ -49,4 +49,52 @@ SCENARIO("Input")
 	}
 }
 
+SCENARIO("Input getInput direct")
+{
+	GIVEN("a valid integer on the stream")
+	{
+		std::istringstream input{"42\n"};
+
+		WHEN("getInput is called directly with a non-empty prompt")
+		{
+			int result{Input::getInput<int>("Enter: ", {}, true, input)};
+
+			THEN("the value is returned")
+			{
+				CHECK((result == 42));
+			}
+		}
+	}
+
+	GIVEN("invalid input followed by valid input")
+	{
+		std::istringstream input{"abc\n42\n"};
+
+		WHEN("getInput is called with a non-empty error message")
+		{
+			int result{Input::getInput<int>({}, "Invalid!", true, input)};
+
+			THEN("the valid value is returned after retry")
+			{
+				CHECK((result == 42));
+			}
+		}
+	}
+
+	GIVEN("input with extraneous characters after the number")
+	{
+		std::istringstream input{"42abc\n99\n"};
+
+		WHEN("getInput is called with ignoreExtraneous set")
+		{
+			int result{Input::getInput<int>({}, "Invalid!", true, input)};
+
+			THEN("extraneous input is rejected and the next clean value is returned")
+			{
+				CHECK((result == 99));
+			}
+		}
+	}
+}
+
 // NOLINTEND(misc-const-correctness,cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
