@@ -50,6 +50,23 @@ namespace Project::Utility
 				return std::uniform_int_distribution<T>{min, max}(mTwister);
 			}
 
+			/*! @brief Gets a random number in the range [min, max) wtih a templated return type in case you need to cast the real
+			   distribution result to a different type
+				@tparam T The type to cast the real distribution result to
+				@param[in] min The minimum value (inclusive)
+				@param[in] max The maximum value (exclusive)
+				@retval T The typecasted random number
+				@date --/--/----
+				@version x.x.x
+				@since x.x.x
+				@author Matthew Moore
+			*/
+			template <PocketCore::Core::FloatingPoint T>
+			ATTR_NODISCARD static T get(const T min, const T max) noexcept
+			{
+				return std::uniform_real_distribution<T>{min, max}(mTwister);
+			}
+
 			/*! @brief Gets #mTwister
 				@retval std::mt19937 The global random number generator
 				@date --/--/----
