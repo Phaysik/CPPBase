@@ -61,7 +61,7 @@ namespace Project::Utility
 				@since x.x.x
 				@author Matthew Moore
 			*/
-			template <PocketCore::Core::FloatingPoint T>
+			template <Project::Core::FloatingPoint T>
 			ATTR_NODISCARD static T get(const T min, const T max) noexcept
 			{
 				return std::uniform_real_distribution<T>{min, max}(mTwister);
