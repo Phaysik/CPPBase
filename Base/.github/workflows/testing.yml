@@ -202,7 +202,7 @@ jobs:
         run: sudo apt-get install libgmock-dev catch2 -y
 
       - name: Make project
-        run: make build_tests
+        run: make -j$(nproc) build_tests
 
       - name: Save Apt Packages Cache
         run: |
