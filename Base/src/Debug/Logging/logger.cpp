@@ -1,9 +1,9 @@
-/*! \file logger.cpp
-	\brief Contains the function definitions for creating a logger
-	\date --/--/----
-	\version x.x.x
-	\since x.x.x
-	\author Matthew Moore
+/*! @file logger.cpp
+	@brief Contains the function definitions for creating a logger
+	@date --/--/----
+	@version x.x.x
+	@since x.x.x
+	@author Matthew Moore
 */
 
 #include "Utility/Debug/Logging/logger.h"
@@ -79,7 +79,7 @@ namespace Project::Utility::Debug::Logging
 			// LCOV_EXCL_BR_START — uncovered branch is the compiler-generated throw edge from ofstream construction
 			std::ofstream ofs(convertedFileName, std::ofstream::out | std::ofstream::trunc);
 			// LCOV_EXCL_BR_STOP
-			
+
 			if (!ofs.is_open())
 			{
 				return false;
