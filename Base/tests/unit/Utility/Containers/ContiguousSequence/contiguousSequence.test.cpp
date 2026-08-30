@@ -1,5 +1,5 @@
 /*! @file contiguousSequence.test.cpp
-	@brief Google Test unit tests for `Containers::ContiguousSequence` utilities.
+	@brief Catch2 unit tests for `Containers::ContiguousSequence` utilities.
 	@date --/--/----
 	@version x.x.x
 	@since x.x.x

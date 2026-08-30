@@ -1,5 +1,5 @@
 /*! @file floatUtility.test.cpp
-	@brief Google Test unit tests for Floats::approximatelyEqualAbsRel.
+	@brief Catch2 unit tests for Floats::approximatelyEqualAbsRel.
 	@details Exercises absolute and relative epsilon paths to ensure correct behavior
 	across near-zero and large-magnitude comparisons. Tests intentionally execute
 	runtime code paths (non-constexpr variables) to improve coverage reporting.

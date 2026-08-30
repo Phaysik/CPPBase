@@ -1,5 +1,5 @@
 /*! @file timer.test.cpp
-	@brief Google Test unit tests for `Clock::Timer` utilities.
+	@brief Catch2 unit tests for `Clock::Timer` utilities.
 	@date --/--/----
 	@version x.x.x
 	@since x.x.x

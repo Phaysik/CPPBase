@@ -1,5 +1,5 @@
 /*! @file overflowProtection.test.cpp
-	@brief Google Test unit tests for the OverflowProtection helpers.
+	@brief Catch2 unit tests for the OverflowProtection helpers.
 	@date --/--/----
 	@version x.x.x
 	@since x.x.x
