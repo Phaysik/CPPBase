@@ -1,7 +1,7 @@
 CompileFlags:
-  Remove: ['-fimplicit-constexpr', '-fhardened']
-  Add: ['-std=c++2c', '-ferror-limit=0']
+    Remove: ["-fimplicit-constexpr", "-fhardened"]
+    Add: ["-std=c++2c", "-ferror-limit=0", "-Iinclude"]
 
 Diagnostics:
-  ClangTidy:
-    FastCheckFilter: None
+    ClangTidy:
+        FastCheckFilter: None
