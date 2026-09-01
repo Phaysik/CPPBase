@@ -107,12 +107,10 @@ SCENARIO("Random")
 	{
 		WHEN("the twister is reseeded to a known state and get is called twice for integers")
 		{
-			std::mt19937 &twister{Random::getTwister()};
-
-			twister.seed(99U); // Fixed seed — first draw
+			Random::getTwister().seed(99U); // Fixed seed — first draw
 			us firstResult{Random::get<us>(0, 10'000)};
 
-			twister.seed(99U); // Same seed — second draw must match
+			Random::getTwister().seed(99U); // Same seed — second draw must match
 			us secondResult{Random::get<us>(0, 10'000)};
 
 			THEN("both draws produce the same value")
@@ -123,17 +121,60 @@ SCENARIO("Random")
 
 		WHEN("the twister is reseeded to a known state and get is called twice for doubles")
 		{
-			std::mt19937 &twister{Random::getTwister()};
-
-			twister.seed(99U); // Fixed seed — first draw
+			Random::getTwister().seed(99U); // Fixed seed — first draw
 			double firstResult{Random::get<double>(0.45, 0.63)};
 
-			twister.seed(99U); // Same seed — second draw must match
+			Random::getTwister().seed(99U); // Same seed — second draw must match
 			double secondResult{Random::get<double>(0.45, 0.63)};
 
 			THEN("both draws produce the same value")
 			{
 				CHECK_THAT(firstResult, Catch::Matchers::WithinAbs(secondResult, 1e-9));
+			}
+		}
+	}
+
+	GIVEN("a trivial function that finds values less than 100")
+	{
+		Random::setSeed(20);
+
+		const auto trivial = []() -> std::size_t {
+			std::size_t lessThan100{0};
+
+			for (us i = 0; i < 100; ++i)
+			{
+				us value{Random::get<us>(0, 150)};
+
+				if (value < 100)
+				{
+					lessThan100++;
+				}
+			}
+
+			return lessThan100;
+		};
+
+		WHEN("findSeed is called with an expected result of 60")
+		{
+			const std::size_t seed{Random::findSeed(trivial, 60UL)};
+
+			THEN("using the seed found to re-run the function should give the same result")
+			{
+				Random::setSeed(seed);
+
+				std::size_t lessThan100{0};
+
+				for (us i = 0; i < 100; ++i)
+				{
+					us value{Random::get<us>(0, 150)};
+
+					if (value < 100)
+					{
+						lessThan100++;
+					}
+				}
+
+				CHECK((lessThan100 == 60UL));
 			}
 		}
 	}
