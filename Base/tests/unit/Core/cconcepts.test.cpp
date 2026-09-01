@@ -8,6 +8,7 @@
 
 #include "Core/cconcepts.h"
 
+#include <cstddef>
 #include <functional>
 #include <string>
 #include <string_view>

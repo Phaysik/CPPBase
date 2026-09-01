@@ -130,6 +130,7 @@ OUTPUT_FILE_LCOV = coverage.info
 LCOV_REMOVE_FILES = '*/${TEST_FOLDER}/*'
 
 GENHTML_OUTPUT_FOLDER = coverage
+GENHTML_FLAGS = --dark-mode -o ${GENHTML_OUTPUT_FOLDER}
 
 CLANG_SOURCES = ${SOURCES} ${TEST_SOURCES}
 TIDY_COMPILE_FLAGS = --config-file=.clang-tidy
@@ -305,7 +306,7 @@ lcov: build_tests
 genhtml: lcov
 	rm -rf ${GENHTML_OUTPUT_FOLDER}
 	mkdir -p ${GENHTML_OUTPUT_FOLDER}
-	genhtml ${OUTPUT_FOLDER_LCOV}/${OUTPUT_FILE_LCOV} ${BRANCH_COVERAGE} ${LCOV_EXCLUDE_ASSERT} --output-directory ${GENHTML_OUTPUT_FOLDER}
+	genhtml ${OUTPUT_FOLDER_LCOV}/${OUTPUT_FILE_LCOV} ${BRANCH_COVERAGE} ${LCOV_EXCLUDE_ASSERT} ${GENHTML_FLAGS}
 
 clean_coverage:
 	find ${OUTPUT_FOLDER_TEST} -name '*.gcda' -delete
