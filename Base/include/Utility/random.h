@@ -81,8 +81,8 @@ namespace PocketCore::Utility
 
 			/*! @brief Sets the seed for #mTwister
 				@param[in] seed The seed value
-				@since 0.12.13
-				@version 0.12.13
+				@since x.x.x
+				@version x.x.x
 				@author Matthew Moore
 			*/
 			static void setSeed(const ul seed) noexcept
