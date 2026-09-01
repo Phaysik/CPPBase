@@ -24,7 +24,7 @@ using PocketCore::Utility::Random;
 SCENARIO("Random")
 {
 	// Reseed with a fixed value before each scenario for determinism
-	Random::getTwister().seed(12'345U);
+	Random::setSeed(12'345U);
 
 	GIVEN("a signed integer range [1, 10]")
 	{

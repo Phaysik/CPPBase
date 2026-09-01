@@ -79,6 +79,17 @@ namespace PocketCore::Utility
 				return mTwister;
 			}
 
+			/*! @brief Sets the seed for #mTwister
+				@param[in] seed The seed value
+				@since 0.12.13
+				@version 0.12.13
+				@author Matthew Moore
+			*/
+			static void setSeed(const ul seed) noexcept
+			{
+				mTwister.seed(seed);
+			}
+
 			/*! @brief Gets a seed for the random number generator based on a function and desired result
 				@tparam Func The function type
 				@tparam DesiredValue The desired result type
@@ -91,7 +102,7 @@ namespace PocketCore::Utility
 			*/
 			template <typename Func, typename DesiredValue>
 				requires PocketCore::Core::InvocableNoArgs<Func> && std::same_as<std::invoke_result_t<Func>, DesiredValue>
-			ATTR_NODISCARD static ul getSeed(Func &&func, const DesiredValue &result) noexcept
+			ATTR_NODISCARD static ul findSeed(Func &&func, const DesiredValue &result) noexcept
 			{
 				Func &&forwardedFunc{std::forward<Func>(func)};
 				std::size_t seedIncrement{0};
