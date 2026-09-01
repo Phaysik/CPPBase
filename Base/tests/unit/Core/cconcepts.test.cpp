@@ -1,13 +1,14 @@
 /*! @file cconcepts.test.cpp
 	@brief C++ file for creating tests for validating custom concepts.
 	@date --/--/----
-	@version x.x.x
 	@since x.x.x
+	@version x.x.x
 	@author Matthew Moore
 */
 
 #include "Core/cconcepts.h"
 
+#include <functional>
 #include <string>
 #include <string_view>
 
@@ -15,18 +16,21 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-using Project::Core::FloatingPoint;
-using Project::Core::Integral;
-using Project::Core::RationalNumber;
-using Project::Core::sb;
-using Project::Core::si;
-using Project::Core::SignedIntegral;
-using Project::Core::sl;
-using Project::Core::String;
-using Project::Core::ub;
-using Project::Core::ui;
-using Project::Core::ul;
-using Project::Core::UnsignedIntegral;
+using PocketCore::Core::FloatingPoint;
+using PocketCore::Core::Integral;
+using PocketCore::Core::InvocableNoArgs;
+using PocketCore::Core::InvocableWithArgs;
+using PocketCore::Core::IsEnum;
+using PocketCore::Core::RationalNumber;
+using PocketCore::Core::sb;
+using PocketCore::Core::si;
+using PocketCore::Core::SignedIntegral;
+using PocketCore::Core::sl;
+using PocketCore::Core::String;
+using PocketCore::Core::ub;
+using PocketCore::Core::ui;
+using PocketCore::Core::ul;
+using PocketCore::Core::UnsignedIntegral;
 
 // Compile-time sanity checks (will fail to compile if concepts change unexpectedly)
 static_assert(Integral<si>);
@@ -198,6 +202,96 @@ SCENARIO("Concepts")
 	}
 
 	// NOLINTEND(hicpp-avoid-c-arrays,cppcoreguidelines-avoid-c-arrays,modernize-avoid-c-arrays)
+
+	GIVEN("InvocableNoArgs")
+	{
+		GIVEN("std::function<void()> and a lambda with no arguments")
+		{
+			THEN("They should satisfy the InvocableNoArgs concept")
+			{
+				REQUIRE(InvocableNoArgs<std::function<void()>>);
+				REQUIRE(InvocableNoArgs<decltype([] {})>);
+			}
+		}
+
+		GIVEN("std::function<void(param)> and a lambda with arguments")
+		{
+			THEN("They should not satisfy the InvocableNoArgs concept")
+			{
+				REQUIRE_FALSE(InvocableNoArgs<std::function<void(std::size_t)>>);
+				REQUIRE_FALSE(InvocableNoArgs<decltype([](std::size_t) {})>);
+			}
+		}
+
+		GIVEN("Non-callable types")
+		{
+			THEN("Should not satisfy the InvocableNoArgs concept")
+			{
+				REQUIRE_FALSE(InvocableNoArgs<std::string>);
+				REQUIRE_FALSE(InvocableNoArgs<std::string_view>);
+			}
+		}
+	}
+
+	GIVEN("InvocableWithArgs")
+	{
+		GIVEN("std::function<void(param?)> and a lambda with arguments")
+		{
+			THEN("They should satisfy the InvocableWithArgs concept")
+			{
+				REQUIRE(InvocableWithArgs<std::function<void(std::size_t)>, std::size_t>);
+				REQUIRE(InvocableWithArgs<decltype([](std::size_t) {}), std::size_t>);
+			}
+		}
+
+		GIVEN("std::function<void(param?)> and a lambda with arguments with the wrong argument type")
+		{
+			THEN("Should not satisfy the InvocableWithArgs concept")
+			{
+				REQUIRE_FALSE(InvocableWithArgs<std::function<void(std::size_t)>, std::string>);
+				REQUIRE_FALSE(InvocableWithArgs<decltype([](std::size_t) {}), std::string>);
+			}
+		}
+
+		GIVEN("Non-callable types")
+		{
+			THEN("Should not satisfy the InvocableWithArgs concept")
+			{
+				REQUIRE_FALSE(InvocableWithArgs<std::string>);
+				REQUIRE_FALSE(InvocableWithArgs<std::string_view>);
+			}
+		}
+	}
+
+	GIVEN("Enum")
+	{
+		GIVEN("Enum and enum class types")
+		{
+			// NOLINTNEXTLINE(cppcoreguidelines-use-enum-class)
+			enum test
+			{
+			};
+
+			enum class testClass
+			{
+			};
+
+			THEN("They should satisfy the Enum concept")
+			{
+				REQUIRE(IsEnum<test>);
+				REQUIRE(IsEnum<testClass>);
+			}
+		}
+
+		GIVEN("Non-enum and non-enum class types")
+		{
+			THEN("They should not satisfy the Enum concept")
+			{
+				REQUIRE_FALSE(IsEnum<std::string>);
+				REQUIRE_FALSE(IsEnum<std::string_view>);
+			}
+		}
+	}
 }
 
 // NOLINTEND(misc-const-correctness,cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers,readability-function-cognitive-complexity)
