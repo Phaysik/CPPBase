@@ -8,6 +8,8 @@
 
 #include "Utility/random.h"
 
+#include <cstddef>
+
 #include "Core/typedefs.h"
 
 #include <catch2/catch_test_macros.hpp>
@@ -138,7 +140,7 @@ SCENARIO("Random")
 	{
 		Random::setSeed(20);
 
-		const auto trivial = []() -> std::size_t {
+		const auto trivial = [] -> std::size_t {
 			std::size_t lessThan100{0};
 
 			for (us i = 0; i < 100; ++i)
