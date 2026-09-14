@@ -1,13 +1,31 @@
-name: 'Run Google Test Suite'
+name: 'Run Catch2 Test Suite'
 
 on:
   push:
     branches:
       - master
+  pull_request:
+    branches:
+      - master
+    paths:
+      [
+        '**.c',
+        '**.cpp',
+        '**.h',
+        '**.hpp',
+        '**.cxx',
+        '**.hxx',
+        '**.cc',
+        '**.hh',
+        'Makefile',
+        '**CMakeLists.txt',
+        'meson.build',
+        '**.cmake',
+      ]
 
 jobs:
   test:
-    name: Test
+    name: Catch2-Test-Suite
     runs-on: ubuntu-latest
     permissions:
       actions: read
@@ -198,7 +216,6 @@ jobs:
         run: sudo bash $GITHUB_WORKSPACE/makefileDependencies.sh a
 
       - name: Install Testing Frameworks
-        if: steps.cache-apt-packages.outputs.cache-hit == 'true' || steps.cache-apt-lists.outputs.cache-hit == 'true' || steps.cache-google-tests.outputs.cache-hit == 'true' || steps.cache-config-cat.outputs.cache-hit == 'true' || steps.cache-curl.outputs.cache-hit == 'true' || steps.cache-hash-library.outputs.cache-hit == 'true' || steps.cache-gcc-latest.outputs.cache-hit == 'true' || steps.cache-spdlog.outputs.cache-hit == 'true'
         run: sudo apt-get install libgmock-dev catch2 -y
 
       - name: Make project
