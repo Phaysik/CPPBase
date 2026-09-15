@@ -14,10 +14,10 @@ name: 'CodeQL Advanced'
 on:
   push:
     branches:
-      - master
+    - master
   pull_request:
     branches:
-      - master
+    - master
     paths:
       [
         '**.c',
@@ -191,11 +191,11 @@ jobs:
 
       - name: Install Apt Packages From Cache
         if: steps.cache-apt-packages.outputs.cache-hit == 'true'
-        run: sudo cp -r ./cache/apt-packages/* /var/cache/apt
+        run: sudo cp -r ./cache/apt-packages/apt/* /var/cache/apt
 
       - name: Install Apt Lists From Cache
         if: steps.cache-apt-lists.outputs.cache-hit == 'true'
-        run: sudo cp -r ./cache/apt-lists/* /var/lib/apt/lists
+        run: sudo cp -r ./cache/apt-lists/lists/* /var/lib/apt/lists
 
       - name: Install Google Test From Cache
         if: steps.cache-google-tests.outputs.cache-hit == 'true'
@@ -251,6 +251,18 @@ jobs:
         if: steps.cache-apt-packages.outputs.cache-hit != 'true' || steps.cache-apt-lists.outputs.cache-hit != 'true' || steps.cache-google-tests.outputs.cache-hit != 'true' || steps.cache-config-cat.outputs.cache-hit != 'true' || steps.cache-curl.outputs.cache-hit != 'true' || steps.cache-hash-library.outputs.cache-hit != 'true' || steps.cache-gcc-latest.outputs.cache-hit != 'true' || steps.cache-spdlog.outputs.cache-hit != 'true'
         run: ./makefileDependencies.sh a
 
+      - name: Install Dependencies
+        run: |
+            wget llvm.sh https://apt.llvm.org/llvm.sh
+            sudo chmod +x llvm.sh
+            sudo ./llvm.sh 24
+            rm llvm.sh
+            sudo apt update
+            sudo apt-get install clang++-24 -y
+            sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-24 24
+            sudo update-alternatives --set clang++ /usr/bin/clang++-24
+            pip3 install cmake --break-system-packages
+
       # Add any setup steps before running the `github/codeql-action/init` action.
       # This includes steps like installing compilers or runtimes (`actions/setup-node`
       # or others). This is typically only required for manual builds.
@@ -276,8 +288,17 @@ jobs:
       # to build your code.
       # ℹ️ Command-line programs to run using the OS shell.
       # 📚 See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
-      - name: Make project
-        run: make -j$(nproc)
+      - name: Run GCC Release
+        run: |
+            cmake --preset gcc-release
+            cmake --build --preset gcc-release
+            ./build/gcc-release/main
+
+      - name: Run Clang release
+        run: |
+            cmake --preset clang-release
+            cmake --build --preset clang-release
+            ./build/clang-release/main
 
       - name: Ensure CodeQL TRAP directory exists
         if: always()

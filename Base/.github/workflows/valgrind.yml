@@ -155,11 +155,11 @@ jobs:
 
       - name: Install Apt Packages From Cache
         if: steps.cache-apt-packages.outputs.cache-hit == 'true'
-        run: sudo cp -r ./cache/apt-packages/* /var/cache/apt
+        run: sudo cp -r ./cache/apt-packages/apt/* /var/cache/apt
 
       - name: Install Apt Lists From Cache
         if: steps.cache-apt-lists.outputs.cache-hit == 'true'
-        run: sudo cp -r ./cache/apt-lists/* /var/lib/apt/lists
+        run: sudo cp -r ./cache/apt-lists/lists/* /var/lib/apt/lists
 
       - name: Install Google Test From Cache
         if: steps.cache-google-tests.outputs.cache-hit == 'true'
@@ -215,13 +215,22 @@ jobs:
         if: steps.cache-apt-packages.outputs.cache-hit != 'true' || steps.cache-apt-lists.outputs.cache-hit != 'true' || steps.cache-google-tests.outputs.cache-hit != 'true' || steps.cache-config-cat.outputs.cache-hit != 'true' || steps.cache-curl.outputs.cache-hit != 'true' || steps.cache-hash-library.outputs.cache-hit != 'true' || steps.cache-gcc-latest.outputs.cache-hit != 'true' || steps.cache-spdlog.outputs.cache-hit != 'true'
         run: sudo bash $GITHUB_WORKSPACE/makefileDependencies.sh a
 
-      - name: Install Valgrind
+      - name: Install Dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install valgrind -y
+          wget llvm.sh https://apt.llvm.org/llvm.sh
+          sudo chmod +x llvm.sh
+          sudo ./llvm.sh 24
+          rm llvm.sh
+          sudo apt update
+          sudo apt-get install valgrind clang++-24 -y
+          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-24 24
+          sudo update-alternatives --set clang++ /usr/bin/clang++-24
+          pip3 install cmake --break-system-packages
 
       - name: Make project
-        run: make -j$(nproc) valgrind
+        run: |
+            cmake --preset gcc-debug
+            cmake --build --preset valgrind
 
       - name: Save Apt Packages Cache
         run: |

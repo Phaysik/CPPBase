@@ -164,11 +164,11 @@ jobs:
 
       - name: Install Apt Packages From Cache
         if: steps.cache-apt-packages.outputs.cache-hit == 'true'
-        run: sudo cp -r ./cache/apt-packages/* /var/cache/apt
+        run: sudo cp -r ./cache/apt-packages/apt/* /var/cache/apt
 
       - name: Install Apt Lists From Cache
         if: steps.cache-apt-lists.outputs.cache-hit == 'true'
-        run: sudo cp -r ./cache/apt-lists/* /var/lib/apt/lists
+        run: sudo cp -r ./cache/apt-lists/lists/* /var/lib/apt/lists
 
       - name: Install Google Test From Cache
         if: steps.cache-google-tests.outputs.cache-hit == 'true'

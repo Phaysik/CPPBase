@@ -1,0 +1,273 @@
+{
+	"version": 6,
+	"cmakeMinimumRequired": {
+		"major": 4,
+		"minor": 4,
+		"patch": 0
+	},
+	"configurePresets": [
+		{
+			"name": "base",
+			"hidden": true,
+			"generator": "Ninja",
+			"binaryDir": "${sourceDir}/build/${presetName}",
+			"cacheVariables": {
+				"CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+			}
+		},
+		{
+			"name": "gcc-release",
+			"inherits": "base",
+			"displayName": "GCC / Release (Ninja)",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Release",
+				"CMAKE_CXX_COMPILER": "g++"
+			},
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Linux"
+			}
+		},
+		{
+			"name": "gcc-debug",
+			"inherits": "gcc-release",
+			"displayName": "GCC / Debug (Ninja)",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Debug"
+			}
+		},
+		{
+			"name": "clang-release",
+			"inherits": "base",
+			"displayName": "Clang / Release (Ninja)",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Release",
+				"CMAKE_CXX_COMPILER": "clang++"
+			}
+		},
+		{
+			"name": "clang-debug",
+			"inherits": "clang-release",
+			"displayName": "Clang / Debug (Ninja)",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Debug"
+			}
+		},
+		{
+			"name": "msvc-release",
+			"inherits": "base",
+			"displayName": "MSVC / Release (Ninja)",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Release",
+				"CMAKE_CXX_COMPILER": "cl"
+			},
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Windows"
+			}
+		},
+		{
+			"name": "msvc-debug",
+			"inherits": "msvc-release",
+			"displayName": "MSVC / Debug (Ninja)",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Debug"
+			}
+		},
+		{
+			"name": "clang-cl-release",
+			"inherits": "base",
+			"displayName": "clang-cl / Release (Ninja)",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Release",
+				"CMAKE_CXX_COMPILER": "clang-cl"
+			},
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Windows"
+			}
+		},
+		{
+			"name": "gcc-tests",
+			"inherits": "gcc-debug",
+			"displayName": "GCC / Tests (Ninja, Catch2)",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Debug",
+				"BUILD_TESTS": "ON",
+				"TEST_STANDARD": "catch2"
+			}
+		},
+		{
+			"name": "clang-tests",
+			"inherits": "clang-debug",
+			"displayName": "Clang / Tests (Ninja, Catch2)",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Debug",
+				"BUILD_TESTS": "ON",
+				"TEST_STANDARD": "catch2"
+			}
+		},
+		{
+			"name": "coverage",
+			"inherits": "base",
+			"displayName": "Coverage (Ninja, GCC/Clang only)",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Debug",
+				"BUILD_TESTS": "ON",
+				"ENABLE_COVERAGE": "ON"
+			}
+		},
+		{
+			"name": "benchmarks",
+			"inherits": "base",
+			"displayName": "Benchmarks (Ninja, Release)",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Release",
+				"BUILD_BENCHMARKS": "ON"
+			}
+		},
+		{
+			"name": "tracy",
+			"inherits": "base",
+			"displayName": "Tracy (Ninja, Release)",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Release",
+				"BUILD_TRACY": "ON"
+			}
+		},
+		{
+			"name": "analysis-clang",
+			"inherits": "base",
+			"displayName": "Static analysis (Ninja + Clang)",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Debug",
+				"CMAKE_CXX_COMPILER": "clang++",
+				"BUILD_TESTS": "ON",
+				"ENABLE_COVERAGE": "OFF",
+				"ENABLE_SANITIZERS": "OFF",
+				"WARNINGS_AS_ERRORS": "OFF"
+			}
+		}
+	],
+	"buildPresets": [
+		{
+			"name": "gcc-release",
+			"configurePreset": "gcc-release",
+			"targets": ["main_app"]
+		},
+		{
+			"name": "gcc-debug",
+			"configurePreset": "gcc-debug",
+			"targets": ["dev_app"]
+		},
+		{
+			"name": "clang-release",
+			"configurePreset": "clang-release",
+			"targets": ["main_app"]
+		},
+		{
+			"name": "clang-debug",
+			"configurePreset": "clang-debug",
+			"targets": ["dev_app"]
+		},
+		{
+			"name": "msvc-release",
+			"configurePreset": "msvc-release",
+			"targets": ["main_app"]
+		},
+		{
+			"name": "msvc-debug",
+			"configurePreset": "msvc-debug",
+			"targets": ["dev_app"]
+		},
+		{
+			"name": "benchmarks",
+			"configurePreset": "benchmarks",
+			"targets": ["benchmark_app"]
+		},
+		{
+			"name": "tracy",
+			"configurePreset": "tracy",
+			"targets": ["tracy_app"]
+		},
+		{
+			"name": "coverage",
+			"configurePreset": "coverage",
+			"targets": ["coverage"]
+		},
+		{
+			"name": "genhtml",
+			"configurePreset": "coverage",
+			"targets": ["genhtml"]
+		},
+		{
+			"name": "valgrind",
+			"configurePreset": "gcc-debug",
+			"targets": ["run_valgrind"]
+		},
+		{
+			"name": "tidy",
+			"configurePreset": "analysis-clang",
+			"targets": ["tidy"]
+		},
+		{
+			"name": "run_tidy",
+			"configurePreset": "analysis-clang",
+			"targets": ["run_tidy"]
+		},
+		{
+			"name": "check",
+			"configurePreset": "analysis-clang",
+			"targets": ["check"]
+		},
+		{
+			"name": "flawfinder",
+			"configurePreset": "analysis-clang",
+			"targets": ["flawfinder"]
+		},
+		{
+			"name": "format",
+			"configurePreset": "analysis-clang",
+			"targets": ["format"]
+		},
+		{
+			"name": "format_check",
+			"configurePreset": "analysis-clang",
+			"targets": ["format_check"]
+		},
+		{
+			"name": "analysis",
+			"configurePreset": "analysis-clang",
+			"targets": ["analysis"]
+		},
+		{
+			"name": "gcc-tests",
+			"configurePreset": "gcc-tests",
+			"targets": ["test_app"]
+		},
+		{
+			"name": "clang-tests",
+			"configurePreset": "clang-tests",
+			"targets": ["test_app"]
+		}
+	],
+	"testPresets": [
+		{
+			"name": "gcc-tests",
+			"configurePreset": "gcc-tests",
+			"output": {
+				"outputOnFailure": true
+			}
+		},
+		{
+			"name": "clang-tests",
+			"configurePreset": "clang-tests",
+			"output": {
+				"outputOnFailure": true
+			}
+		}
+	]
+}
