@@ -14,10 +14,10 @@ name: 'CodeQL Advanced'
 on:
   push:
     branches:
-      - master
+    - master
   pull_request:
     branches:
-      - master
+    - master
     paths:
       [
         '**.c',
@@ -253,15 +253,17 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          wget -qO llvm.sh https://apt.llvm.org/llvm.sh
-          sudo chmod +x llvm.sh
-          sudo ./llvm.sh 24
-          rm llvm.sh
-          sudo apt update
-          sudo apt-get install clang++-24 -y
-          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-24 24
-          sudo update-alternatives --set clang++ /usr/bin/clang++-24
-          pip3 install cmake --break-system-packages
+            wget -qO llvm.sh https://apt.llvm.org/llvm.sh
+            sudo chmod +x llvm.sh
+            sudo ./llvm.sh 24
+            rm llvm.sh
+            sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+            sudo apt update
+            sudo apt install --only-upgrade libstdc++6
+            sudo apt-get install clang++-24 -y
+            sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-24 24
+            sudo update-alternatives --set clang++ /usr/bin/clang++-24
+            pip3 install cmake --break-system-packages
 
       # Add any setup steps before running the `github/codeql-action/init` action.
       # This includes steps like installing compilers or runtimes (`actions/setup-node`
@@ -290,15 +292,15 @@ jobs:
       # 📚 See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
       - name: Run GCC Release
         run: |
-          cmake --preset gcc-release
-          cmake --build --preset gcc-release
-          ./build/gcc-release/main
+            cmake --preset gcc-release
+            cmake --build --preset gcc-release
+            ./build/gcc-release/main
 
       - name: Run Clang release
         run: |
-          cmake --preset clang-release
-          cmake --build --preset clang-release
-          ./build/clang-release/main
+            cmake --preset clang-release
+            cmake --build --preset clang-release
+            ./build/clang-release/main
 
       - name: Ensure CodeQL TRAP directory exists
         if: always()
