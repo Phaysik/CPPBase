@@ -80,6 +80,9 @@ foreach(_d IN LISTS EXCLUDED_FOLDERS)
     list(FILTER PROJECT_SOURCES EXCLUDE REGEX "/${_d}/")
 endforeach()
 
+set(PROJECT_SUPPORT_SOURCES ${PROJECT_SOURCES})
+list(REMOVE_ITEM PROJECT_SUPPORT_SOURCES "${SRC_DIR}/main.cpp")
+
 # ----------------------------------------------------------------------------
 #  Modules
 # ----------------------------------------------------------------------------
@@ -106,7 +109,10 @@ endfunction()
 
 function(apply_debug_flags tgt)
     if(MSVC)
-        target_compile_options(${tgt} PRIVATE /Od /Zi /RTC1)
+        target_compile_options(${tgt} PRIVATE /Od /Zi)
+        if(NOT ENABLE_SANITIZERS)
+            target_compile_options(${tgt} PRIVATE /RTC1)
+        endif()
         target_compile_definitions(${tgt} PRIVATE _DEBUG)
     else()
         target_compile_options(${tgt} PRIVATE -O0 -g)
@@ -195,20 +201,13 @@ if(BUILD_BENCHMARKS)
     endforeach()
     list(FILTER BENCH_SOURCES EXCLUDE REGEX "/main\\.cpp$")
 
-    add_executable(benchmark_app ${BENCH_SOURCES} ${PROJECT_SOURCES})
+    add_executable(benchmark_app ${BENCH_SOURCES} ${PROJECT_SUPPORT_SOURCES})
     set_target_properties(benchmark_app PROPERTIES OUTPUT_NAME "benchmarks")
     target_include_directories(benchmark_app PRIVATE "${INC_DIR}")
     target_link_libraries(benchmark_app PRIVATE Project::Warnings)
 
-    find_package(benchmark CONFIG QUIET)
-    if(TARGET benchmark::benchmark)
-        target_link_libraries(benchmark_app PRIVATE benchmark::benchmark)
-    else()
-        find_library(BENCHMARK_LIBRARY NAMES benchmark)
-        if(BENCHMARK_LIBRARY)
-            target_link_libraries(benchmark_app PRIVATE ${BENCHMARK_LIBRARY})
-        endif()
-    endif()
+    find_package(benchmark CONFIG REQUIRED)
+    target_link_libraries(benchmark_app PRIVATE benchmark::benchmark)
 
     find_package(Threads REQUIRED)
     target_link_libraries(benchmark_app PRIVATE Threads::Threads)
@@ -249,8 +248,9 @@ if(BUILD_TESTS)
         endforeach()
     endif()
 
-    list(REMOVE_ITEM PROJECT_SOURCES "${SRC_DIR}/main.cpp")
-    list(APPEND _test_srcs ${PROJECT_SOURCES})
+    list(APPEND _test_srcs "${TEST_MAIN_DIR}/testMain.cpp")
+    list(REMOVE_DUPLICATES _test_srcs)
+    list(APPEND _test_srcs ${PROJECT_SUPPORT_SOURCES})
 
     add_executable(test_app ${_test_srcs})
     set_target_properties(test_app PROPERTIES OUTPUT_NAME "tests")
@@ -261,23 +261,18 @@ if(BUILD_TESTS)
     target_link_libraries(test_app PRIVATE Project::Warnings)
 
     if(TEST_STANDARD STREQUAL "catch2")
-        find_package(Catch2 QUIET)
-        if(TARGET Catch2::Catch2WithMain)
-            target_link_libraries(test_app PRIVATE Catch2::Catch2WithMain)
-        elseif(TARGET Catch2::Catch2)
-            target_link_libraries(test_app PRIVATE Catch2::Catch2)
-        endif()
+        find_package(Catch2 CONFIG REQUIRED)
+        target_link_libraries(test_app PRIVATE Catch2::Catch2)
         target_compile_definitions(test_app PRIVATE catch2)
     elseif(TEST_STANDARD STREQUAL "googletest")
-        find_package(GTest QUIET)
-        if(TARGET GTest::gtest_main)
-            target_link_libraries(test_app PRIVATE GTest::gtest_main GTest::gmock)
-        else()
-            target_link_libraries(test_app PRIVATE gtest gmock)
-        endif()
+        find_package(GTest REQUIRED)
+        target_link_libraries(test_app PRIVATE GTest::gtest)
         find_package(Threads REQUIRED)
         target_link_libraries(test_app PRIVATE Threads::Threads)
         target_compile_definitions(test_app PRIVATE googletest)
+    else()
+        message(FATAL_ERROR
+            "Unsupported TEST_STANDARD='${TEST_STANDARD}'; expected catch2 or googletest")
     endif()
 
     if(ENABLE_COVERAGE AND NOT MSVC)
@@ -296,12 +291,8 @@ if(BUILD_TESTS)
         include(GoogleTest)
         gtest_discover_tests(test_app)
     else()
-        add_test(NAME unit_tests COMMAND test_app)
-        find_package(Catch2 QUIET)
-        if(Catch2_FOUND)
-            include(Catch)
-            catch_discover_tests(test_app)
-        endif()
+        include(Catch)
+        catch_discover_tests(test_app)
     endif()
 endif()
 
@@ -509,38 +500,42 @@ foreach(_d IN LISTS EXCLUDED_FOLDERS)
 endforeach()
 
 # --- clang-tidy (single-threaded, one file at a time) ----------------------
-add_custom_target(tidy
-    COMMAND ${CLANG_TIDY_EXECUTABLE}
-        -p ${CMAKE_BINARY_DIR}
-        --config-file=${CMAKE_CURRENT_SOURCE_DIR}/.clang-tidy
-        --extra-arg=-Wno-error
-        ${ANALYSIS_SOURCES}
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    COMMENT "Running clang-tidy"
-    USES_TERMINAL VERBATIM
-)
+if(CLANG_TIDY_EXECUTABLE)
+    add_custom_target(tidy
+        COMMAND ${CLANG_TIDY_EXECUTABLE}
+            -p ${CMAKE_BINARY_DIR}
+            --config-file=${CMAKE_CURRENT_SOURCE_DIR}/.clang-tidy
+            --extra-arg=-Wno-error
+            ${ANALYSIS_SOURCES}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        COMMENT "Running clang-tidy"
+        USES_TERMINAL VERBATIM
+    )
+endif()
 
 # --- run-clang-tidy (parallel) ---------------------------------------------
-add_custom_target(run_tidy
-    COMMAND ${RUN_CLANG_TIDY_EXECUTABLE}
-        -p ${CMAKE_BINARY_DIR}
-        -config-file=${CMAKE_CURRENT_SOURCE_DIR}/.clang-tidy
-        -j
-        -use-color=true
-        -extra-arg=-Wno-error
-        -extra-arg=-Wno-unknown-warning-option
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    COMMENT "Running run-clang-tidy (parallel)"
-    USES_TERMINAL VERBATIM
-)
+if(RUN_CLANG_TIDY_EXECUTABLE)
+    add_custom_target(run_tidy
+        COMMAND ${RUN_CLANG_TIDY_EXECUTABLE}
+            -p ${CMAKE_BINARY_DIR}
+            -config-file=${CMAKE_CURRENT_SOURCE_DIR}/.clang-tidy
+            -j
+            -use-color=true
+            -extra-arg=-Wno-error
+            -extra-arg=-Wno-unknown-warning-option
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        COMMENT "Running run-clang-tidy (parallel)"
+        USES_TERMINAL VERBATIM
+    )
+endif()
 
 # --- cppcheck --------------------------------------------------------------
 if(CPPCHECK_EXECUTABLE)
     add_custom_target(check
         COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/cppcheck"
         COMMAND ${CPPCHECK_EXECUTABLE}
-            --project="${CMAKE_BINARY_DIR}/compile_commands.json"
-            --cppcheck-build-dir="${CMAKE_BINARY_DIR}/cppcheck"
+            "--project=${CMAKE_BINARY_DIR}/compile_commands.json"
+            "--cppcheck-build-dir=${CMAKE_BINARY_DIR}/cppcheck"
             --check-level=exhaustive
             --inline-suppr
             --suppress=missingIncludeSystem

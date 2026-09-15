@@ -177,6 +177,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     check_cxx_compiler_flag("-fhardened" _HAS_FHARDENED)
     if(_HAS_FHARDENED)
         target_compile_options(project_release_flags INTERFACE -fhardened)
+        target_link_options(project_release_flags INTERFACE -fhardened)
     endif()
 
     check_cxx_compiler_flag("-Whardened" _HAS_WHARDENED)
