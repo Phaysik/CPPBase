@@ -227,7 +227,7 @@ jobs:
           sudo update-alternatives --set clang++ /usr/bin/clang++-24
           pip3 install cmake --break-system-packages
 
-      - name: Make project
+      - name: Run Valgrind
         run: |
           cmake --preset gcc-debug
           cmake --build --preset valgrind
