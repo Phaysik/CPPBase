@@ -231,13 +231,13 @@ jobs:
         run: |
           cmake --preset gcc-tests
           cmake --build --preset gcc-tests
-          ./build/gcc-tests/main
+          ./build/gcc-tests/tests
 
       - name: Run Clang Tests
         run: |
           cmake --preset clang-tests
           cmake --build --preset clang-tests
-          ./build/clang-tests/main
+          ./build/clang-tests/tests
 
       - name: Save Apt Packages Cache
         run: |
