@@ -217,27 +217,27 @@ jobs:
 
       - name: Install Dependencies
         run: |
-            wget llvm.sh https://apt.llvm.org/llvm.sh
-            sudo chmod +x llvm.sh
-            sudo ./llvm.sh 24
-            rm llvm.sh
-            sudo apt update
-            sudo apt-get install python3-pip libgmock-dev catch2 clang++-24 -y
-            sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-24 24
-            sudo update-alternatives --set clang++ /usr/bin/clang++-24
-            pip3 install cmake --break-system-packages
+          wget -qO llvm.sh https://apt.llvm.org/llvm.sh
+          sudo chmod +x llvm.sh
+          sudo ./llvm.sh 24
+          rm llvm.sh
+          sudo apt update
+          sudo apt-get install python3-pip libgmock-dev catch2 clang++-24 -y
+          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-24 24
+          sudo update-alternatives --set clang++ /usr/bin/clang++-24
+          pip3 install cmake --break-system-packages
 
       - name: Run GCC Tests
         run: |
-            cmake --preset gcc-tests
-            cmake --build --preset gcc-tests
-            ./build/gcc-tests/main
+          cmake --preset gcc-tests
+          cmake --build --preset gcc-tests
+          ./build/gcc-tests/main
 
       - name: Run Clang Tests
         run: |
-            cmake --preset clang-tests
-            cmake --build --preset clang-tests
-            ./build/clang-tests/main
+          cmake --preset clang-tests
+          cmake --build --preset clang-tests
+          ./build/clang-tests/main
 
       - name: Save Apt Packages Cache
         run: |
