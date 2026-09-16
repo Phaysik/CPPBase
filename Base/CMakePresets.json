@@ -174,102 +174,122 @@
 		{
 			"name": "gcc-release",
 			"configurePreset": "gcc-release",
-			"targets": ["main_app"]
+			"targets": ["main_app"],
+			"jobs": 4
 		},
 		{
 			"name": "gcc-debug",
 			"configurePreset": "gcc-debug",
-			"targets": ["dev_app"]
+			"targets": ["dev_app"],
+			"jobs": 4
 		},
 		{
 			"name": "clang-release",
 			"configurePreset": "clang-release",
-			"targets": ["main_app"]
+			"targets": ["main_app"],
+			"jobs": 4
 		},
 		{
 			"name": "clang-debug",
 			"configurePreset": "clang-debug",
-			"targets": ["dev_app"]
+			"targets": ["dev_app"],
+			"jobs": 4
 		},
 		{
 			"name": "msvc-release",
 			"configurePreset": "msvc-release",
-			"targets": ["main_app"]
+			"targets": ["main_app"],
+			"jobs": 4
 		},
 		{
 			"name": "msvc-debug",
 			"configurePreset": "msvc-debug",
-			"targets": ["dev_app"]
+			"targets": ["dev_app"],
+			"jobs": 4
 		},
 		{
 			"name": "benchmarks",
 			"configurePreset": "benchmarks",
-			"targets": ["benchmark_app"]
+			"targets": ["benchmark_app"],
+			"jobs": 4
 		},
 		{
 			"name": "tracy",
 			"configurePreset": "tracy",
-			"targets": ["tracy_app"]
+			"targets": ["tracy_app"],
+			"jobs": 4
 		},
 		{
 			"name": "coverage",
 			"configurePreset": "coverage",
-			"targets": ["coverage"]
+			"targets": ["coverage"],
+			"jobs": 4
 		},
 		{
 			"name": "genhtml",
 			"configurePreset": "coverage",
-			"targets": ["genhtml"]
+			"targets": ["genhtml"],
+			"jobs": 4
 		},
 		{
 			"name": "valgrind",
 			"configurePreset": "gcc-valgrind",
-			"targets": ["run_valgrind"]
+			"targets": ["run_valgrind"],
+			"jobs": 4
 		},
 		{
 			"name": "tidy",
 			"configurePreset": "analysis-clang",
-			"targets": ["tidy"]
+			"targets": ["tidy"],
+			"jobs": 4
 		},
 		{
 			"name": "run_tidy",
 			"configurePreset": "analysis-clang",
-			"targets": ["run_tidy"]
+			"targets": ["run_tidy"],
+			"jobs": 4
 		},
 		{
 			"name": "check",
 			"configurePreset": "analysis-clang",
-			"targets": ["check"]
+			"targets": ["check"],
+			"jobs": 4
 		},
 		{
 			"name": "flawfinder",
 			"configurePreset": "analysis-clang",
-			"targets": ["flawfinder"]
+			"targets": ["flawfinder"],
+			"jobs": 4
 		},
 		{
 			"name": "format",
 			"configurePreset": "analysis-clang",
-			"targets": ["format"]
+			"targets": ["format"],
+			"jobs": 4
 		},
 		{
 			"name": "format_check",
 			"configurePreset": "analysis-clang",
-			"targets": ["format_check"]
+			"targets": ["format_check"],
+			"jobs": 4
 		},
 		{
 			"name": "analysis",
 			"configurePreset": "analysis-clang",
-			"targets": ["analysis"]
+			"targets": ["analysis"],
+			"jobs": 4
 		},
 		{
 			"name": "gcc-tests",
 			"configurePreset": "gcc-tests",
-			"targets": ["test_app"]
+			"targets": ["test_app"],
+			"jobs": 4
 		},
 		{
 			"name": "clang-tests",
 			"configurePreset": "clang-tests",
-			"targets": ["test_app"]
+			"targets": ["test_app"],
+			"jobs": 4
 		}
 	],
 	"testPresets": [
