@@ -20,6 +20,7 @@
 			"inherits": "base",
 			"displayName": "GCC / Release (Ninja)",
 			"cacheVariables": {
+				"BUILD_TESTS": "OFF",
 				"CMAKE_BUILD_TYPE": "Release",
 				"CMAKE_CXX_COMPILER": "g++"
 			},
@@ -34,6 +35,7 @@
 			"inherits": "gcc-release",
 			"displayName": "GCC / Debug (Ninja)",
 			"cacheVariables": {
+				"BUILD_TESTS": "OFF",
 				"CMAKE_BUILD_TYPE": "Debug"
 			}
 		},
@@ -42,6 +44,7 @@
 			"inherits": "base",
 			"displayName": "Clang / Release (Ninja)",
 			"cacheVariables": {
+				"BUILD_TESTS": "OFF",
 				"CMAKE_BUILD_TYPE": "Release",
 				"CMAKE_CXX_COMPILER": "clang++"
 			}
@@ -51,6 +54,7 @@
 			"inherits": "clang-release",
 			"displayName": "Clang / Debug (Ninja)",
 			"cacheVariables": {
+				"BUILD_TESTS": "OFF",
 				"CMAKE_BUILD_TYPE": "Debug"
 			}
 		},
@@ -59,6 +63,7 @@
 			"inherits": "base",
 			"displayName": "MSVC / Release (Ninja)",
 			"cacheVariables": {
+				"BUILD_TESTS": "OFF",
 				"CMAKE_BUILD_TYPE": "Release",
 				"CMAKE_CXX_COMPILER": "cl"
 			},
@@ -73,6 +78,7 @@
 			"inherits": "msvc-release",
 			"displayName": "MSVC / Debug (Ninja)",
 			"cacheVariables": {
+				"BUILD_TESTS": "OFF",
 				"CMAKE_BUILD_TYPE": "Debug"
 			}
 		},
@@ -81,6 +87,7 @@
 			"inherits": "base",
 			"displayName": "clang-cl / Release (Ninja)",
 			"cacheVariables": {
+				"BUILD_TESTS": "OFF",
 				"CMAKE_BUILD_TYPE": "Release",
 				"CMAKE_CXX_COMPILER": "clang-cl"
 			},
@@ -125,6 +132,7 @@
 			"inherits": "base",
 			"displayName": "Benchmarks (Ninja, Release)",
 			"cacheVariables": {
+				"BUILD_TESTS": "OFF",
 				"CMAKE_BUILD_TYPE": "Release",
 				"BUILD_BENCHMARKS": "ON"
 			}
@@ -134,6 +142,7 @@
 			"inherits": "base",
 			"displayName": "Tracy (Ninja, Release)",
 			"cacheVariables": {
+				"BUILD_TESTS": "OFF",
 				"CMAKE_BUILD_TYPE": "Release",
 				"BUILD_TRACY": "ON"
 			}
@@ -150,108 +159,137 @@
 				"ENABLE_SANITIZERS": "OFF",
 				"WARNINGS_AS_ERRORS": "OFF"
 			}
+		},
+		{
+			"name": "gcc-valgrind",
+			"inherits": "gcc-debug",
+			"displayName": "GCC / Valgrind (Ninja, tests off)",
+			"cacheVariables": {
+				"BUILD_TESTS": "OFF",
+				"ENABLE_SANITIZERS": "OFF"
+			}
 		}
 	],
 	"buildPresets": [
 		{
 			"name": "gcc-release",
 			"configurePreset": "gcc-release",
-			"targets": ["main_app"]
+			"targets": ["main_app"],
+			"jobs": 8
 		},
 		{
 			"name": "gcc-debug",
 			"configurePreset": "gcc-debug",
-			"targets": ["dev_app"]
+			"targets": ["dev_app"],
+			"jobs": 8
 		},
 		{
 			"name": "clang-release",
 			"configurePreset": "clang-release",
-			"targets": ["main_app"]
+			"targets": ["main_app"],
+			"jobs": 8
 		},
 		{
 			"name": "clang-debug",
 			"configurePreset": "clang-debug",
-			"targets": ["dev_app"]
+			"targets": ["dev_app"],
+			"jobs": 8
 		},
 		{
 			"name": "msvc-release",
 			"configurePreset": "msvc-release",
-			"targets": ["main_app"]
+			"targets": ["main_app"],
+			"jobs": 8
 		},
 		{
 			"name": "msvc-debug",
 			"configurePreset": "msvc-debug",
-			"targets": ["dev_app"]
+			"targets": ["dev_app"],
+			"jobs": 8
 		},
 		{
 			"name": "benchmarks",
 			"configurePreset": "benchmarks",
-			"targets": ["benchmark_app"]
+			"targets": ["benchmark_app"],
+			"jobs": 8
 		},
 		{
 			"name": "tracy",
 			"configurePreset": "tracy",
-			"targets": ["tracy_app"]
+			"targets": ["tracy_app"],
+			"jobs": 8
 		},
 		{
 			"name": "coverage",
 			"configurePreset": "coverage",
-			"targets": ["coverage"]
+			"targets": ["coverage"],
+			"jobs": 8
 		},
 		{
 			"name": "genhtml",
 			"configurePreset": "coverage",
-			"targets": ["genhtml"]
+			"targets": ["genhtml"],
+			"jobs": 8
 		},
 		{
 			"name": "valgrind",
-			"configurePreset": "gcc-debug",
-			"targets": ["run_valgrind"]
+			"configurePreset": "gcc-valgrind",
+			"targets": ["run_valgrind"],
+			"jobs": 8
 		},
 		{
 			"name": "tidy",
 			"configurePreset": "analysis-clang",
-			"targets": ["tidy"]
+			"targets": ["tidy"],
+			"jobs": 8
 		},
 		{
 			"name": "run_tidy",
 			"configurePreset": "analysis-clang",
-			"targets": ["run_tidy"]
+			"targets": ["run_tidy"],
+			"jobs": 8
 		},
 		{
 			"name": "check",
 			"configurePreset": "analysis-clang",
-			"targets": ["check"]
+			"targets": ["check"],
+			"jobs": 8
 		},
 		{
 			"name": "flawfinder",
 			"configurePreset": "analysis-clang",
-			"targets": ["flawfinder"]
+			"targets": ["flawfinder"],
+			"jobs": 8
 		},
 		{
 			"name": "format",
 			"configurePreset": "analysis-clang",
-			"targets": ["format"]
+			"targets": ["format"],
+			"jobs": 8
 		},
 		{
 			"name": "format_check",
 			"configurePreset": "analysis-clang",
-			"targets": ["format_check"]
+			"targets": ["format_check"],
+			"jobs": 8
 		},
 		{
 			"name": "analysis",
 			"configurePreset": "analysis-clang",
-			"targets": ["analysis"]
+			"targets": ["analysis"],
+			"jobs": 8
 		},
 		{
 			"name": "gcc-tests",
 			"configurePreset": "gcc-tests",
-			"targets": ["test_app"]
+			"targets": ["test_app"],
+			"jobs": 8
 		},
 		{
 			"name": "clang-tests",
 			"configurePreset": "clang-tests",
-			"targets": ["test_app"]
+			"targets": ["test_app"],
+			"jobs": 8
 		}
 	],
 	"testPresets": [
