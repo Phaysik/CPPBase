@@ -92,13 +92,6 @@ jobs:
         run: |
           mkdir -p ./cache/gcc-latest
 
-      - name: Set up LCOV Cache Site
-        run: |
-          mkdir -p ./cache/lcov/bin
-          mkdir -p ./cache/lcov/etc
-          mkdir -p ./cache/lcov/lib
-          mkdir -p ./cache/lcov/share
-
       - name: Cache Apt Packages
         id: cache-apt-packages
         uses: actions/cache@v5
@@ -177,15 +170,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gcc-latest-
 
-      - name: Cache LCOV
-        id: cache-lcov
-        uses: actions/cache@v5
-        with:
-          path: ./cache/lcov
-          key: ${{ runner.os }}-lcov-${{ hashFiles('makefileDependencies.sh') }}
-          restore-keys: |
-            ${{ runner.os }}-lcov-
-
       - name: Install Apt Packages From Cache
         if: steps.cache-apt-packages.outputs.cache-hit == 'true'
         run: sudo cp -r ./cache/apt-packages/apt/* /var/cache/apt
@@ -244,17 +228,8 @@ jobs:
           sudo update-alternatives --install /usr/bin/gcc gcc /usr/local/gcc-latest/bin/gcc 100
           sudo update-alternatives --install /usr/bin/gcov gcov /usr/local/gcc-latest/bin/gcov 100
 
-      - name: Install LCOV From Cache
-        if: steps.cache-lcov.outputs.cache-hit == 'true'
-        run: |
-          sudo cp -r ./cache/lcov/bin/* /usr/local/bin/
-          sudo cp -r ./cache/lcov/etc/* /usr/local/etc/
-          sudo mkdir -p /usr/local/lib/lcov /usr/local/share/lcov
-          sudo cp -r ./cache/lcov/lib/* /usr/local/lib/lcov/
-          sudo cp -r ./cache/lcov/share/* /usr/local/share/lcov/
-
       - name: Install dependencies
-        if: steps.cache-apt-packages.outputs.cache-hit != 'true' || steps.cache-apt-lists.outputs.cache-hit != 'true' || steps.cache-google-tests.outputs.cache-hit != 'true' || steps.cache-config-cat.outputs.cache-hit != 'true' || steps.cache-curl.outputs.cache-hit != 'true' || steps.cache-hash-library.outputs.cache-hit != 'true' || steps.cache-gcc-latest.outputs.cache-hit != 'true' || steps.cache-lcov.outputs.cache-hit != 'true' || steps.cache-spdlog.outputs.cache-hit != 'true'
+        if: steps.cache-apt-packages.outputs.cache-hit != 'true' || steps.cache-apt-lists.outputs.cache-hit != 'true' || steps.cache-google-tests.outputs.cache-hit != 'true' || steps.cache-config-cat.outputs.cache-hit != 'true' || steps.cache-curl.outputs.cache-hit != 'true' || steps.cache-hash-library.outputs.cache-hit != 'true' || steps.cache-gcc-latest.outputs.cache-hit != 'true' || steps.cache-spdlog.outputs.cache-hit != 'true'
         run: sudo bash $GITHUB_WORKSPACE/makefileDependencies.sh a
 
       - name: Install Testing Dependencies
@@ -324,16 +299,6 @@ jobs:
       - name: Save GCC Cache
         run: |
           sudo cp -r "$LATEST_GCC"/* ./cache/gcc-latest
-
-      - name: Save LCOV Cache
-        if: steps.cache-lcov.outputs.cache-hit != 'true'
-        run: |
-          cp /usr/local/bin/gendesc /usr/local/bin/genhtml /usr/local/bin/geninfo /usr/local/bin/genpng ./cache/lcov/bin/
-          cp /usr/local/bin/lcov /usr/local/bin/llvm2lcov /usr/local/bin/perl2lcov /usr/local/bin/py2lcov ./cache/lcov/bin/
-          cp /usr/local/bin/xml2lcov /usr/local/bin/xml2lcovutil.py ./cache/lcov/bin/
-          cp /usr/local/etc/lcovrc ./cache/lcov/etc/
-          cp -r /usr/local/lib/lcov/* ./cache/lcov/lib/
-          cp -r /usr/local/share/lcov/* ./cache/lcov/share/
 
       - name: Give Read Access For Apt Folder
         run: sudo chown -R $USER:$USER ./cache/apt-packages/apt/archives/lock ./cache/apt-packages/apt/archives/partial ./cache/apt-lists/lists/lock ./cache/apt-lists/lists/partial
