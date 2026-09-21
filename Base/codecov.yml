@@ -15,6 +15,7 @@ coverage:
         target: 70% # new/changed lines in the PR must be >= 70%
         threshold: 0% # allow no drop without failing
         base: auto
+        if_ci_failed: error
 
   ignore:
     - 'tests/*' # ignore all files in the tests directory
