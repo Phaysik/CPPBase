@@ -422,8 +422,9 @@ if(ENABLE_COVERAGE AND NOT MSVC)
             COMMAND ${LCOV_EXECUTABLE}
                 --capture
                 -d "${CMAKE_BINARY_DIR}/CMakeFiles/test_app.dir"
-                --rc branch_coverage=1
-                --ignore-errors gcov,gcov,mismatch,mismatch,unused,unused
+                --config-file "${CMAKE_SOURCE_DIR}/.lcovrc"
+                --branch-coverage
+                --ignore-errors gcov,gcov,inconsistent,inconsistent,mismatch,mismatch,unused,unused
                 -o "${CMAKE_BINARY_DIR}/coverage.raw.info"
 
             # 4) Keep only project sources, anchored to the project root.
@@ -432,8 +433,9 @@ if(ENABLE_COVERAGE AND NOT MSVC)
                 "${CMAKE_SOURCE_DIR}/src/*"
                 "${CMAKE_SOURCE_DIR}/include/*"
                 "${CMAKE_SOURCE_DIR}/testInclude/*"
-                --rc branch_coverage=1
-                --ignore-errors gcov,gcov,mismatch,mismatch,unused,unused
+                --config-file "${CMAKE_SOURCE_DIR}/.lcovrc"
+                --branch-coverage
+                --ignore-errors gcov,gcov,inconsistent,inconsistent,mismatch,mismatch,unused,unused
                 -o "${CMAKE_BINARY_DIR}/coverage.tmp.info"
 
             COMMAND ${CMAKE_COMMAND} -E rename
@@ -453,6 +455,7 @@ if(ENABLE_COVERAGE AND NOT MSVC)
             COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/coverage"
             COMMAND ${GENHTML_EXECUTABLE}
                 "${CMAKE_BINARY_DIR}/coverage.info"
+                --config-file "${CMAKE_SOURCE_DIR}/.lcovrc"
                 --branch-coverage
                 --ignore-errors empty,unused
                 --dark-mode

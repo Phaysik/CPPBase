@@ -45,18 +45,20 @@ setUpGCC() {
 	sudo ldconfig
 }
 
-setUpClangTools() {
-	echo "Setting up clang-tidy, clang-format, and clangd"
+setUpClang() {
+    echo "Setting up clang++, clang-tidy, clang-format, and clangd"
 
 	wget https://apt.llvm.org/llvm.sh
 	sudo chmod +x llvm.sh
 	sudo ./llvm.sh "$1"
 	rm -rf ./llvm.sh
-	sudo apt-get install -y clang-format clang-tidy clangd
+	sudo apt-get update
+	sudo apt-get install -y clang-format-"$1" clang-tidy-"$1" clangd-"$1" clang++-"$1"
 
-	sudo update-alternatives --install /usr/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-"$1"
-	sudo update-alternatives --install /usr/bin/clang-format clang-format /usr/bin/clang-format-"$1"
-	sudo update-alternatives --install /usr/bin/clangd clangd /usr/bin/clangd-"$1"
+	sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-"$1" "$1"
+	sudo update-alternatives --install /usr/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-"$1" "$1"
+	sudo update-alternatives --install /usr/bin/clang-format clang-format /usr/bin/clang-format-"$1" "$1"
+	sudo update-alternatives --install /usr/bin/clangd clangd /usr/bin/clangd-"$1" "$1"
 }
 
 installDoxygen() {
@@ -81,7 +83,7 @@ installDoxygen() {
 }
 
 checkSphinx() {
-	packages=("sphinx" "breathe" "sphinx-book-theme" "sphinx-copybutton" "sphinx-autobuild" "sphinx-last-updated-by-git" "sphinx-notfound-page" "sphinxcontrib-spelling" "furo")
+	packages=("sphinx" "breathe" "sphinx-book-theme" "sphinx-copybutton" "sphinx-autobuild" "sphinx-last-updated-by-git" "sphinx-notfound-page" "sphinxcontrib-spelling" "furo" "sphinx-rtd-theme")
 
 	all_packages_installed=true
 
@@ -97,6 +99,21 @@ checkSphinx() {
 	else
 		return 1 # Some packages missing
 	fi
+}
+
+setUpLCOV() {
+	echo "Setting up gcc, g++, and gcov"
+
+	curl -L -o lcov-latest.tar.gz https://github.com/linux-test-project/lcov/releases/download/v"$1"/lcov-"$1".tar.gz
+	mkdir -p lcov-latest
+	tar -xvzf lcov-latest.tar.gz -C lcov-latest --strip-components=1
+	sudo rm -rf lcov-latest.tar.gz
+
+	cd lcov-latest
+	sudo GIT_DIR=/dev/null make install
+
+	cd ..
+	rm -rf lcov-latest
 }
 
 setUpTracy() {
@@ -307,11 +324,13 @@ main() {
 	# a or 'A' for automated running (For Github workflows ignoring long documentation, linting, and formatting installation)
 	if [[ ${response,,} == "y" ]] || [[ ${1,,} == "y" ]] || [[ ${response,,} == "a" ]] || [[ ${1,,} == "a" ]]; then
 		echo "Update and upgrading your packages (will require an elevated user's password)"
-		sudo apt-get update && sudo apt-get upgrade -y
+		sudo apt-get update
 
 		echo "Installing all the required packages for all commands used in the Makefile"
 
-		sudo apt-get install make cmake libgtest-dev libgmock-dev python3-pip docker-compose catch2 -y
+		sudo apt-get install make libgtest-dev libgmock-dev python3-pip docker-compose catch2 -y
+
+		pip3 install cmake --break-system-packages
 
 		sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 10
 		sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-14 14
@@ -324,14 +343,24 @@ main() {
 			setUpConfigCat
 		fi
 
-		desired_version="16.1.0"
+		gpp_desired_version="16.1.0"
 		gpp_priority="16"
 		echo "Setting up g++"
 
-		if [[ "$(command g++ --version | grep -oP '\d+\.\d+\.\d+' || true)" == "${desired_version}" ]]; then
-			echo "g++-${desired_version} exists"
+		if [[ "$(command g++ --version | grep -oP '\d+\.\d+\.\d+' || true)" == "${gpp_desired_version}" ]]; then
+			echo "g++-${gpp_desired_version} exists"
 		else
-			setUpGCC "${desired_version}" "${gpp_priority}"
+			setUpGCC "${gpp_desired_version}" "${gpp_priority}"
+		fi
+
+		clang_desired_version="24.0.0"
+		clang_priority="24"
+		echo "Setting up clang tooling"
+
+		if [[ "$(command clang++ --version | grep -oP '\d+\.\d+\.\d+' || true)" == "${clang_desired_version}" ]]; then
+			echo "g++-${clang_desired_version} exists"
+		else
+			setUpClang "${clang_priority}"
 		fi
 
 		if [[ -f "/usr/lib/libgtest.a" ]] && [[ -f "/usr/lib/libgtest_main.a" ]]; then
@@ -358,29 +387,37 @@ main() {
 			installSpdlog
 		fi
 
+		checkSphinx
+		status=$?
+
+		if [[ ${status} -eq 0 ]]; then
+			echo "All Sphinx packages are installed"
+		else
+			echo "Installing Sphinx and it's dependencies for documentation"
+			sudo apt install python3-sphinx
+			pip3 install --upgrade pip --break-system-packages
+			sudo pip3 install sphinx breathe sphinx-book-theme sphinx-copybutton sphinx-autobuild sphinx-last-updated-by-git sphinx-notfound-page sphinxcontrib-spelling furo sphinx-rtd-theme --break-system-packages
+		fi
+
+		lcov_desired_version="2.5-0"
+		lcov_priority="2.5"
+
+		if [[ "$(command lcov --version | grep -oP '\d+\.\d+-\d+' || true)" == "${lcov_desired_version}" ]]; then
+			echo "g++-${lcov_desired_version} exists"
+		else
+			setUpLCOV "${lcov_priority}"
+		fi
+		setUpLCOV "${lcov_desired_version}"
+
+		if [[ -x "$(command -v flawfinder || true)" ]]; then
+			echo "Flawfinder already exists"
+		else
+			pip3 install flawfinder --break-system-packages
+		fi
+
 		# If not 'a' or 'A', set up documentation, formatting, and linting tools
 		if [[ ${response,,} == "y" ]] || [[ ${1,,} == "y" ]]; then
 			sudo apt-get install binutils valgrind graphviz flex bison libpcre3 libpcre3-dev lcov cppcheck xterm bear -y
-
-			llvmVersionToDownload="22"
-
-			if [[ -x "$(command -v clang-tidy || true)" ]] && [[ -x "$(command -v clang-format || true)" ]]; then
-				echo "clang-tidy and clang-format already exists"
-
-				clang_tidy_version=$(clang-tidy --version | awk '/LLVM version/ {print $4}' || true)
-				clang_tidy_desired_version="22.0.0"
-
-				clang_format_version=$(clang-format --version | awk '{print $4}' || true)
-				clang_format_desired_version="22.0.0"
-
-				if [[ ${clang_tidy_version} == "${clang_tidy_desired_version}" ]] && [[ ${clang_format_version} == "${clang_format_desired_version}" ]]; then
-					echo "clang-tidy version ${clang_tidy_desired_version} and clang-format version ${clang_format_desired_version} already exists"
-				else
-					setUpClangTools" ${llvmVersionToDownload}"
-				fi
-			else
-				setUpClangTools "${llvmVersionToDownload}"
-			fi
 
 			doxygen_desired_version="1.16.1"
 			if [[ -x "$(command -v doxygen || true)" ]]; then
@@ -395,23 +432,6 @@ main() {
 				fi
 			else
 				installDoxygen "${doxygen_desired_version}"
-			fi
-
-			checkSphinx
-			status=$?
-
-			if [[ ${status} -eq 0 ]]; then
-				echo "All Sphinx packages are installed"
-			else
-				echo "Installing Sphinx and it's dependencies for documentation"
-				pip3 install --upgrade pip --break-system-packages
-				pip3 install sphinx breathe sphinx-book-theme sphinx-copybutton sphinx-autobuild sphinx-last-updated-by-git sphinx-notfound-page sphinxcontrib-spelling furo --break-system-packages
-			fi
-
-			if [[ -x "$(command -v flawfinder || true)" ]]; then
-				echo "Flawfinder already exists"
-			else
-				pip3 install flawfinder --break-system-packages
 			fi
 
 			if [[ -x "$(command -v tracy-profiler || true)" ]]; then
