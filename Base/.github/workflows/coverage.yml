@@ -55,7 +55,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
-            fetch-depth: 0
+          fetch-depth: 0
 
       - name: Set up Cache Site
         run: mkdir -p ./cache
@@ -238,30 +238,30 @@ jobs:
 
       - name: Install Tooling Dependencies
         run: |
-            wget -qO llvm.sh https://apt.llvm.org/llvm.sh
-            sudo chmod +x llvm.sh
-            sudo ./llvm.sh 24
-            rm llvm.sh
-            sudo apt update
-            sudo apt-get install python3-pip libgmock-dev catch2 clang++-24 python3-sphinx build-essential libcapture-tiny-perl libdatetime-perl -y
-            sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-24 24
-            sudo update-alternatives --set clang++ /usr/bin/clang++-24
-            pip3 install --upgrade pip --break-system-packages
-            pip3 install cmake --break-system-packages
-            sudo pip3 install sphinx-rtd-theme --break-system-packages
-            curl -L -o lcov-latest.tar.gz https://github.com/linux-test-project/lcov/releases/download/v2.5/lcov-2.5.tar.gz
-            mkdir -p lcov-latest
-            tar -xvzf lcov-latest.tar.gz -C lcov-latest --strip-components=1
-            sudo rm -rf lcov-latest.tar.gz
-            cd lcov-latest
-            sudo GIT_DIR=/dev/null make install
-            cd ..
-            sudo rm -rf lcov-latest
+          wget -qO llvm.sh https://apt.llvm.org/llvm.sh
+          sudo chmod +x llvm.sh
+          sudo ./llvm.sh 24
+          rm llvm.sh
+          sudo apt update
+          sudo apt-get install python3-pip libgmock-dev catch2 clang++-24 python3-sphinx build-essential libcapture-tiny-perl libdatetime-perl -y
+          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-24 24
+          sudo update-alternatives --set clang++ /usr/bin/clang++-24
+          pip3 install --upgrade pip --break-system-packages
+          pip3 install cmake --break-system-packages
+          sudo pip3 install sphinx-rtd-theme --break-system-packages
+          curl -L -o lcov-latest.tar.gz https://github.com/linux-test-project/lcov/releases/download/v2.5/lcov-2.5.tar.gz
+          mkdir -p lcov-latest
+          tar -xvzf lcov-latest.tar.gz -C lcov-latest --strip-components=1
+          sudo rm -rf lcov-latest.tar.gz
+          cd lcov-latest
+          sudo GIT_DIR=/dev/null make install
+          cd ..
+          sudo rm -rf lcov-latest
 
       - name: Build & run coverage
         run: |
-            cmake --preset coverage
-            cmake --build --preset coverage
+          cmake --preset coverage
+          cmake --build --preset coverage
 
       # Optional HMTL report for humans (won't fail the job)
       - name: Generate HTML report
@@ -271,6 +271,8 @@ jobs:
         uses: codecov/codecov-action@v7
         with:
           files: build/coverage/coverage.info
+          disable_search: true # only upload the curated coverage.info, don't scan the repo
+          plugins: noop # don't run the gcov plugin, which would re-derive coverage (incl. tests/) from build artifacts
           flags: unittests
           name: gcc-coverage
           fail_ci_if_error: true
@@ -282,11 +284,11 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7
         with:
-            name: coverage-report
-            path: |
-                build/coverage/coverage.info
-                build/coverage/coverage/
-            if-no-files-found: warn
+          name: coverage-report
+          path: |
+            build/coverage/coverage.info
+            build/coverage/coverage/
+          if-no-files-found: warn
 
       - name: Save Apt Packages Cache
         run: |

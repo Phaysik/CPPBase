@@ -18,10 +18,10 @@ coverage:
         if_ci_failed: error
 
   ignore:
-    - 'tests/*' # ignore all files in the tests directory
-    - 'testInclude/*' # ignore all files in the testInclude directory
-    - 'benchmarks/*' # ignore all files in the benchmarks directory
-    - 'src/tracy/*' # ignore all files in the src/tracy directory
+    - "tests/**" # ignore all files in the tests directory (recursive)
+    - "testInclude/**" # ignore all files in the testInclude directory (recursive)
+    - "benchmarks/**" # ignore all files in the benchmarks directory (recursive)
+    - "src/tracy/**" # ignore all files in the src/tracy directory (recursive)
 
 comment:
   layout: 'reach,diff,flags,tree,footer'
