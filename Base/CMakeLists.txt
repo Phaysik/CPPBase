@@ -459,7 +459,6 @@ if(ENABLE_COVERAGE AND NOT MSVC)
                 --extract "${CMAKE_BINARY_DIR}/coverage.raw.info"
                 "${CMAKE_SOURCE_DIR}/src/*"
                 "${CMAKE_SOURCE_DIR}/include/*"
-                "${CMAKE_SOURCE_DIR}/testInclude/*"
                 --config-file "${CMAKE_SOURCE_DIR}/.lcovrc"
                 --branch-coverage
                 --ignore-errors gcov,gcov,inconsistent,inconsistent,mismatch,mismatch,unused,unused
