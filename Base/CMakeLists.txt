@@ -160,8 +160,10 @@ function(copy_resources tgt)
     endif()
 endfunction()
 
-set(SPDLOG_INCLUDE_DIR
-    "${CMAKE_CURRENT_SOURCE_DIR}/third_party/spdlog/include")
+if(MSVC)
+    set(SPDLOG_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/spdlog/include")
+endif()
+
 # ----------------------------------------------------------------------------
 #  Main (release) executable
 # ----------------------------------------------------------------------------
@@ -338,12 +340,14 @@ if(MSVC)
     target_compile_options(test_app PRIVATE /std:c++latest)
 endif()
 
-# Header-only mode: no library to link, just the include path.
-target_include_directories(main_app     SYSTEM PRIVATE "${SPDLOG_INCLUDE_DIR}")
-target_include_directories(dev_app      SYSTEM PRIVATE "${SPDLOG_INCLUDE_DIR}")
-target_include_directories(valgrind_app SYSTEM PRIVATE "${SPDLOG_INCLUDE_DIR}")
-target_include_directories(benchmark_app SYSTEM PRIVATE "${SPDLOG_INCLUDE_DIR}")
-target_include_directories(test_app SYSTEM PRIVATE "${SPDLOG_INCLUDE_DIR}")
+if(MSVC)
+    # Header-only mode: no library to link, just the include path.
+    target_include_directories(main_app     SYSTEM PRIVATE "${SPDLOG_INCLUDE_DIR}")
+    target_include_directories(dev_app      SYSTEM PRIVATE "${SPDLOG_INCLUDE_DIR}")
+    target_include_directories(valgrind_app SYSTEM PRIVATE "${SPDLOG_INCLUDE_DIR}")
+    target_include_directories(benchmark_app SYSTEM PRIVATE "${SPDLOG_INCLUDE_DIR}")
+    target_include_directories(test_app SYSTEM PRIVATE "${SPDLOG_INCLUDE_DIR}")
+endif()
 
 # ----------------------------------------------------------------------------
 #  Shader compilation (optional)
