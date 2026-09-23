@@ -1,9 +1,9 @@
-/*! \file attributeMacros.h
-	\brief Contains the attribute macros for creating portable C++ code
-	\date --/--/----
-	\version x.x.x
-	\since x.x.x
-	\author Matthew Moore
+/*! @file attributeMacros.h
+	@brief Declares portable compiler-attribute macros used across PocketCore.
+	@date --/--/----
+	@since x.x.x
+	@version x.x.x
+	@author Matthew Moore
 */
 
 #ifndef INCLUDE_ATTRIBUTEMACROS_H
@@ -15,6 +15,8 @@
 		@details This macro defined when the compiler predefined macro `__GNUC__` is present.
 		Use it to enable GCC-specific attributes or workarounds.
 		@note Do not assume exact GCC version from this macro; check `__GNUC__`/`__GNUC_MINOR__` when needed.
+		@since x.x.x
+		@version x.x.x
 	*/
 	#define ATTR_GCC
 #endif
@@ -25,6 +27,8 @@
 		@details This macro defined when the compiler predefined macro `__clang__` is present. Use it to conditionally enable Clang-specific
 	   features or attributes.
 		@note This macro is internal to the attribute macros helper and is not intended as a stable public API.
+		@since x.x.x
+		@version x.x.x
 	*/
 	#define ATTR_CLANG
 #endif
@@ -34,6 +38,8 @@
 		@brief Defined when compiling with Microsoft Visual C++.
 		@details This macro defined when `_MSC_VER` is defined by the compiler.
 		Use it to guard MSVC-specific pragmas or attribute equivalents.
+		@since x.x.x
+		@version x.x.x
 	*/
 	#define ATTR_MSVC
 #endif
@@ -53,6 +59,8 @@
 			@code{.cpp}
 			ATTR_CONST int pure_function(int x) { return x * 2; }
 			@endcode
+			@since x.x.x
+			@version x.x.x
 		*/
 		#define ATTR_CONST __attribute__((const))
 	#else
@@ -71,6 +79,8 @@
 			@code{.cpp}
 			ATTR_PURE int compute_value(int x) { return x * 2; }
 			@endcode
+			@since x.x.x
+			@version x.x.x
 		*/
 		#define ATTR_PURE __attribute__((pure))
 	#else
@@ -89,6 +99,8 @@
 			@code{.cpp}
 			ATTR_RETURNS_NONNULL int* get_value() { static int x = 42; return &x; }
 			@endcode
+			@since x.x.x
+			@version x.x.x
 		*/
 		#define ATTR_RETURNS_NONNULL __attribute__((returns_nonnull))
 	#else
@@ -110,6 +122,8 @@
 				FlagC
 			};
 			@endcode
+			@since x.x.x
+			@version x.x.x
 		*/
 		#define ATTR_FLAG_ENUM __attribute__((flag_enum))
 	#else
@@ -129,6 +143,8 @@
 			@code{.cpp}
 			ATTR_ALWAYS_INLINE static inline int fast_mul2(int x) { return x * 2; }
 			@endcode
+			@since x.x.x
+			@version x.x.x
 		*/
 		#define ATTR_ALWAYS_INLINE __attribute__((always_inline))
 	#else
@@ -150,6 +166,8 @@
 			@code{.cpp}
 			ATTR_ARTIFICIAL static inline void wrapper_for_debug() { helper(); }
 			@endcode
+			@since x.x.x
+			@version x.x.x
 		*/
 		#define ATTR_ARTIFICIAL __attribute__((artificial))
 	#else
@@ -173,6 +191,8 @@
 			// when an offset is required:
 			int * ATTR_ASSUME_ALIGNED_EX(16, 8) ptr2 = ...; // assume ptr2 + 8 is 16-byte aligned
 			@endcode
+			@since x.x.x
+			@version x.x.x
 		*/
 		#define ATTR_ASSUME_ALIGNED_EX(alignment, offset) __attribute__((assume_aligned(alignment, offset)))
 		#define ATTR_ASSUME_ALIGNED(alignment)			  ATTR_ASSUME_ALIGNED_EX(alignment, 0)
@@ -195,6 +215,8 @@
 			@code{.cpp}
 			ATTR_COLD void handle_error(int code) { // infrequent error path  }
 			@endcode
+			@since x.x.x
+			@version x.x.x
 		*/
 		#define ATTR_COLD __attribute__((cold))
 	#else
@@ -215,6 +237,8 @@
 			@code{.cpp}
 			ATTR_HOT inline int inner_compute(int x) { return x * 2; }
 			@endcode
+			@since x.x.x
+			@version x.x.x
 		*/
 		#define ATTR_HOT __attribute__((hot))
 	#else
@@ -234,6 +258,8 @@
 			// Both parameters must be non-null (indices are 1-based):
 			int copy_strings(const char *src, char *dst) ATTR_NONNULL(1, 2);
 			@endcode
+			@since x.x.x
+			@version x.x.x
 		*/
 		#define ATTR_NONNULL(...) __attribute__((nonnull(__VA_ARGS__)))
 	#else
@@ -254,11 +280,49 @@
 			@code{.cpp}
 			ATTR_NOINLINE void expensive_path() { // large function body }
 			@endcode
+			@since x.x.x
+			@version x.x.x
 		*/
 		#define ATTR_NOINLINE __attribute__((noinline))
 	#else
 		#define ATTR_NOINLINE
 	#endif
+#else
+	// Non-GNU, non-Clang compilers (MSVC, Intel, etc.) don't support
+	// these attributes.  Define everything as empty so the macros still
+	// exist and expand to nothing.
+
+	#define ATTR_CONST
+	#define ATTR_PURE
+	#define ATTR_RETURNS_NONNULL
+	#define ATTR_FLAG_ENUM
+	#define ATTR_ALWAYS_INLINE
+	#define ATTR_ARTIFICIAL
+	#define ATTR_ASSUME_ALIGNED_EX(alignment, offset)
+	#define ATTR_ASSUME_ALIGNED(alignment)
+	#define ATTR_COLD
+	#define ATTR_HOT
+	#define ATTR_NONNULL(...)
+#endif
+
+#ifdef ATTR_MSVC
+	/*! @def ATTR_NOINLINE
+		@brief Portable macro for the compiler `noinline` attribute.
+		@details Expands to `[[msvc::noinline]]` on MSVC, and to an empty token on other compilers.
+		The `noinline` attribute prevents the compiler from inlining a function at its call sites. This is useful when inlining
+		a function would cause excessive code-size growth (e.g. exceeding `--param inline-unit-growth`) or when the function
+		should remain a discrete call for profiling or debugging purposes. The attribute is compatible with `constexpr`;
+		compile-time evaluation is unaffected.
+		@warning Preventing inlining of small, hot functions can degrade performance. Apply only when inlining is known to
+		cause problems (e.g. build failures due to inline-unit-growth limits or measurable code-size bloat).
+		@example
+		@code{.cpp}
+		ATTR_NOINLINE void expensive_path() { // large function body }
+		@endcode
+		@since x.x.x
+		@version x.x.x
+	*/
+	#define ATTR_NOINLINE [[msvc::noinline]]
 #endif
 
 #ifdef ATTR_CLANG
@@ -291,6 +355,8 @@
 			ofe = D0 | D1;     // no warnings
 			ofe = D0 | D1 | 4; // no warnings
 			@endcode
+			@since x.x.x
+			@version x.x.x
 		*/
 		#define ATTR_ENUM_EXTENSIBILITY_OPEN __attribute__((enum_extensibility(open)))
 	#else
@@ -327,6 +393,8 @@
 			cfe = C0 | C1;     // no warnings
 			cfe = C0 | C1 | 4; // warning issued
 			@endcode
+			@since x.x.x
+			@version x.x.x
 		*/
 		#define ATTR_ENUM_EXTENSIBILITY_CLOSED __attribute__((enum_extensibility(closed)))
 	#else
@@ -360,6 +428,8 @@
 			TypeA a; // OK
 			TypeB b; // OK if TypeB exists, otherwise compile error
 			@endcode
+			@since x.x.x
+			@version x.x.x
 		*/
 		#define ATTR_USING_IF_EXISTS __attribute__((using_if_exists))
 	#else
@@ -394,6 +464,8 @@
 			x = s->a;    // warning
 			x = (*s).a;  // warning
 			@endcode
+			@since x.x.x
+			@version x.x.x
 		*/
 		#define ATTR_NODEREF __attribute__((noderef))
 	#else
@@ -436,6 +508,8 @@
 			}
 			}
 			@endcode
+			@since x.x.x
+			@version x.x.x
 		*/
 		#define ATTR_CALLED_ONCE __attribute__((called_once))
 	#else
@@ -467,6 +541,8 @@
 				return 0;
 			}
 			@endcode
+			@since x.x.x
+			@version x.x.x
 		*/
 		#define ATTR_NO_SPECIALIZATIONS [[clang::no_specializations]]
 	#else
@@ -494,6 +570,8 @@
 				ATTR_PREFERRED_TYPE(bool) unsigned UseAlternateColorSpace : 1;
 			} s = { Green, false };
 			@endcode
+			@since x.x.x
+			@version x.x.x
 		*/
 		#define ATTR_PREFERRED_TYPE(param) [[clang::preferred_type(param)]]
 	#else
@@ -519,6 +597,8 @@
 					ATTR_REINITIALIZES void Clear();
 			};
 			@endcode
+			@since x.x.x
+			@version x.x.x
 		*/
 		#define ATTR_REINITIALIZES [[clang::reinitializes]]
 	#else
@@ -545,6 +625,8 @@
 		@code{.cpp}
 		ATTR_NODISCARD int compute_value() { return 42; }
 		@endcode
+		@since x.x.x
+		@version x.x.x
 	*/
 	#define ATTR_NODISCARD [[nodiscard]]
 #else
@@ -560,6 +642,8 @@
 		@code{.cpp}
 		int compute_value(ATTR_MAYBE_UNUSED int number) { return number; }
 		@endcode
+		@since x.x.x
+		@version x.x.x
 	*/
 	#define ATTR_MAYBE_UNUSED [[maybe_unused]]
 #else
@@ -575,6 +659,8 @@
 		@code{.cpp}
 		ATTR_DEPRECATED int compute_value(int number) { return number; }
 		@endcode
+		@since x.x.x
+		@version x.x.x
 	*/
 	#define ATTR_DEPRECATED [[deprecated]]
 #else
@@ -591,6 +677,8 @@
 		@code{.cpp}
 		ATTR_NORETURN void terminate_program() { exit(1); }
 		@endcode
+		@since x.x.x
+		@version x.x.x
 	*/
 	#define ATTR_NORETURN [[noreturn]]
 #else
@@ -618,6 +706,8 @@
 			}
 		}
 		@endcode
+		@since x.x.x
+		@version x.x.x
 	*/
 	#define ATTR_FALLTHROUGH [[fallthrough]]
 #else
@@ -631,13 +721,15 @@
 		The `[[likely]]` attribute indicates that the a code path is more likely to be executed than the others.
 		@example
 		@code{.cpp}
-		constexpr double pow(doulbe x, uint64_t n) noexcept {
+		constexpr double pow(double x, uint64_t n) noexcept {
 			if (n > 0) ATTR_LIKELY
 				return x * pow(x, n - 1);
 			else ATTR_UNLIKELY
 				return 1;
 		}
 		@endcode
+		@since x.x.x
+		@version x.x.x
 	*/
 	#define ATTR_LIKELY [[likely]]
 #else
@@ -652,16 +744,42 @@
 		@example
 		@code{.cpp}
 		constexpr double pow(doulbe x, uint64_t n) noexcept {
-			if (n > 0) ATTR_UNLIKELY
+			if (n > 0) ATTR_LIKELY
 				return x * pow(x, n - 1);
-			else ATTR_UNUNLIKELY
+			else ATTR_UNLIKELY
 				return 1;
 		}
 		@endcode
+		@since x.x.x
+		@version x.x.x
 	*/
 	#define ATTR_UNLIKELY [[unlikely]]
 #else
 	#define ATTR_UNLIKELY
+#endif
+
+#if defined(__cpp_deleted_function) && __cpp_deleted_function >= 202'403L
+	#define ATTR_DELETE_REASON(reason) = delete (reason)
+#else
+	#define ATTR_DELETE_REASON(reason) = delete
+#endif
+
+#if defined(ATTR_GCC) && !defined(ATTR_MSVC) && !defined(ATTR_CLANG)
+	#define ATTR_ONLY_GCC 1
+#else
+	#define ATTR_ONLY_GCC 0
+#endif
+
+#if defined(ATTR_CLANG) && !defined(ATTR_MSVC)
+	#define ATTR_ONLY_CLANG 1
+#else
+	#define ATTR_ONLY_CLANG 0
+#endif
+
+#if defined(ATTR_MSVC) && !defined(ATTR_CLANG) && !defined(ATTR_GCC)
+	#define ATTR_ONLY_MSVC 1
+#else
+	#define ATTR_ONLY_MSVC 0
 #endif
 
 #endif

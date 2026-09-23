@@ -18,6 +18,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED   ON)
 set(CMAKE_CXX_EXTENSIONS          OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+if(MSVC AND CMAKE_CXX_STANDARD EQUAL 26)
+    set(CMAKE_CXX_STANDARD_REQUIRED OFF)
+else()
+    set(CMAKE_CXX_STANDARD_REQUIRED ON)
+endif()
+
 # CMake 4.4 auto-enables C++20 module scanning when CMAKE_CXX_STANDARD >= 20.
 # That injects -fmodules-ts / -fmodule-mapper= / -x c++ into every compile,
 # which triggers ICEs on GCC 16.1.  The project does not use modules.
@@ -154,6 +160,8 @@ function(copy_resources tgt)
     endif()
 endfunction()
 
+set(SPDLOG_INCLUDE_DIR
+    "${CMAKE_CURRENT_SOURCE_DIR}/third_party/spdlog/include")
 # ----------------------------------------------------------------------------
 #  Main (release) executable
 # ----------------------------------------------------------------------------
@@ -321,6 +329,21 @@ if(BUILD_TRACY)
     find_package(Threads REQUIRED)
     target_link_libraries(tracy_app PRIVATE Threads::Threads)
 endif()
+
+if(MSVC)
+    target_compile_options(main_app     PRIVATE /std:c++latest)
+    target_compile_options(dev_app      PRIVATE /std:c++latest)
+    target_compile_options(valgrind_app PRIVATE /std:c++latest)
+    target_compile_options(benchmark_app PRIVATE /std:c++latest)
+    target_compile_options(test_app PRIVATE /std:c++latest)
+endif()
+
+# Header-only mode: no library to link, just the include path.
+target_include_directories(main_app     SYSTEM PRIVATE "${SPDLOG_INCLUDE_DIR}")
+target_include_directories(dev_app      SYSTEM PRIVATE "${SPDLOG_INCLUDE_DIR}")
+target_include_directories(valgrind_app SYSTEM PRIVATE "${SPDLOG_INCLUDE_DIR}")
+target_include_directories(benchmark_app SYSTEM PRIVATE "${SPDLOG_INCLUDE_DIR}")
+target_include_directories(test_app SYSTEM PRIVATE "${SPDLOG_INCLUDE_DIR}")
 
 # ----------------------------------------------------------------------------
 #  Shader compilation (optional)

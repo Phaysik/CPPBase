@@ -94,7 +94,7 @@ namespace Project::Utility::Debug::Logging
 		}
 		// LCOV_EXCL_BR_START — uncovered branch is the catch-clause type-mismatch fallthrough; only reachable if a non-spdlog_ex escapes
 		// basic_logger_mt (e.g. std::bad_alloc)
-		catch (const spdlog::spdlog_ex &ex)
+		catch (const spdlog::spdlog_ex &)
 		{
 			return false;
 		}
@@ -104,7 +104,7 @@ namespace Project::Utility::Debug::Logging
 	}
 
 // GCC incorrectly suggests returns_nonnull for reference-returning functions; suppress since references are inherently non-null.
-#if defined(ATTR_GCC) && !defined(ATTR_CLANG)
+#if ATTR_ONLY_GCC
 	#pragma GCC diagnostic push
 	#pragma GCC diagnostic ignored "-Wsuggest-attribute=returns_nonnull"
 #endif
@@ -130,7 +130,7 @@ namespace Project::Utility::Debug::Logging
 		return fileName;
 	}
 
-#if defined(ATTR_GCC) && !defined(ATTR_CLANG)
+#if ATTR_ONLY_GCC
 	#pragma GCC diagnostic pop
 #endif
 } // namespace Project::Utility::Debug::Logging
