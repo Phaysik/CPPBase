@@ -1,10 +1,12 @@
 {
+	"options": {
+		"cwd": "${workspaceFolder}"
+	},
 	"tasks": [
 		{
 			"type": "shell",
 			"label": "Release build",
-			"command": "make",
-			"args": ["release"],
+			"command": "export PATH=\"$HOME/.local/bin:$PATH\" && cmake --preset gcc-release && cmake --build --preset gcc-release",
 			"group": {
 				"kind": "build",
 				"isDefault": true
@@ -14,8 +16,7 @@
 		{
 			"type": "shell",
 			"label": "Dev build",
-			"command": "make",
-			"args": ["dev"],
+			"command": "export PATH=\"$HOME/.local/bin:$PATH\" && cmake --preset gcc-dev && cmake --build --preset gcc-dev",
 			"group": {
 				"kind": "build"
 			},
@@ -24,8 +25,7 @@
 		{
 			"type": "shell",
 			"label": "Debug build",
-			"command": "make",
-			"args": ["debug"],
+			"command": "export PATH=\"$HOME/.local/bin:$PATH\" && cmake --preset gcc-debug && cmake --build --preset gcc-debug",
 			"group": {
 				"kind": "build"
 			},
@@ -34,8 +34,7 @@
 		{
 			"type": "shell",
 			"label": "Debug tests",
-			"command": "make",
-			"args": ["build_tests"],
+			"command": "export PATH=\"$HOME/.local/bin:$PATH\" && cmake --preset coverage && cmake --build --preset coverage",
 			"group": {
 				"kind": "build"
 			},
