@@ -11,6 +11,10 @@
 		"cwd": "$ZED_WORKTREE_ROOT",
 		"env": {
 			"ASAN_OPTIONS": "detect_leaks=0"
+		},
+		"build": {
+			"command": "export PATH=\"$HOME/.local/bin:$PATH\" && cmake --preset clang-debug && cmake --build --preset clang-debug",
+			"cwd": "$ZED_WORKTREE_ROOT"
 		}
 	},
 	{
@@ -21,6 +25,10 @@
 		"cwd": "$ZED_WORKTREE_ROOT",
 		"env": {
 			"ASAN_OPTIONS": "detect_leaks=0"
+		},
+		"build": {
+			"command": "export PATH=\"$HOME/.local/bin:$PATH\" && cmake --preset clang-tests && cmake --build --preset clang-tests",
+			"cwd": "$ZED_WORKTREE_ROOT"
 		}
 	}
 ]
