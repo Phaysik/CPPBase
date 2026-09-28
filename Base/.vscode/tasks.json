@@ -15,15 +15,6 @@
 		},
 		{
 			"type": "shell",
-			"label": "Dev build",
-			"command": "export PATH=\"$HOME/.local/bin:$PATH\" && cmake --preset gcc-dev && cmake --build --preset gcc-dev",
-			"group": {
-				"kind": "build"
-			},
-			"problemMatcher": ["$gcc"]
-		},
-		{
-			"type": "shell",
 			"label": "Debug build",
 			"command": "export PATH=\"$HOME/.local/bin:$PATH\" && cmake --preset gcc-debug && cmake --build --preset gcc-debug",
 			"group": {
