@@ -42,6 +42,7 @@ setUpGCC() {
 	sudo mv /lib/x86_64-linux-gnu/libstdc++.so.6 /lib/x86_64-linux-gnu/libstdc++.so-copy.6
 
 	sudo ln -sf /usr/local/gcc-"$2"/lib64/libstdc++.so.6 /lib/x86_64-linux-gnu
+	sudo ln -sf /usr/local/gcc-"$2"/lib64/libstdc++.so.6.0.36 /lib/x86_64-linux-gnu
 	sudo ldconfig
 }
 
