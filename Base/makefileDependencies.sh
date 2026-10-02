@@ -359,7 +359,7 @@ main() {
 			setUpConfigCat
 		fi
 
-		gpp_desired_version="16.1.0"
+		gpp_desired_version="16.2.0"
 		gpp_priority="16"
 		echo "Setting up g++"
 
