@@ -30,6 +30,8 @@ on:
         'meson.build',
         '**.cmake',
         '**CMakePresets.json',
+        '.github/workflows/codeql-analysis.yml',
+        'vcpkg.json',
       ]
   pull_request:
     branches:
@@ -49,6 +51,8 @@ on:
         'meson.build',
         '**.cmake',
         '**CMakePresets.json',
+        '.github/workflows/codeql-analysis.yml',
+        'vcpkg.json',
       ]
   schedule:
     - cron: '15 8 * * 6'
@@ -88,6 +92,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+
+      - name: Set up vcpkg
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgDirectory: '${{ runner.temp }}/vcpkg'
+
+      - name: Set VCPKG_ROOT
+        run: echo "VCPKG_ROOT=${{ runner.temp }}/vcpkg" >> "$GITHUB_ENV"
 
       - name: Set up Cache Site
         run: mkdir -p ./cache

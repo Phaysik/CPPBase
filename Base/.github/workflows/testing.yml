@@ -19,6 +19,8 @@ on:
         'meson.build',
         '**.cmake',
         '**CMakePresets.json',
+        '.github/workflows/testing.yml',
+        'vcpkg.json',
       ]
   pull_request:
     branches:
@@ -38,6 +40,8 @@ on:
         'meson.build',
         '**.cmake',
         '**CMakePresets.json',
+        '.github/workflows/testing.yml',
+        'vcpkg.json',
       ]
 
 jobs:
@@ -52,6 +56,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+
+      - name: Set up vcpkg
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgDirectory: '${{ runner.temp }}/vcpkg'
+
+      - name: Set VCPKG_ROOT
+        run: echo "VCPKG_ROOT=${{ runner.temp }}/vcpkg" >> "$GITHUB_ENV"
 
       - name: Set up Cache Site
         run: mkdir -p ./cache

@@ -42,6 +42,7 @@ setUpGCC() {
 	sudo mv /lib/x86_64-linux-gnu/libstdc++.so.6 /lib/x86_64-linux-gnu/libstdc++.so-copy.6
 
 	sudo ln -sf /usr/local/gcc-"$2"/lib64/libstdc++.so.6 /lib/x86_64-linux-gnu
+	sudo ln -sf /usr/local/gcc-"$2"/lib64/libstdc++.so.6.0.36 /lib/x86_64-linux-gnu
 	sudo ldconfig
 }
 
@@ -132,108 +133,6 @@ setUpLCOV() {
 	sudo update-alternatives --install /usr/bin/llvm2lcov llvm2lcov /usr/local/bin/llvm2lcov 25
 }
 
-setUpTracy() {
-	echo "Setting up Tracy Profiler"
-
-	sudo apt-get install g++-11 gcc-11 meson libfreetype6-dev libcapstone-dev libegl1-mesa-dev libxkbcommon-dev libwayland-dev libdbus-1-dev libglfw3 libglfw3-dev wayland-protocols xsltproc xmlto -y
-	sudo cp -r /usr/include/freetype2/* /usr/include/
-	sudo cp -r /usr/include/capstone/* /usr/include/
-	sudo cp -r /usr/include/dbus-1.0/* /usr/include/
-
-	sudo apt-get remove rustc cargo
-	sudo curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh || true
-	sudo sh -c source "${HOME}"/.cargo/env
-
-	cargo install mdbook
-	sudo cp ~/.cargo/bin/mdbook /usr/local/bin/
-
-	# Setup Wayland
-	git clone https://gitlab.freedesktop.org/wayland/wayland.git
-	cd wayland || exit
-
-	sudo meson setup build
-	sudo meson compile -C build
-	sudo meson install -C build
-
-	cd ..
-	sudo rm -rf wayland
-
-	cd tracy-latest || exit
-
-	sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-11 11
-	sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 11
-
-	sudo ln -s /usr/local/gcc-15/bin/g++ /usr/bin/g++-15
-
-	# Set up Tracy
-	git clone https://github.com/wolfpld/tracy.git
-
-	# For installing the Client of Tracy
-	mkdir build
-	cd build || exit
-	cmake ..
-	make
-	sudo make install
-	cd ..
-
-	# For installing the Server of Tracy
-	cd profiler || exit
-	mkdir build
-	cd build || exit
-
-	export PKG_CONFIG_PATH=/usr/local/lib/x86_64-linux-gnu/pkgconfig:${PKG_CONFIG_PATH}
-	export LD_LIBRARY_PATH=/usr/local/gcc-15/lib64:${LD_LIBRARY_PATH}
-	export LDFLAGS="-L/usr/local/lib/x86_64-linux-gnu -Wl,-rpath,/usr/local/lib/x86_64-linux-gnu"
-
-	cmake ..
-	make -j"$(nproc)" || true
-	sudo cp tracy-profiler /usr/bin/
-
-	# Remove Tracy files from local
-	cd ..
-	cd ..
-	cd ..
-	sudo rm -rf tracy-latest
-
-	sudo cp -r /usr/local/include/tracy /usr/include/
-	sudo cp /usr/local/lib/libTracy* /usr/lib/
-
-	sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-"$1" "$1"
-	sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-"$1" "$1"
-}
-
-setUpConfigCat() {
-	echo "Setting up Config Cat Feature Flags"
-
-	git clone https://github.com/microsoft/vcpkg
-	sudo ./vcpkg/bootstrap-vcpkg.sh
-	sudo ./vcpkg/vcpkg install configcat
-
-	cd vcpkg || exit
-	cd packages || exit
-	cd configcat_x64-linux || exit
-
-	sudo cp ./lib/* /usr/lib/
-	sudo cp -r ./include/* /usr/include/
-
-	cd ..
-	cd curl_x64-linux || exit
-
-	sudo cp -r ./lib/* /usr/lib/
-	sudo cp -r ./include/* /usr/include/
-
-	cd ..
-	cd hash-library_x64-linux || exit
-
-	sudo cp ./lib/* /usr/lib/
-	sudo cp -r ./include/* /usr/include/
-
-	cd ..
-	cd ..
-	cd ..
-	sudo rm -rf vcpkg
-}
-
 installVulkan() {
 	echo "Installing build essentials..."
 	sudo apt-get update
@@ -287,47 +186,6 @@ installVulkan() {
 	echo "Verify installation by running: vkcube"
 }
 
-installBenchmark() {
-	git clone https://github.com/google/benchmark.git
-	cd benchmark || exit
-
-	sudo cmake -E make_directory "build"
-
-	sudo cmake -DBENCHMARK_DOWNLOAD_DEPENDENCIES=on -DCMAKE_BUILD_TYPE=Release -S . -B "build"
-
-	sudo cmake --build "build" --config Release --target install
-
-	sudo cp /usr/local/lib/libbench* /usr/lib/
-	sudo cp -r /usr/local/include/benchmark* /usr/include
-	sudo cp /usr/local/lib/pkgconfig/benchmark* /usr/lib/pkgconfig/
-	sudo cp -r /usr/local/lib/cmake/benchmark /usr/lib/cmake/
-	sudo cp -r /usr/local/share/doc/benchmark /usr/share/doc/
-	sudo cp -r /usr/local/share/googlebenchmark /usr/share
-
-	cd ..
-	sudo rm -rf benchmark
-}
-
-installSpdlog() {
-	git clone https://github.com/gabime/spdlog.git
-	cd spdlog || exit
-
-	sudo mkdir -p build
-	cd build || exit
-
-	sudo cmake ..
-	sudo make install
-
-	sudo cp /usr/local/lib/libspdlog* /usr/lib/
-	sudo cp -r /usr/local/lib/cmake/spdlog /usr/lib/cmake/
-	sudo cp /usr/local/lib/pkgconfig/spdlog* /usr/lib/pkgconfig/
-	sudo cp -r /usr/local/include/spdlog* /usr/include
-
-	cd ..
-	cd ..
-	sudo rm -rf spdlog
-}
-
 main() {
 	echo "This shell file is set up to only work on Ubuntu operating systems"
 
@@ -344,7 +202,7 @@ main() {
 
 		echo "Installing all the required packages for all commands used in the Makefile"
 
-		sudo apt-get install make libgtest-dev libgmock-dev python3-pip docker-compose catch2 -y
+		sudo apt-get install make python3-pip docker-compose -y
 
 		pip3 install cmake --break-system-packages
 
@@ -352,14 +210,7 @@ main() {
 		sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-14 14
 		sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 10
 
-		if [[ -f "/usr/lib/libconfigcat.a" ]]; then
-			echo "Config Cat already exists"
-		else
-			echo "Setting up Config Cat"
-			setUpConfigCat
-		fi
-
-		gpp_desired_version="16.1.0"
+		gpp_desired_version="16.2.0"
 		gpp_priority="16"
 		echo "Setting up g++"
 
@@ -377,30 +228,6 @@ main() {
 			echo "clang-${clang_desired_version} exists"
 		else
 			setUpClang "${clang_priority}"
-		fi
-
-		if [[ -f "/usr/lib/libgtest.a" ]] && [[ -f "/usr/lib/libgtest_main.a" ]]; then
-			echo "Google Test already exists"
-		else
-			echo "Setting up Google Test"
-			cd /usr/src/gtest || exit
-			sudo cmake CMakeLists.txt
-			sudo make
-			sudo cp ./lib/libgtest*.a /usr/lib
-		fi
-
-		if [[ -f "/usr/lib/libbenchmark.a" ]] && [[ -f "/usr/lib/libbenchmark_main.a" ]]; then
-			echo "Google Benchmark already exists"
-		else
-			echo "Setting up Google Benchmark"
-			installBenchmark
-		fi
-
-		if [[ -f "/usr/lib/libspdlog.a" ]]; then
-			echo "Spdlog already exists"
-		else
-			echo "Setting up Spdlog"
-			installSpdlog
 		fi
 
 		checkSphinx
@@ -447,12 +274,6 @@ main() {
 				fi
 			else
 				installDoxygen "${doxygen_desired_version}"
-			fi
-
-			if [[ -x "$(command -v tracy-profiler || true)" ]]; then
-				echo "tracy-profiler already exists"
-			else
-				setUpTracy "${gpp_priority}"
 			fi
 
 			vulkan_desired_version="1.4.341.1"
