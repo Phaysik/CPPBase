@@ -122,6 +122,10 @@ jobs:
         run: |
           sudo mkdir -p /usr/local/gcc-latest
           sudo cp -r ./cache/gcc-latest/* /usr/local/gcc-latest/
+          sudo mv /lib/x86_64-linux-gnu/libstdc++.so.6 /lib/x86_64-linux-gnu/libstdc++.so-copy.6
+          sudo ln -sf /usr/local/gcc-latest/lib64/libstdc++.so.6 /lib/x86_64-linux-gnu
+          sudo ln -sf /usr/local/gcc-latest/lib64/libstdc++.so.6.0.36 /lib/x86_64-linux-gnu
+          sudo ldconfig
           sudo update-alternatives --install /usr/bin/g++ g++ /usr/local/gcc-latest/bin/g++ 100
           sudo update-alternatives --install /usr/bin/gcc gcc /usr/local/gcc-latest/bin/gcc 100
           sudo update-alternatives --install /usr/bin/gcov gcov /usr/local/gcc-latest/bin/gcov 100
