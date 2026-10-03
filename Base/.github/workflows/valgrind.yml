@@ -73,11 +73,6 @@ jobs:
           mkdir -p ./cache/apt-packages
           mkdir -p ./cache/apt-lists
 
-      - name: Set up Google Test Cache Site
-        run: |
-          mkdir -p ./cache/gtest/lib
-          mkdir -p ./cache/gtest/include
-
       - name: Set up Config Cat Cache Site
         run: |
           mkdir -p ./cache/configcat/lib
@@ -121,16 +116,6 @@ jobs:
           key: ${{ runner.os }}-apt-lists-${{ hashFiles('makefileDependencies.sh') }}
           restore-keys: |
             ${{ runner.os }}-apt-lists-
-
-      - name: Cache Google Test
-        id: cache-google-tests
-        uses: actions/cache@v5
-        with:
-          path: |
-            ./cache/gtest
-          key: ${{ runner.os }}-google-tests-${{ hashFiles('makefileDependencies.sh') }}
-          restore-keys: |
-            ${{ runner.os }}-google-tests-
 
       - name: Cache Config Cat
         id: cache-config-cat
@@ -189,13 +174,6 @@ jobs:
       - name: Install Apt Lists From Cache
         if: steps.cache-apt-lists.outputs.cache-hit == 'true'
         run: sudo cp -r ./cache/apt-lists/lists/* /var/lib/apt/lists
-
-      - name: Install Google Test From Cache
-        if: steps.cache-google-tests.outputs.cache-hit == 'true'
-        run: |
-          sudo cp -r ./cache/gtest/lib/* /usr/lib
-          sudo mkdir -p /usr/include/gtest
-          sudo cp -r ./cache/gtest/include/* /usr/include/gtest
 
       - name: Install Config Cat From Cache
         if: steps.cache-config-cat.outputs.cache-hit == 'true'
@@ -268,11 +246,6 @@ jobs:
       - name: Save Apt Lists Cache
         run: |
           sudo cp -r /var/lib/apt/lists ./cache/apt-lists
-
-      - name: Save Google Test Cache
-        run: |
-          sudo cp -r /usr/lib/libgtest* ./cache/gtest/lib
-          sudo cp -r /usr/include/gtest/* ./cache/gtest/include
 
       - name: Save Config Cat Cache
         run: |
