@@ -137,7 +137,7 @@ jobs:
             sudo ./llvm.sh 24
             rm llvm.sh
             sudo apt update
-            sudo apt-get install python3-pip libgmock-dev catch2 clang++-24 python3-sphinx build-essential libcapture-tiny-perl libdatetime-perl -y
+            sudo apt-get install python3-pip clang++-24 python3-sphinx build-essential libcapture-tiny-perl libdatetime-perl -y
             sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-24 24
             sudo update-alternatives --set clang++ /usr/bin/clang++-24
             pip3 install --upgrade pip --break-system-packages
