@@ -160,20 +160,18 @@ function(copy_resources tgt)
     endif()
 endfunction()
 
-if(MSVC)
-    set(SPDLOG_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/spdlog/include")
-endif()
-
 # ----------------------------------------------------------------------------
 #  Main (release) executable
 # ----------------------------------------------------------------------------
 add_executable(main_app ${PROJECT_SOURCES})
 set_target_properties(main_app PROPERTIES OUTPUT_NAME "main")
 target_include_directories(main_app PRIVATE "${INC_DIR}")
+find_package(spdlog CONFIG REQUIRED)
 # ORDER MATTERS: Warnings first, ReleaseFlags second.  See CompilerWarnings.cmake.
 target_link_libraries(main_app PRIVATE
     Project::Warnings
     Project::ReleaseFlags
+    spdlog::spdlog
 )
 apply_release_flags(main_app)
 copy_resources(main_app)
@@ -184,7 +182,10 @@ copy_resources(main_app)
 add_executable(dev_app ${PROJECT_SOURCES})
 set_target_properties(dev_app PROPERTIES OUTPUT_NAME "dev")
 target_include_directories(dev_app PRIVATE "${INC_DIR}")
-target_link_libraries(dev_app PRIVATE Project::Warnings)
+target_link_libraries(dev_app PRIVATE
+    Project::Warnings
+    spdlog::spdlog
+)
 apply_debug_flags(dev_app)
 if(ENABLE_SANITIZERS)
     target_link_libraries(dev_app PRIVATE Project::Sanitizers)
@@ -197,7 +198,10 @@ copy_resources(dev_app)
 add_executable(valgrind_app ${PROJECT_SOURCES})
 set_target_properties(valgrind_app PROPERTIES OUTPUT_NAME "valgrind")
 target_include_directories(valgrind_app PRIVATE "${INC_DIR}")
-target_link_libraries(valgrind_app PRIVATE Project::Warnings)
+target_link_libraries(valgrind_app PRIVATE
+    Project::Warnings
+    spdlog::spdlog
+)
 apply_valgrind_flags(valgrind_app)
 copy_resources(valgrind_app)
 
@@ -214,7 +218,10 @@ if(BUILD_BENCHMARKS)
     add_executable(benchmark_app ${BENCH_SOURCES} ${PROJECT_SUPPORT_SOURCES})
     set_target_properties(benchmark_app PROPERTIES OUTPUT_NAME "benchmarks")
     target_include_directories(benchmark_app PRIVATE "${INC_DIR}")
-    target_link_libraries(benchmark_app PRIVATE Project::Warnings)
+    target_link_libraries(benchmark_app PRIVATE
+        Project::Warnings
+        spdlog::spdlog
+    )
 
     find_package(benchmark CONFIG REQUIRED)
     target_link_libraries(benchmark_app PRIVATE benchmark::benchmark)
@@ -268,7 +275,10 @@ if(BUILD_TESTS)
     if(EXISTS "${TEST_INC_DIR}")
         target_include_directories(test_app PRIVATE "${TEST_INC_DIR}")
     endif()
-    target_link_libraries(test_app PRIVATE Project::Warnings)
+    target_link_libraries(test_app PRIVATE
+        Project::Warnings
+        spdlog::spdlog
+    )
 
     if(TEST_STANDARD STREQUAL "catch2")
         find_package(Catch2 CONFIG REQUIRED)
@@ -318,18 +328,27 @@ if(BUILD_TRACY)
 
     add_executable(tracy_app ${_tracy_srcs})
     set_target_properties(tracy_app PROPERTIES OUTPUT_NAME "tracy-client")
-    target_compile_definitions(tracy_app PRIVATE
-        TRACY_ENABLE TRACY_TIMER_FALLBACK TRACY_ON_DEMAND)
     target_include_directories(tracy_app PRIVATE "${INC_DIR}")
     target_link_libraries(tracy_app PRIVATE
         Project::Warnings
         Project::ReleaseFlags
+        spdlog::spdlog
     )
-    apply_release_flags(tracy_app)
-    copy_resources(tracy_app)
+
+    find_package(tracy CONFIG REQUIRED)
+    target_link_libraries(tracy_app PRIVATE tracy::tracy)
 
     find_package(Threads REQUIRED)
     target_link_libraries(tracy_app PRIVATE Threads::Threads)
+
+    target_compile_definitions(tracy_app PRIVATE
+        TRACY_ENABLE
+        TRACY_TIMER_FALLBACK
+        TRACY_ON_DEMAND
+    )
+
+    apply_release_flags(tracy_app)
+    copy_resources(tracy_app)
 endif()
 
 if(MSVC)
@@ -340,14 +359,6 @@ if(MSVC)
     target_compile_options(test_app PRIVATE /std:c++latest)
 endif()
 
-if(MSVC)
-    # Header-only mode: no library to link, just the include path.
-    target_include_directories(main_app     SYSTEM PRIVATE "${SPDLOG_INCLUDE_DIR}")
-    target_include_directories(dev_app      SYSTEM PRIVATE "${SPDLOG_INCLUDE_DIR}")
-    target_include_directories(valgrind_app SYSTEM PRIVATE "${SPDLOG_INCLUDE_DIR}")
-    target_include_directories(benchmark_app SYSTEM PRIVATE "${SPDLOG_INCLUDE_DIR}")
-    target_include_directories(test_app SYSTEM PRIVATE "${SPDLOG_INCLUDE_DIR}")
-endif()
 
 # ----------------------------------------------------------------------------
 #  Shader compilation (optional)
