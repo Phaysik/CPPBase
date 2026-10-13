@@ -14,7 +14,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-using Project::Utility::Input;
+using Project::Utility::IO::Input;
 
 // NOLINTBEGIN(misc-const-correctness,cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
 

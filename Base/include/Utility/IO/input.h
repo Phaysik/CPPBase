@@ -25,7 +25,7 @@
 	@since x.x.x
 	@author Matthew Moore
 */
-namespace Project::Utility
+namespace Project::Utility::IO
 {
 	/*! @class Input input.h "include/input.h"
 		@brief Will try and extract valid user input and clean up the input buffer as needed
