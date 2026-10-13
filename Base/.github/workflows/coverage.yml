@@ -165,11 +165,17 @@ jobs:
       - name: Generate HTML report
         run: cmake --build --preset genhtml || true
 
+      - name: Prepare Codecov report by removing excluded branch records
+        run: |
+          awk '!/^BRDA:[0-9]+,[ef]?U[0-9]+,/' \
+            build/coverage/coverage.info \
+            > build/coverage/coverage.codecov.info
+
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v7
         with:
-          files: build/coverage/coverage.info
-          disable_search: true # only upload the curated coverage.info, don't scan the repo
+          files: build/coverage/coverage.codecov.info
+          disable_search: true # only upload the curated report, don't scan the repo
           plugins: noop # don't run the gcov plugin, which would re-derive coverage (incl. tests/) from build artifacts
           flags: unittests
           name: gcc-coverage
@@ -185,6 +191,7 @@ jobs:
             name: coverage-report
             path: |
                 build/coverage/coverage.info
+                build/coverage/coverage.codecov.info
                 build/coverage/coverage/
             if-no-files-found: warn
 
