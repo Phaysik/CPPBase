@@ -51,6 +51,8 @@ option(WARNINGS_AS_ERRORS "Treat warnings as errors"                       ON)
 option(ENABLE_SANITIZERS  "Enable ASan/UBSan on the dev target"            ON)
 option(ENABLE_COVERAGE    "Enable coverage instrumentation on tests"       OFF)
 option(ENABLE_PROFILING   "Enable gprof (-pg) on the dev target"           OFF)
+option(ENABLE_CONTRACTS   "Enable C++26 contracts"                         ON)
+option(ENABLE_REFLECTION  "Enable C++26 reflection"                        ON)
 
 set(TEST_OPTION "full" CACHE STRING "Which tests to build")
 set_property(CACHE TEST_OPTION PROPERTY STRINGS full integrations mocks unit)
@@ -96,6 +98,8 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(CompilerWarnings)
 include(Sanitizers)
 include(Coverage)
+include(Contracts)
+include(Reflection)
 
 # ----------------------------------------------------------------------------
 #  Helper functions
@@ -170,6 +174,8 @@ find_package(spdlog CONFIG REQUIRED)
 # ORDER MATTERS: Warnings first, ReleaseFlags second.  See CompilerWarnings.cmake.
 target_link_libraries(main_app PRIVATE
     Project::Warnings
+    Project::ContractsRelease
+    Project::Reflection
     Project::ReleaseFlags
     spdlog::spdlog
 )
@@ -184,6 +190,8 @@ set_target_properties(dev_app PROPERTIES OUTPUT_NAME "dev")
 target_include_directories(dev_app PRIVATE "${INC_DIR}")
 target_link_libraries(dev_app PRIVATE
     Project::Warnings
+    Project::ContractsDebug
+    Project::Reflection
     spdlog::spdlog
 )
 apply_debug_flags(dev_app)
@@ -200,6 +208,8 @@ set_target_properties(valgrind_app PROPERTIES OUTPUT_NAME "valgrind")
 target_include_directories(valgrind_app PRIVATE "${INC_DIR}")
 target_link_libraries(valgrind_app PRIVATE
     Project::Warnings
+    Project::ContractsDebug
+    Project::Reflection
     spdlog::spdlog
 )
 apply_valgrind_flags(valgrind_app)
@@ -220,6 +230,8 @@ if(BUILD_BENCHMARKS)
     target_include_directories(benchmark_app PRIVATE "${INC_DIR}")
     target_link_libraries(benchmark_app PRIVATE
         Project::Warnings
+        Project::ContractsRelease
+        Project::Reflection
         spdlog::spdlog
     )
 
@@ -277,6 +289,8 @@ if(BUILD_TESTS)
     endif()
     target_link_libraries(test_app PRIVATE
         Project::Warnings
+        Project::ContractsDebug
+        Project::Reflection
         spdlog::spdlog
     )
 
@@ -331,6 +345,8 @@ if(BUILD_TRACY)
     target_include_directories(tracy_app PRIVATE "${INC_DIR}")
     target_link_libraries(tracy_app PRIVATE
         Project::Warnings
+        Project::ContractsRelease
+        Project::Reflection
         Project::ReleaseFlags
         spdlog::spdlog
     )
@@ -352,11 +368,18 @@ if(BUILD_TRACY)
 endif()
 
 if(MSVC)
-    target_compile_options(main_app     PRIVATE /std:c++latest)
-    target_compile_options(dev_app      PRIVATE /std:c++latest)
-    target_compile_options(valgrind_app PRIVATE /std:c++latest)
-    target_compile_options(benchmark_app PRIVATE /std:c++latest)
-    target_compile_options(test_app PRIVATE /std:c++latest)
+    foreach(_tgt main_app dev_app valgrind_app)
+        target_compile_options(${_tgt} PRIVATE /std:c++latest)
+    endforeach()
+    if(TARGET benchmark_app)
+        target_compile_options(benchmark_app PRIVATE /std:c++latest)
+    endif()
+    if(TARGET test_app)
+        target_compile_options(test_app PRIVATE /std:c++latest)
+    endif()
+    if(TARGET tracy_app)
+        target_compile_options(tracy_app PRIVATE /std:c++latest)
+    endif()
 endif()
 
 

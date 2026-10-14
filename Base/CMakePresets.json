@@ -47,7 +47,9 @@
 			"cacheVariables": {
 				"BUILD_TESTS": "OFF",
 				"CMAKE_BUILD_TYPE": "Release",
-				"CMAKE_CXX_COMPILER": "clang++"
+				"CMAKE_CXX_COMPILER": "clang++",
+				"ENABLE_CONTRACTS": "OFF",
+				"ENABLE_REFLECTION": "OFF"
 			}
 		},
 		{
@@ -56,7 +58,9 @@
 			"displayName": "Clang / Debug (Ninja)",
 			"cacheVariables": {
 				"BUILD_TESTS": "OFF",
-				"CMAKE_BUILD_TYPE": "Debug"
+				"CMAKE_BUILD_TYPE": "Debug",
+				"ENABLE_CONTRACTS": "OFF",
+				"ENABLE_REFLECTION": "OFF"
 			}
 		},
 		{
@@ -66,7 +70,9 @@
 			"cacheVariables": {
 				"BUILD_TESTS": "OFF",
 				"CMAKE_BUILD_TYPE": "Release",
-				"CMAKE_CXX_COMPILER": "cl"
+				"CMAKE_CXX_COMPILER": "cl",
+				"ENABLE_CONTRACTS": "OFF",
+				"ENABLE_REFLECTION": "OFF"
 			},
 			"condition": {
 				"type": "equals",
@@ -80,7 +86,9 @@
 			"displayName": "MSVC / Debug (Ninja)",
 			"cacheVariables": {
 				"BUILD_TESTS": "OFF",
-				"CMAKE_BUILD_TYPE": "Debug"
+				"CMAKE_BUILD_TYPE": "Debug",
+				"ENABLE_CONTRACTS": "OFF",
+				"ENABLE_REFLECTION": "OFF"
 			}
 		},
 		{
@@ -90,7 +98,9 @@
 			"cacheVariables": {
 				"BUILD_TESTS": "OFF",
 				"CMAKE_BUILD_TYPE": "Release",
-				"CMAKE_CXX_COMPILER": "clang-cl"
+				"CMAKE_CXX_COMPILER": "clang-cl",
+				"ENABLE_CONTRACTS": "OFF",
+				"ENABLE_REFLECTION": "OFF"
 			},
 			"condition": {
 				"type": "equals",
@@ -117,7 +127,9 @@
 				"CMAKE_BUILD_TYPE": "Debug",
 				"BUILD_TESTS": "ON",
 				"TEST_STANDARD": "catch2",
-				"VCPKG_MANIFEST_FEATURES": "with-tests"
+				"VCPKG_MANIFEST_FEATURES": "with-tests",
+				"ENABLE_CONTRACTS": "OFF",
+				"ENABLE_REFLECTION": "OFF"
 			}
 		},
 		{
@@ -162,7 +174,9 @@
 				"BUILD_TESTS": "ON",
 				"ENABLE_COVERAGE": "OFF",
 				"ENABLE_SANITIZERS": "OFF",
-				"WARNINGS_AS_ERRORS": "OFF"
+				"WARNINGS_AS_ERRORS": "OFF",
+				"ENABLE_CONTRACTS": "OFF",
+				"ENABLE_REFLECTION": "OFF"
 			}
 		},
 		{
