@@ -1,7 +1,6 @@
 CompileFlags:
-    CompilationDatabase: ../build/gcc-release/
-    Remove: ["-fimplicit-constexpr", "-fhardened"]
-    Add: ["-std=c++2c", "-ferror-limit=0", "-Iinclude"]
+    CompilationDatabase: ./build/gcc-release/
+    Add: ["-Iinclude"]
 
 Diagnostics:
     ClangTidy:
