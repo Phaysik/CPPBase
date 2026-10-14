@@ -9,6 +9,7 @@
 #ifndef BASE_INCLUDE_CCONCEPTS_H
 #define BASE_INCLUDE_CCONCEPTS_H
 
+#include <ratio>
 #include <string>
 #include <type_traits>
 
@@ -24,6 +25,8 @@ namespace Project::Core
 	/*! @concept Integral
 		@brief Tests whether a type is an integral type.
 		@tparam T The type to test. Typical examples: `int`, `long`, `char`.
+		@since x.x.x
+		@version x.x.x
 	*/
 	template <typename T>
 	concept Integral = std::is_integral_v<T>;
@@ -31,6 +34,8 @@ namespace Project::Core
 	/*! @concept UnsignedIntegral
 		@brief Tests whether a type is an unsigned integral type.
 		@tparam T The type to test. Typical examples: `unsigned int`, `std::uint32_t`.
+		@since x.x.x
+		@version x.x.x
 	*/
 	template <typename T>
 	concept UnsignedIntegral = std::is_unsigned_v<T>;
@@ -38,6 +43,8 @@ namespace Project::Core
 	/*! @concept SignedIntegral
 		@brief Tests whether a type is a signed integral type.
 		@tparam T The type to test. Typical examples: `int`, `long`.
+		@since x.x.x
+		@version x.x.x
 	*/
 	template <typename T>
 	concept SignedIntegral = std::is_signed_v<T>;
@@ -45,6 +52,8 @@ namespace Project::Core
 	/*! @concept FloatingPoint
 		@brief Tests whether a type is a floating-point type.
 		@tparam T The type to test. Typical examples: `float`, `double`, `long double`.
+		@since x.x.x
+		@version x.x.x
 	*/
 	template <typename T>
 	concept FloatingPoint = std::is_floating_point_v<T>;
@@ -54,6 +63,8 @@ namespace Project::Core
 		@details This concept is satisfied if `T` is either an `Integral` or a `FloatingPoint`.
 		Use this to constrain templates that accept any numeric type that models rational numbers.
 		@tparam T The type to test. Accepts both integral and floating-point types.
+		@since x.x.x
+		@version x.x.x
 	*/
 	template <typename T>
 	concept RationalNumber = Integral<T> || FloatingPoint<T>;
@@ -64,6 +75,8 @@ namespace Project::Core
 		It is satisfied for `std::string`, `const std::string&`, `std::string&&`, etc.
 		@tparam T The type to test. Use this to constrain templates that require `std::string` specifically.
 		@note This concept does not accept C-style strings (e.g., `const char*`).
+		@since x.x.x
+		@version x.x.x
 	*/
 	template <typename T>
 	concept String = std::is_same_v<std::string, std::remove_cvref_t<T>>;
@@ -74,6 +87,8 @@ namespace Project::Core
 		@details This concept is satisfied when `std::invocable<Func>` is true, i.e. the callable
 		can be invoked with an empty argument list. Use this to constrain templates that accept
 		parameterless callables submitted to thread pools or deferred tasks.
+		@since x.x.x
+		@version x.x.x
 	*/
 	template <class Func>
 	concept InvocableNoArgs = std::invocable<Func>;
@@ -85,6 +100,8 @@ namespace Project::Core
 		@details This concept is satisfied when `std::invocable<Func, Args...>` is true, i.e. the
 		callable can be invoked with the given `Args...`. Use this to constrain templates that accept
 		callables and their arguments for asynchronous invocation or task scheduling.
+		@since x.x.x
+		@version x.x.x
 	*/
 	template <class Func, class... Args>
 	concept InvocableWithArgs = std::invocable<Func, Args...>;
@@ -92,9 +109,27 @@ namespace Project::Core
 	/*! @concept IsEnum
 		@brief Tests whether a type is an enumeration type.
 		@tparam T The type to test. Typical examples: scoped enums (`enum class`) and unscoped enums (`enum`).
+		@since x.x.x
+		@version x.x.x
 	*/
 	template <typename T>
 	concept IsEnum = std::is_enum_v<T>;
+
+	/*! @concept Ratio
+		@brief Tests whether a type is a normalized std::ratio specialization.
+		@details Requires T to be identical to std::ratio<T::num, T::den>, reconstructed from its normalized numerator and denominator.
+		@tparam T The type to test; its num and den constants, when present, must form a valid std::ratio specialization.
+		@note Does not remove cv/ref qualifiers. std::ratio<1, 2> satisfies the concept, but std::ratio<2, 4> and const std::ratio<1, 2> do
+	   not.
+		@since x.x.x
+		@version x.x.x
+		@author Matthew Moore
+	*/
+	template <typename T>
+	concept Ratio = requires {
+		T::num;
+		T::den;
+	} && std::is_same_v<T, std::ratio<T::num, T::den>>;
 } // namespace Project::Core
 
 #endif

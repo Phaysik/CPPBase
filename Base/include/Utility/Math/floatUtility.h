@@ -6,8 +6,8 @@
 	@author Matthew Moore
 */
 
-#ifndef INCLUDE_FLOATUTILITY_H
-#define INCLUDE_FLOATUTILITY_H
+#ifndef INCLUDE_UTILITY_MATH_FLOATUTILITY_H
+#define INCLUDE_UTILITY_MATH_FLOATUTILITY_H
 
 #include <algorithm>
 #include <cmath>
@@ -35,7 +35,7 @@ namespace Project::Utility::Math
 		@note This is a reasonable default but may be tightened or relaxed depending on the
 		numerical domain. Callers may provide an explicit `absEpsilon` to `approximatelyEqualAbsRel`.
 	*/
-	constexpr double ABS_EPSILON{1e-12};
+	inline constexpr double ABS_EPSILON{1e-12};
 
 	/*! @brief Relative tolerance used for scale-aware comparisons of non-zero values.
 		@details When two values are sufficiently far from zero, this relative epsilon is
@@ -43,7 +43,7 @@ namespace Project::Utility::Math
 		prevents false negatives when comparing large-magnitude values where absolute
 		tolerances would be ineffective.
 	*/
-	constexpr double REL_EPSILON{1e-8};
+	inline constexpr double REL_EPSILON{1e-8};
 
 	/*! @brief Compare two double-precision values using combined absolute and relative tolerances.
 		@details The comparison first checks whether the absolute difference between `lhs` and `rhs`

@@ -6,7 +6,7 @@
 	@author Matthew Moore
 */
 
-#include "Utility/input.h"
+#include "Utility/IO/Input/input.h"
 
 #include <array>
 #include <span>
@@ -14,7 +14,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-using Project::Utility::IO::Input;
+using PocketCore::Utility::IO::Input::Input;
 
 // NOLINTBEGIN(misc-const-correctness,cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
 

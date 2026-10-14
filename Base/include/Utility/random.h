@@ -6,8 +6,8 @@
 	@author Matthew Moore
 */
 
-#ifndef INCLUDE_RANDOM_H
-#define INCLUDE_RANDOM_H
+#ifndef INCLUDE_UTILITY_RANDOM_H
+#define INCLUDE_UTILITY_RANDOM_H
 
 #include <chrono>
 #include <concepts>
@@ -27,7 +27,7 @@ namespace PocketCore::Utility
 {
 	using PocketCore::Core::ul;
 
-	/*! @class Random random.h "include/random.h"
+	/*! @class Random random.h "Utility/random.h"
 		@brief Class for creating a random number generator
 		@since x.x.x
 		@version x.x.x

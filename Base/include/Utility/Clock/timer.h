@@ -6,19 +6,19 @@
 	@author Matthew Moore
 */
 
-#ifndef INCLUDE_CLOCK_H
-#define INCLUDE_CLOCK_H
+#ifndef INCLUDE_UTILITY_CLOCK_TIMER_H
+#define INCLUDE_UTILITY_CLOCK_TIMER_H
 
 #include <chrono>
 #include <format>
 #include <fstream>
 #include <iostream>
 #include <mutex>
-#include <ratio>
 #include <string_view>
 #include <utility>
 
 #include "Core/attributeMacros.h"
+#include "Core/concepts.h"
 #include "Core/typedefs.h"
 
 /*! @namespace Project::Utility::Clock Holds any useful functionality that doesn't fit anywhere else
@@ -29,10 +29,8 @@
 */
 namespace Project::Utility::Clock
 {
+	using Project::Core::Ratio;
 	using Project::Core::ub;
-
-	template <typename T>
-	concept Ratio = std::is_same_v<T, std::ratio<T::num, T::den>>; /*!< A concept to check if a type is a std::ratio */
 
 	/*! @enum TimeUnit A collection of named units of time
 		@date --/--/----
