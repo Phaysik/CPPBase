@@ -1,6 +1,6 @@
 CompileFlags:
     CompilationDatabase: ./build/gcc-release/
-    Add: ["-Iinclude"]
+    Add: ["-ferror-limit=0", "-Iinclude"]
 
 Diagnostics:
     ClangTidy:
