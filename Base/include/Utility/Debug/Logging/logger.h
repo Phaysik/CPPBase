@@ -153,7 +153,7 @@ namespace PocketCore::Utility::Debug::Logging
 				@version x.x.x
 			*/
 			template <typename... Args>
-			ATTR_NODISCARD static std::optional<std::string_view> log(spdlog::level::level_enum level, const std::string_view &format,
+			ATTR_NODISCARD static std::optional<std::string_view> log(spdlog::level::level_enum level, const std::string_view format,
 																	  Args &&...args)
 			{
 				const std::shared_ptr<spdlog::logger> &logger = getLoggerInstance();
@@ -179,7 +179,7 @@ namespace PocketCore::Utility::Debug::Logging
 				@version x.x.x
 			*/
 			template <typename... Args>
-			ATTR_NODISCARD static std::optional<std::string_view> trace(const std::string_view &format, Args &&...args)
+			ATTR_NODISCARD static std::optional<std::string_view> trace(const std::string_view format, Args &&...args)
 			{
 				const std::shared_ptr<spdlog::logger> &logger = getLoggerInstance();
 
@@ -204,7 +204,7 @@ namespace PocketCore::Utility::Debug::Logging
 				@version x.x.x
 			*/
 			template <typename... Args>
-			ATTR_NODISCARD static std::optional<std::string_view> debug(const std::string_view &format, Args &&...args)
+			ATTR_NODISCARD static std::optional<std::string_view> debug(const std::string_view format, Args &&...args)
 			{
 				const std::shared_ptr<spdlog::logger> &logger = getLoggerInstance();
 
@@ -229,7 +229,7 @@ namespace PocketCore::Utility::Debug::Logging
 				@version x.x.x
 			*/
 			template <typename... Args>
-			ATTR_NODISCARD static std::optional<std::string_view> info(const std::string_view &format, Args &&...args)
+			ATTR_NODISCARD static std::optional<std::string_view> info(const std::string_view format, Args &&...args)
 			{
 				const std::shared_ptr<spdlog::logger> &logger = getLoggerInstance();
 
@@ -254,7 +254,7 @@ namespace PocketCore::Utility::Debug::Logging
 				@version x.x.x
 			*/
 			template <typename... Args>
-			ATTR_NODISCARD static std::optional<std::string_view> warn(const std::string_view &format, Args &&...args)
+			ATTR_NODISCARD static std::optional<std::string_view> warn(const std::string_view format, Args &&...args)
 			{
 				const std::shared_ptr<spdlog::logger> &logger = getLoggerInstance();
 
@@ -279,7 +279,7 @@ namespace PocketCore::Utility::Debug::Logging
 				@version x.x.x
 			*/
 			template <typename... Args>
-			ATTR_NODISCARD static std::optional<std::string_view> error(const std::string_view &format, Args &&...args)
+			ATTR_NODISCARD static std::optional<std::string_view> error(const std::string_view format, Args &&...args)
 			{
 				const std::shared_ptr<spdlog::logger> &logger = getLoggerInstance();
 
@@ -304,7 +304,7 @@ namespace PocketCore::Utility::Debug::Logging
 				@version x.x.x
 			*/
 			template <typename... Args>
-			ATTR_NODISCARD static std::optional<std::string_view> critical(const std::string_view &format, Args &&...args)
+			ATTR_NODISCARD static std::optional<std::string_view> critical(const std::string_view format, Args &&...args)
 			{
 				const std::shared_ptr<spdlog::logger> &logger = getLoggerInstance();
 
