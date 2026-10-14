@@ -1,4 +1,4 @@
-/*! @file cconcepts.h
+/*! @file concepts.h
 	@brief Contains the declarations of common concepts that might be used in multiple files.
 	@date --/--/----
 	@version x.x.x

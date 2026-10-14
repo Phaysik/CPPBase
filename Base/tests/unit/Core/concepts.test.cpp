@@ -1,4 +1,4 @@
-/*! @file cconcepts.test.cpp
+/*! @file concepts.test.cpp
 	@brief C++ file for creating tests for validating custom concepts.
 	@date --/--/----
 	@since x.x.x
@@ -6,12 +6,13 @@
 	@author Matthew Moore
 */
 
+#include "Core/concepts.h"
+
 #include <cstddef>
 #include <functional>
 #include <string>
 #include <string_view>
 
-#include "Core/concepts.h"
 #include "Core/typedefs.h"
 
 #include <catch2/catch_test_macros.hpp>
