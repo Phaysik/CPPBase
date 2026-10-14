@@ -6,13 +6,12 @@
 	@author Matthew Moore
 */
 
-#include "Core/cconcepts.h"
-
 #include <cstddef>
 #include <functional>
 #include <string>
 #include <string_view>
 
+#include "Core/concepts.h"
 #include "Core/typedefs.h"
 
 #include <catch2/catch_test_macros.hpp>

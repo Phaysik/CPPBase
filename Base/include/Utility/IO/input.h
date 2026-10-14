@@ -17,7 +17,7 @@
 #include <span>
 #include <string>
 
-#include "Core/cconcepts.h" // for Integral, String
+#include "Core/concepts.h" // for Integral, String
 
 /*! @namespace Project::Utility Holds any useful functionality that doesn't fit anywhere else
 	@date --/--/----
@@ -319,6 +319,6 @@ namespace Project::Utility::IO
 				}
 			}
 	};
-} // namespace Project::Utility
+} // namespace Project::Utility::IO
 
 #endif
