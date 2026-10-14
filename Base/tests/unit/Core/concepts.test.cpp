@@ -10,6 +10,7 @@
 
 #include <cstddef>
 #include <functional>
+#include <ratio>
 #include <string>
 #include <string_view>
 
@@ -17,21 +18,22 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-using PocketCore::Core::FloatingPoint;
-using PocketCore::Core::Integral;
-using PocketCore::Core::InvocableNoArgs;
-using PocketCore::Core::InvocableWithArgs;
-using PocketCore::Core::IsEnum;
-using PocketCore::Core::RationalNumber;
-using PocketCore::Core::sb;
-using PocketCore::Core::si;
-using PocketCore::Core::SignedIntegral;
-using PocketCore::Core::sl;
-using PocketCore::Core::String;
-using PocketCore::Core::ub;
-using PocketCore::Core::ui;
-using PocketCore::Core::ul;
-using PocketCore::Core::UnsignedIntegral;
+using Project::Core::FloatingPoint;
+using Project::Core::Integral;
+using Project::Core::InvocableNoArgs;
+using Project::Core::InvocableWithArgs;
+using Project::Core::IsEnum;
+using Project::Core::Ratio;
+using Project::Core::RationalNumber;
+using Project::Core::sb;
+using Project::Core::si;
+using Project::Core::SignedIntegral;
+using Project::Core::sl;
+using Project::Core::String;
+using Project::Core::ub;
+using Project::Core::ui;
+using Project::Core::ul;
+using Project::Core::UnsignedIntegral;
 
 // Compile-time sanity checks (will fail to compile if concepts change unexpectedly)
 static_assert(Integral<si>);
@@ -290,6 +292,39 @@ SCENARIO("Concepts")
 			{
 				REQUIRE_FALSE(IsEnum<std::string>);
 				REQUIRE_FALSE(IsEnum<std::string_view>);
+			}
+		}
+	}
+
+	GIVEN("Ratio")
+	{
+		GIVEN("normalized std::ratio specializations")
+		{
+			THEN("they satisfy the Ratio concept")
+			{
+				CHECK((Ratio<std::ratio<1, 2>>) );
+				CHECK((Ratio<std::ratio<-1, 2>>) );
+				CHECK(Ratio<std::ratio<0>>);
+				CHECK(Ratio<std::ratio<1>>);
+				CHECK(Ratio<std::milli>);
+			}
+		}
+
+		GIVEN("unreduced ratios, cv-ref variants, and types without ratio members")
+		{
+			THEN("they do not satisfy the Ratio concept")
+			{
+				CHECK_FALSE((Ratio<std::ratio<2, 4>>) );
+				CHECK_FALSE((Ratio<std::ratio<0, 5>>) );
+				CHECK_FALSE((Ratio<std::ratio<1, -2>>) );
+				CHECK_FALSE((Ratio<const std::ratio<1, 2>>) );
+				CHECK_FALSE((Ratio<volatile std::ratio<1, 2>>) );
+				CHECK_FALSE((Ratio<std::ratio<1, 2> &>) );
+				CHECK_FALSE((Ratio<std::ratio<1, 2> &&>) );
+				CHECK_FALSE(Ratio<si>);
+				CHECK_FALSE(Ratio<void>);
+				CHECK_FALSE(Ratio<std::string>);
+				CHECK_FALSE(Ratio<std::string_view>);
 			}
 		}
 	}
