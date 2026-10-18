@@ -25,9 +25,6 @@ using PocketCore::Utility::Random;
 
 SCENARIO("Random")
 {
-	// Reseed with a fixed value before each scenario for determinism
-	Random::setSeed(12'345U);
-
 	GIVEN("a signed integer range [1, 10]")
 	{
 		WHEN("get is called")
