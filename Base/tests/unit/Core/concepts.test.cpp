@@ -22,7 +22,9 @@ using Project::Core::FloatingPoint;
 using Project::Core::Integral;
 using Project::Core::InvocableNoArgs;
 using Project::Core::InvocableWithArgs;
+using Project::Core::IsBoolean;
 using Project::Core::IsEnum;
+using Project::Core::RandomFn;
 using Project::Core::Ratio;
 using Project::Core::RationalNumber;
 using Project::Core::sb;
@@ -37,7 +39,7 @@ using Project::Core::UnsignedIntegral;
 
 // Compile-time sanity checks (will fail to compile if concepts change unexpectedly)
 static_assert(Integral<si>);
-static_assert(Integral<bool>);
+static_assert(!Integral<bool>);
 static_assert(FloatingPoint<double>);
 static_assert(!FloatingPoint<si>);
 static_assert(RationalNumber<si>);
@@ -50,6 +52,27 @@ static_assert(!String<const char *>);
 
 SCENARIO("Concepts")
 {
+	GIVEN("IsBoolean")
+	{
+		GIVEN("Basic boolean value")
+		{
+			THEN("It should satisfy the IsBoolean concept")
+			{
+				REQUIRE(IsBoolean<bool>);
+			}
+		}
+
+		GIVEN("Non-boolean types")
+		{
+			THEN("They should not satisfy the IsBoolean concept")
+			{
+				REQUIRE_FALSE(IsBoolean<double>);
+				REQUIRE_FALSE(IsBoolean<int>);
+				REQUIRE_FALSE(IsBoolean<std::string>);
+			}
+		}
+	}
+
 	GIVEN("Integral")
 	{
 		GIVEN("Basic integral types")
@@ -58,7 +81,6 @@ SCENARIO("Concepts")
 			{
 				REQUIRE(Integral<si>);
 				REQUIRE(Integral<ul>);
-				REQUIRE(Integral<bool>);
 			}
 		}
 
@@ -66,6 +88,7 @@ SCENARIO("Concepts")
 		{
 			THEN("They should not satisfy the Integral concept")
 			{
+				REQUIRE_FALSE(Integral<bool>);
 				REQUIRE_FALSE(Integral<double>);
 				REQUIRE_FALSE(Integral<std::string>);
 			}
@@ -98,6 +121,7 @@ SCENARIO("Concepts")
 		{
 			THEN("They should not satisfy the UnsignedIntegral concept")
 			{
+				REQUIRE_FALSE(Integral<bool>);
 				REQUIRE_FALSE(UnsignedIntegral<double>);
 				REQUIRE_FALSE(UnsignedIntegral<std::string>);
 			}
@@ -130,6 +154,7 @@ SCENARIO("Concepts")
 		{
 			THEN("They should not satisfy the UnsignedIntegral concept")
 			{
+				REQUIRE_FALSE(Integral<bool>);
 				REQUIRE_FALSE(UnsignedIntegral<double>);
 				REQUIRE_FALSE(UnsignedIntegral<std::string>);
 			}
@@ -165,7 +190,6 @@ SCENARIO("Concepts")
 			{
 				REQUIRE(RationalNumber<si>);
 				REQUIRE(RationalNumber<double>);
-				REQUIRE(RationalNumber<bool>);
 			}
 		}
 

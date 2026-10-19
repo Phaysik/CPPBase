@@ -1,8 +1,8 @@
 /*! @file concepts.h
 	@brief Contains the declarations of common concepts that might be used in multiple files.
 	@date --/--/----
-	@version x.x.x
 	@since x.x.x
+	@version x.x.x
 	@author Matthew Moore
 */
 
@@ -19,9 +19,20 @@
 	type-traits library. Use these concepts to constrain template parameters for integral,
 	unsigned, signed, floating-point, rational (integral or floating), and std::string-like types.
 	@note All concepts are compile-time predicates with no runtime cost.
+	@since x.x.x
+	@version x.x.x
 */
 namespace Project::Core
 {
+	/*! @concept IsBoolean
+		@brief Tests whether a type is a boolean type.
+		@tparam T The type to test.
+		@since x.x.x
+		@version x.x.x
+	*/
+	template <typename T>
+	concept IsBoolean = std::is_same_v<bool, std::remove_cv_t<T>>;
+
 	/*! @concept Integral
 		@brief Tests whether a type is an integral type.
 		@tparam T The type to test. Typical examples: `int`, `long`, `char`.
@@ -29,7 +40,7 @@ namespace Project::Core
 		@version x.x.x
 	*/
 	template <typename T>
-	concept Integral = std::is_integral_v<T>;
+	concept Integral = std::is_integral_v<T> && !IsBoolean<T>;
 
 	/*! @concept UnsignedIntegral
 		@brief Tests whether a type is an unsigned integral type.
@@ -38,7 +49,7 @@ namespace Project::Core
 		@version x.x.x
 	*/
 	template <typename T>
-	concept UnsignedIntegral = std::is_unsigned_v<T>;
+	concept UnsignedIntegral = std::is_unsigned_v<T> && !IsBoolean<T>;
 
 	/*! @concept SignedIntegral
 		@brief Tests whether a type is a signed integral type.
@@ -47,7 +58,7 @@ namespace Project::Core
 		@version x.x.x
 	*/
 	template <typename T>
-	concept SignedIntegral = std::is_signed_v<T>;
+	concept SignedIntegral = std::is_signed_v<T> && !IsBoolean<T>;
 
 	/*! @concept FloatingPoint
 		@brief Tests whether a type is a floating-point type.
