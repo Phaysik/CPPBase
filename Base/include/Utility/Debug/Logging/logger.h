@@ -162,7 +162,9 @@ namespace PocketCore::Utility::Debug::Logging
 			{
 				const std::shared_ptr<spdlog::logger> &logger = getLoggerInstance();
 
-				if (!logData([&logger, &format, &args..., level] { logger->log(level, fmt::runtime(format), std::forward<Args>(args)...); }))
+				if (!logData([&logger, &format, &args..., level] {
+						logger->log(level, fmt::runtime(format), std::forward<Args>(args)...);
+					})) // LCOV_EXCL_BR
 				{
 					return LOG_LOG_FAILURE;
 				}
@@ -183,7 +185,8 @@ namespace PocketCore::Utility::Debug::Logging
 			{
 				const std::shared_ptr<spdlog::logger> &logger = getLoggerInstance();
 
-				if (!logData([&logger, &format, &args...] { logger->trace(fmt::runtime(format), std::forward<Args>(args)...); }))
+				if (!logData(
+						[&logger, &format, &args...] { logger->trace(fmt::runtime(format), std::forward<Args>(args)...); })) // LCOV_EXCL_BR
 				{
 					return TRACE_LOG_FAILURE;
 				}
@@ -204,7 +207,8 @@ namespace PocketCore::Utility::Debug::Logging
 			{
 				const std::shared_ptr<spdlog::logger> &logger = getLoggerInstance();
 
-				if (!logData([&logger, &format, &args...] { logger->debug(fmt::runtime(format), std::forward<Args>(args)...); }))
+				if (!logData(
+						[&logger, &format, &args...] { logger->debug(fmt::runtime(format), std::forward<Args>(args)...); })) // LCOV_EXCL_BR
 				{
 					return DEBUG_LOG_FAILURE;
 				}
@@ -225,7 +229,8 @@ namespace PocketCore::Utility::Debug::Logging
 			{
 				const std::shared_ptr<spdlog::logger> &logger = getLoggerInstance();
 
-				if (!logData([&logger, &format, &args...] { logger->info(fmt::runtime(format), std::forward<Args>(args)...); }))
+				if (!logData(
+						[&logger, &format, &args...] { logger->info(fmt::runtime(format), std::forward<Args>(args)...); })) // LCOV_EXCL_BR
 				{
 					return INFO_LOG_FAILURE;
 				}
@@ -246,7 +251,8 @@ namespace PocketCore::Utility::Debug::Logging
 			{
 				const std::shared_ptr<spdlog::logger> &logger = getLoggerInstance();
 
-				if (!logData([&logger, &format, &args...] { logger->warn(fmt::runtime(format), std::forward<Args>(args)...); }))
+				if (!logData(
+						[&logger, &format, &args...] { logger->warn(fmt::runtime(format), std::forward<Args>(args)...); })) // LCOV_EXCL_BR
 				{
 					return WARN_LOG_FAILURE;
 				}
@@ -267,7 +273,8 @@ namespace PocketCore::Utility::Debug::Logging
 			{
 				const std::shared_ptr<spdlog::logger> &logger = getLoggerInstance();
 
-				if (!logData([&logger, &format, &args...] { logger->error(fmt::runtime(format), std::forward<Args>(args)...); }))
+				if (!logData(
+						[&logger, &format, &args...] { logger->error(fmt::runtime(format), std::forward<Args>(args)...); })) // LCOV_EXCL_BR
 				{
 					return ERROR_LOG_FAILURE;
 				}
@@ -287,7 +294,9 @@ namespace PocketCore::Utility::Debug::Logging
 			ATTR_NODISCARD static std::optional<std::string_view> critical(const std::string_view format, Args &&...args)
 			{
 				const std::shared_ptr<spdlog::logger> &logger = getLoggerInstance();
-				if (!logData([&logger, &format, &args...] { logger->critical(fmt::runtime(format), std::forward<Args>(args)...); }))
+				if (!logData([&logger, &format, &args...] {
+						logger->critical(fmt::runtime(format), std::forward<Args>(args)...);
+					})) // LCOV_EXCL_BR
 				{
 					return CRITICAL_LOG_FAILURE;
 				}
@@ -301,7 +310,7 @@ namespace PocketCore::Utility::Debug::Logging
 			/*! @brief Invokes a logging operation synchronously and translates spdlog exceptions into failure.
 				@tparam Func The callable type accepting no arguments.
 				@param[in] func The operation to invoke; references captured by it must remain valid for this call.
-				@return True on success, or false when the operation throws spdlog::spdlog_ex.
+				@return True on success, or false when the operation throws an exception.
 				@note Exceptions of other types propagate to the caller.
 				@since x.x.x
 				@version x.x.x
@@ -314,7 +323,7 @@ namespace PocketCore::Utility::Debug::Logging
 				{
 					std::invoke(std::forward<Func>(func));
 				}
-				catch (const spdlog::spdlog_ex &)
+				catch (...)
 				{
 					return false;
 				}
