@@ -1,8 +1,8 @@
 /*! @file random.testHelper.h
 	@brief Header file for running tests for Randomness.
-	@date 10/13/2026
-	@since 0.12.51
-	@version 0.12.51
+	@date --/--/----
+	@since x.x.x
+	@version x.x.x
 	@author Matthew Moore
 */
 
