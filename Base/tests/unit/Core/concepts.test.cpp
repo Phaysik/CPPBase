@@ -302,11 +302,11 @@ SCENARIO("Concepts")
 		{
 			THEN("they satisfy the Ratio concept")
 			{
-				CHECK((Ratio<std::ratio<1, 2>>) );
-				CHECK((Ratio<std::ratio<-1, 2>>) );
-				CHECK(Ratio<std::ratio<0>>);
-				CHECK(Ratio<std::ratio<1>>);
-				CHECK(Ratio<std::milli>);
+				REQUIRE((Ratio<std::ratio<1, 2>>) );
+				REQUIRE((Ratio<std::ratio<-1, 2>>) );
+				REQUIRE(Ratio<std::ratio<0>>);
+				REQUIRE(Ratio<std::ratio<1>>);
+				REQUIRE(Ratio<std::milli>);
 			}
 		}
 
@@ -314,17 +314,47 @@ SCENARIO("Concepts")
 		{
 			THEN("they do not satisfy the Ratio concept")
 			{
-				CHECK_FALSE((Ratio<std::ratio<2, 4>>) );
-				CHECK_FALSE((Ratio<std::ratio<0, 5>>) );
-				CHECK_FALSE((Ratio<std::ratio<1, -2>>) );
-				CHECK_FALSE((Ratio<const std::ratio<1, 2>>) );
-				CHECK_FALSE((Ratio<volatile std::ratio<1, 2>>) );
-				CHECK_FALSE((Ratio<std::ratio<1, 2> &>) );
-				CHECK_FALSE((Ratio<std::ratio<1, 2> &&>) );
-				CHECK_FALSE(Ratio<si>);
-				CHECK_FALSE(Ratio<void>);
-				CHECK_FALSE(Ratio<std::string>);
-				CHECK_FALSE(Ratio<std::string_view>);
+				REQUIRE_FALSE((Ratio<std::ratio<2, 4>>) );
+				REQUIRE_FALSE((Ratio<std::ratio<0, 5>>) );
+				REQUIRE_FALSE((Ratio<std::ratio<1, -2>>) );
+				REQUIRE_FALSE((Ratio<const std::ratio<1, 2>>) );
+				REQUIRE_FALSE((Ratio<volatile std::ratio<1, 2>>) );
+				REQUIRE_FALSE((Ratio<std::ratio<1, 2> &>) );
+				REQUIRE_FALSE((Ratio<std::ratio<1, 2> &&>) );
+				REQUIRE_FALSE(Ratio<si>);
+				REQUIRE_FALSE(Ratio<void>);
+				REQUIRE_FALSE(Ratio<std::string>);
+				REQUIRE_FALSE(Ratio<std::string_view>);
+			}
+		}
+	}
+
+	GIVEN("RandomFn")
+	{
+		GIVEN("std::function and a lambda that accept and return the specified type")
+		{
+			THEN("they should satisfy the RandomFn concept")
+			{
+				REQUIRE(RandomFn<std::function<double(double, double)>, double>);
+				REQUIRE(RandomFn<decltype([](double, double) { return 1.0; }), double>);
+			}
+		}
+
+		GIVEN("callables with an incompatible return type or argument list")
+		{
+			THEN("they should not satisfy the RandomFn concept")
+			{
+				REQUIRE_FALSE(RandomFn<std::function<float(double, double)>, double>);
+				REQUIRE_FALSE(RandomFn<std::function<void(double, double)>, double>);
+				REQUIRE_FALSE(RandomFn<std::function<double(std::string, std::string)>, double>);
+			}
+		}
+
+		GIVEN("a non-callable type")
+		{
+			THEN("it should not satisfy the RandomFn concept")
+			{
+				REQUIRE_FALSE(RandomFn<std::string, double>);
 			}
 		}
 	}
