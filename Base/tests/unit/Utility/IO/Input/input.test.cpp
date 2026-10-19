@@ -1,20 +1,28 @@
 /*! @file input.test.cpp
 	@brief Catch2 unit tests for `Utility::Input` utilities.
 	@date --/--/----
-	@version x.x.x
 	@since x.x.x
+	@version x.x.x
 	@author Matthew Moore
 */
 
 #include "Utility/IO/Input/input.h"
 
 #include <array>
+#include <cerrno>
+#include <cstdio>
 #include <span>
 #include <sstream>
 
 #include <catch2/catch_test_macros.hpp>
 
-using Project::Utility::IO::Input::Input;
+#ifndef _WIN32
+	#include <unistd.h>
+
+	#include <sys/wait.h>
+#endif
+
+using PocketCore::Utility::IO::Input::Input;
 
 // NOLINTBEGIN(misc-const-correctness,cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
 
@@ -93,6 +101,56 @@ SCENARIO("Input getInput direct")
 			{
 				CHECK((result == 99));
 			}
+		}
+
+		WHEN("extraneous-input checking is disabled")
+		{
+			const int checkingResult{Input::getInput<int>({}, {}, false, input)};
+
+			THEN("the number is returned and trailing characters remain")
+			{
+				CHECK((checkingResult == 42));
+				CHECK((input.peek() == 'a'));
+			}
+		}
+	}
+
+	GIVEN("an empty input stream")
+	{
+		WHEN("input is requested in a child process")
+		{
+#ifdef _WIN32
+			SKIP("The EOF termination test requires POSIX fork and waitpid.");
+#else
+			// Prevent the child from flushing a second copy of the parent's buffered output.
+			REQUIRE(std::fflush(nullptr) == 0);
+			const pid_t child{fork()};
+			REQUIRE(child >= 0);
+
+			if (child == 0)
+			{
+				std::istringstream childInput{};
+				static_cast<void>(Input::getInput<int>({}, {}, true, childInput));
+				_exit(99);
+			}
+
+			int status{0};
+			pid_t waited{};
+
+			// NOLINTNEXTLINE(cppcoreguidelines-avoid-do-while)
+			do
+			{
+				waited = waitpid(child, &status, 0);
+			} while (waited == -1 && errno == EINTR);
+
+			REQUIRE(waited == child);
+
+			THEN("EOF terminates the child successfully instead of returning")
+			{
+				REQUIRE(WIFEXITED(status));
+				CHECK(WEXITSTATUS(status) == 0);
+			}
+#endif
 		}
 	}
 }

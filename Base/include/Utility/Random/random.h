@@ -143,6 +143,6 @@ namespace Project::Utility::Random
 
 			static inline std::mt19937 mTwister{generate()}; /*!< The global random number generator */
 	};
-} // namespace Project::Utility
+} // namespace Project::Utility::Random
 
 #endif
