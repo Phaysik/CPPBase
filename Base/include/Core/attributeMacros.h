@@ -1,5 +1,5 @@
 /*! @file attributeMacros.h
-	@brief Declares portable compiler-attribute macros used across PocketCore.
+	@brief Declares portable compiler-attribute macros used across Project.
 	@date --/--/----
 	@since x.x.x
 	@version x.x.x

@@ -19,7 +19,7 @@
 
 #include "Core/concepts.h" // for Integral, String
 
-/*! @namespace PocketCore::Utility::IO::Input Holds input stream manipulation
+/*! @namespace Project::Utility::IO::Input Holds input stream manipulation
 	@date --/--/----
 	@version x.x.x
 	@since x.x.x

@@ -18,14 +18,14 @@
 #include "Core/concepts.h" // for Integral
 #include "Core/typedefs.h"
 
-/*! @namespace PocketCore::Utility Holds any useful functionality that doesn't fit anywhere else
+/*! @namespace Project::Utility Holds any useful functionality that doesn't fit anywhere else
 	@since x.x.x
 	@version x.x.x
 	@author Matthew Moore
 */
-namespace PocketCore::Utility
+namespace Project::Utility::Random
 {
-	using PocketCore::Core::ul;
+	using Project::Core::ul;
 
 	/*! @class Random random.h "Utility/random.h"
 		@brief Class for creating a random number generator
@@ -46,7 +46,7 @@ namespace PocketCore::Utility
 				@version x.x.x
 				@author Matthew Moore
 			*/
-			template <PocketCore::Core::Integral T>
+			template <Project::Core::Integral T>
 			ATTR_NODISCARD static T get(const T min, const T max) noexcept
 			{
 				return std::uniform_int_distribution<T>{min, max}(mTwister);
@@ -62,7 +62,7 @@ namespace PocketCore::Utility
 				@version x.x.x
 				@author Matthew Moore
 			*/
-			template <PocketCore::Core::FloatingPoint T>
+			template <Project::Core::FloatingPoint T>
 			ATTR_NODISCARD static T get(const T min, const T max) noexcept
 			{
 				return std::uniform_real_distribution<T>{min, max}(mTwister);
@@ -101,7 +101,7 @@ namespace PocketCore::Utility
 				@author Matthew Moore
 			*/
 			template <typename Func, typename DesiredValue>
-				requires PocketCore::Core::InvocableNoArgs<Func> && std::same_as<std::invoke_result_t<Func>, DesiredValue>
+				requires Project::Core::InvocableNoArgs<Func> && std::same_as<std::invoke_result_t<Func>, DesiredValue>
 			ATTR_NODISCARD static ul findSeed(Func &&func, const DesiredValue &result) noexcept
 			{
 				Func &&forwardedFunc{std::forward<Func>(func)};
@@ -143,6 +143,6 @@ namespace PocketCore::Utility
 
 			static inline std::mt19937 mTwister{generate()}; /*!< The global random number generator */
 	};
-} // namespace PocketCore::Utility
+} // namespace Project::Utility
 
 #endif

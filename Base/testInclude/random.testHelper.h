@@ -16,7 +16,7 @@
 
 #include "Core/attributeMacros.h"
 
-namespace PocketCore::Testing
+namespace Project::Testing
 {
 	template <typename TypeValue>
 	struct FixedRandom
@@ -60,6 +60,6 @@ namespace PocketCore::Testing
 			std::size_t index{0};
 			// NOLINTEND(misc-non-private-member-variables-in-classes,cppcoreguidelines-non-private-member-variables-in-classes)
 	};
-} // namespace PocketCore::Testing
+} // namespace Project::Testing
 
 #endif

@@ -16,10 +16,10 @@
 #include <catch2/matchers/catch_matchers.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
-using PocketCore::Core::sb;
-using PocketCore::Core::ub;
-using PocketCore::Core::us;
-using PocketCore::Utility::Random;
+using Project::Core::sb;
+using Project::Core::ub;
+using Project::Core::us;
+using Project::Utility::Random::Random;
 
 // NOLINTBEGIN(misc-const-correctness,cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers,bugprone-random-generator-seed,cert-msc51-cpp,cert-msc32-c,readability-function-cognitive-complexity)
 
