@@ -336,7 +336,9 @@ SCENARIO("Concepts")
 			THEN("they should satisfy the RandomFn concept")
 			{
 				REQUIRE(RandomFn<std::function<double(double, double)>, double>);
+				REQUIRE(RandomFn<std::function<int(int, int)>, int>);
 				REQUIRE(RandomFn<decltype([](double, double) { return 1.0; }), double>);
+				REQUIRE(RandomFn<decltype([](int, int) { return 1; }), int>);
 			}
 		}
 
@@ -344,6 +346,7 @@ SCENARIO("Concepts")
 		{
 			THEN("they should not satisfy the RandomFn concept")
 			{
+				REQUIRE_FALSE(RandomFn<std::function<std::string(std::string, std::string)>, std::string>);
 				REQUIRE_FALSE(RandomFn<std::function<float(double, double)>, double>);
 				REQUIRE_FALSE(RandomFn<std::function<void(double, double)>, double>);
 				REQUIRE_FALSE(RandomFn<std::function<double(std::string, std::string)>, double>);
