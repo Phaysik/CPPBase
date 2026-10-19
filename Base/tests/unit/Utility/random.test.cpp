@@ -6,7 +6,7 @@
 	@author Matthew Moore
 */
 
-#include "Utility/random.h"
+#include "Utility/Random/random.h"
 
 #include <cstddef>
 

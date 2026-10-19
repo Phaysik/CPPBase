@@ -6,8 +6,8 @@
 	@author Matthew Moore
 */
 
-#ifndef INCLUDE_UTILITY_RANDOM_H
-#define INCLUDE_UTILITY_RANDOM_H
+#ifndef INCLUDE_UTILITY_RANDOM_RANDOM_H
+#define INCLUDE_UTILITY_RANDOM_RANDOM_H
 
 #include <chrono>
 #include <concepts>
