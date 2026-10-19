@@ -267,7 +267,7 @@ namespace Project::Utility::Clock
 			static std::ofstream &getLogFile(const std::string *filename = nullptr) noexcept
 			{
 
-				static std::ofstream mLogFile; // LCOV_EXCL_BR_LINE — fourth branch is the __cxa_atexit destructor-registration failure
+				static std::ofstream mLogFile; // LCOV_EXCL_BR — fourth branch is the __cxa_atexit destructor-registration failure
 											   // path, only reachable on OOM
 				static std::mutex logMutex;
 				if (filename != nullptr || getFileName() != "null")
@@ -296,7 +296,7 @@ namespace Project::Utility::Clock
 			*/
 			static std::string &getFileName() noexcept
 			{
-				static std::string fileName{"null"}; // LCOV_EXCL_BR_LINE — fourth branch is the __cxa_atexit destructor-registration
+				static std::string fileName{"null"}; // LCOV_EXCL_BR — fourth branch is the __cxa_atexit destructor-registration
 													 // failure path, only reachable on OOM
 				return fileName;
 			}
