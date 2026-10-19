@@ -28,12 +28,12 @@
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/spdlog.h>
 
-namespace Logging = PocketCore::Utility::Debug::Logging;
+namespace Logging = Project::Utility::Debug::Logging;
 
 using Logging::Logger;
-using PocketCore::Core::ub;
-using PocketCore::Core::us;
-using PocketCore::Testing::readLogFile;
+using Project::Core::ub;
+using Project::Core::us;
+using Project::Testing::readLogFile;
 
 // NOLINTBEGIN(misc-const-correctness,cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers,readability-function-cognitive-complexity,llvm-prefer-static-over-anonymous-namespace)
 

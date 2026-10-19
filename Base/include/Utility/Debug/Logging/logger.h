@@ -21,14 +21,14 @@
 
 #include <spdlog/logger.h>
 
-/*! @namespace PocketCore::Utility::Debug::Logging Provides debug and diagnostic logging facilities.
+/*! @namespace Project::Utility::Debug::Logging Provides debug and diagnostic logging facilities.
 	@since x.x.x
 	@version x.x.x
 	@author Matthew Moore
 */
-namespace PocketCore::Utility::Debug::Logging
+namespace Project::Utility::Debug::Logging
 {
-	using PocketCore::Core::InvocableNoArgs;
+	using Project::Core::InvocableNoArgs;
 
 	/*! @class Logger logger.h "include/Utility/Debug/Logging/logger.h"
 		@brief A static-only wrapper around spdlog that provides global logging through deferred initialization.
@@ -353,6 +353,6 @@ namespace PocketCore::Utility::Debug::Logging
 			*/
 			static std::string &getFileNameStore();
 	};
-} // namespace PocketCore::Utility::Debug::Logging
+} // namespace Project::Utility::Debug::Logging
 
 #endif

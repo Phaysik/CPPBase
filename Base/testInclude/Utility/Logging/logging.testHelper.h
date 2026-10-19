@@ -19,11 +19,12 @@
 
 #include <spdlog/spdlog.h>
 
-namespace PocketCore::Testing
+namespace Project::Testing
 {
-	using PocketCore::Utility::Debug::Logging::Logger;
+	using Project::Utility::Debug::Logging::Logger;
 
-	static inline void ensureLoggerInitialized(const std::string_view loggerName, const std::string_view fileName, const bool truncateFile = true)
+	static inline void ensureLoggerInitialized(const std::string_view loggerName, const std::string_view fileName,
+											   const bool truncateFile = true)
 	{
 		static bool initialized{false};
 
@@ -44,6 +45,6 @@ namespace PocketCore::Testing
 		contents << file.rdbuf();
 		return contents.str();
 	}
-} // namespace PocketCore::Testing
+} // namespace Project::Testing
 
 #endif
