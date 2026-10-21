@@ -477,6 +477,7 @@ if(ENABLE_COVERAGE AND NOT MSVC)
             # 2) RUN the tests.  This is the step that was missing.
             COMMAND ${CMAKE_CTEST_COMMAND}
                 --output-on-failure
+                --stop-on-failure
                 --test-dir "${CMAKE_BINARY_DIR}"
 
             # 3) Capture — scope to test_app's object dir only.
