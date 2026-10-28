@@ -515,7 +515,7 @@ SCENARIO("Logger")
 			spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw std::runtime_error(msg); });
 			const std::string_view arg{"x"};
 
-			CHECK((Logger::info("{} {}", arg).has_value()));
+			CHECK(Logger::info("{} {}", arg).has_value());
 
 			spdlog::set_error_handler([](const std::string & /*msg*/) {});
 		}
@@ -526,7 +526,7 @@ SCENARIO("Logger")
 			const std::string_view arg1{"a"};
 			const std::string_view arg2{"b"};
 
-			CHECK((Logger::info("{} {} {}", arg1, arg2).has_value()));
+			CHECK(Logger::info("{} {} {}", arg1, arg2).has_value());
 
 			spdlog::set_error_handler([](const std::string & /*msg*/) {});
 		}
@@ -536,7 +536,7 @@ SCENARIO("Logger")
 			spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw std::runtime_error(msg); });
 			const ub arg{1};
 
-			CHECK((Logger::info("{} {}", arg).has_value()));
+			CHECK(Logger::info("{} {}", arg).has_value());
 
 			spdlog::set_error_handler([](const std::string & /*msg*/) {});
 		}
@@ -546,7 +546,7 @@ SCENARIO("Logger")
 			spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw std::runtime_error(msg); });
 			const std::string_view arg{"x"};
 
-			CHECK((Logger::warn("{} {}", arg).has_value()));
+			CHECK(Logger::warn("{} {}", arg).has_value());
 
 			spdlog::set_error_handler([](const std::string & /*msg*/) {});
 		}
@@ -557,7 +557,7 @@ SCENARIO("Logger")
 			const std::string_view arg1{"a"};
 			const std::string_view arg2{"b"};
 
-			CHECK((Logger::warn("{} {} {}", arg1, arg2).has_value()));
+			CHECK(Logger::warn("{} {} {}", arg1, arg2).has_value());
 
 			spdlog::set_error_handler([](const std::string & /*msg*/) {});
 		}
@@ -568,7 +568,7 @@ SCENARIO("Logger")
 			const ub userID{1};
 			const std::string_view name{"x"};
 
-			CHECK((Logger::warn("{} {} {}", userID, name).has_value()));
+			CHECK(Logger::warn("{} {} {}", userID, name).has_value());
 
 			spdlog::set_error_handler([](const std::string & /*msg*/) {});
 		}
@@ -579,7 +579,7 @@ SCENARIO("Logger")
 			const ub id1{1};
 			const ub id2{2};
 
-			CHECK((Logger::warn("{} {} {}", id1, id2).has_value()));
+			CHECK(Logger::warn("{} {} {}", id1, id2).has_value());
 
 			spdlog::set_error_handler([](const std::string & /*msg*/) {});
 		}
@@ -589,7 +589,7 @@ SCENARIO("Logger")
 			spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw std::runtime_error(msg); });
 			const ub userID{1};
 
-			CHECK((Logger::warn("{} {} {}", 20UL, userID).has_value()));
+			CHECK(Logger::warn("{} {} {}", 20UL, userID).has_value());
 
 			spdlog::set_error_handler([](const std::string & /*msg*/) {});
 		}
@@ -682,7 +682,7 @@ SCENARIO("Logger")
 			std::optional<std::string_view> result{Logger::log(spdlog::level::info, "{} {}", 77)};
 
 			REQUIRE(result.has_value());
-			CHECK((result.value() == Logging::LOG_LOG_FAILURE));
+			CHECK((result == Logging::LOG_LOG_FAILURE));
 
 			spdlog::set_error_handler([](const std::string & /*msg*/) {});
 		}
@@ -695,7 +695,7 @@ SCENARIO("Logger")
 			std::optional<std::string_view> result{Logger::trace("{} {}", 42)};
 
 			REQUIRE(result.has_value());
-			CHECK((result.value() == Logging::TRACE_LOG_FAILURE));
+			CHECK((result == Logging::TRACE_LOG_FAILURE));
 
 			spdlog::set_error_handler([](const std::string & /*msg*/) {});
 			Logger::setLevel(spdlog::level::info);
@@ -709,7 +709,7 @@ SCENARIO("Logger")
 			std::optional<std::string_view> result{Logger::debug("{} {}", "hello")};
 
 			REQUIRE(result.has_value());
-			CHECK((result.value() == Logging::DEBUG_LOG_FAILURE));
+			CHECK((result == Logging::DEBUG_LOG_FAILURE));
 
 			spdlog::set_error_handler([](const std::string & /*msg*/) {});
 			Logger::setLevel(spdlog::level::info);
@@ -722,7 +722,7 @@ SCENARIO("Logger")
 			std::optional<std::string_view> result{Logger::info("{} {}", 100)};
 
 			REQUIRE(result.has_value());
-			CHECK((result.value() == Logging::INFO_LOG_FAILURE));
+			CHECK((result == Logging::INFO_LOG_FAILURE));
 
 			spdlog::set_error_handler([](const std::string & /*msg*/) {});
 		}
@@ -734,7 +734,7 @@ SCENARIO("Logger")
 			std::optional<std::string_view> result{Logger::warn("{} {}", 3.14)};
 
 			REQUIRE(result.has_value());
-			CHECK((result.value() == Logging::WARN_LOG_FAILURE));
+			CHECK((result == Logging::WARN_LOG_FAILURE));
 
 			spdlog::set_error_handler([](const std::string & /*msg*/) {});
 		}
@@ -746,7 +746,7 @@ SCENARIO("Logger")
 			std::optional<std::string_view> result{Logger::error("{} {}", "failure")};
 
 			REQUIRE(result.has_value());
-			CHECK((result.value() == Logging::ERROR_LOG_FAILURE));
+			CHECK((result == Logging::ERROR_LOG_FAILURE));
 
 			spdlog::set_error_handler([](const std::string & /*msg*/) {});
 		}
@@ -758,7 +758,7 @@ SCENARIO("Logger")
 			std::optional<std::string_view> result{Logger::critical("{} {}", 999)};
 
 			REQUIRE(result.has_value());
-			CHECK((result.value() == Logging::CRITICAL_LOG_FAILURE));
+			CHECK((result == Logging::CRITICAL_LOG_FAILURE));
 
 			spdlog::set_error_handler([](const std::string & /*msg*/) {});
 		}
@@ -770,7 +770,7 @@ SCENARIO("Logger")
 		{
 			spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw std::runtime_error(msg); });
 
-			CHECK((Logger::log(spdlog::level::info, "{} {}", 77).has_value()));
+			CHECK(Logger::log(spdlog::level::info, "{} {}", 77).has_value());
 
 			spdlog::set_error_handler([](const std::string & /*msg*/) {});
 		}
@@ -780,7 +780,7 @@ SCENARIO("Logger")
 			Logger::setLevel(spdlog::level::trace);
 			spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw std::runtime_error(msg); });
 
-			CHECK((Logger::trace("{} {}", 42).has_value()));
+			CHECK(Logger::trace("{} {}", 42).has_value());
 
 			spdlog::set_error_handler([](const std::string & /*msg*/) {});
 			Logger::setLevel(spdlog::level::info);
@@ -791,7 +791,7 @@ SCENARIO("Logger")
 			Logger::setLevel(spdlog::level::debug);
 			spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw std::runtime_error(msg); });
 
-			CHECK((Logger::debug("{} {}", "hello").has_value()));
+			CHECK(Logger::debug("{} {}", "hello").has_value());
 
 			spdlog::set_error_handler([](const std::string & /*msg*/) {});
 			Logger::setLevel(spdlog::level::info);
@@ -801,7 +801,7 @@ SCENARIO("Logger")
 		{
 			spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw std::runtime_error(msg); });
 
-			CHECK((Logger::info("{} {}", 100).has_value()));
+			CHECK(Logger::info("{} {}", 100).has_value());
 
 			spdlog::set_error_handler([](const std::string & /*msg*/) {});
 		}
@@ -810,7 +810,7 @@ SCENARIO("Logger")
 		{
 			spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw std::runtime_error(msg); });
 
-			CHECK((Logger::warn("{} {}", 3.14).has_value()));
+			CHECK(Logger::warn("{} {}", 3.14).has_value());
 
 			spdlog::set_error_handler([](const std::string & /*msg*/) {});
 		}
@@ -819,7 +819,7 @@ SCENARIO("Logger")
 		{
 			spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw std::runtime_error(msg); });
 
-			CHECK((Logger::error("{} {}", "failure").has_value()));
+			CHECK(Logger::error("{} {}", "failure").has_value());
 
 			spdlog::set_error_handler([](const std::string & /*msg*/) {});
 		}
@@ -828,7 +828,7 @@ SCENARIO("Logger")
 		{
 			spdlog::set_error_handler([] ATTR_NORETURN(const std::string &msg) { throw std::runtime_error(msg); });
 
-			CHECK((Logger::critical("{} {}", 999).has_value()));
+			CHECK(Logger::critical("{} {}", 999).has_value());
 
 			spdlog::set_error_handler([](const std::string & /*msg*/) {});
 		}
