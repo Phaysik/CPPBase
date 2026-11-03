@@ -20,6 +20,7 @@
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 using Project::Core::si;
+using Project::Core::ub;
 using Project::Utility::Random::DefaultRandomSource;
 using Project::Utility::Random::getDefaultRandomSource;
 using Project::Utility::Random::IRandomSource;
@@ -58,7 +59,38 @@ SCENARIO("DefaultRandomSource")
 {
 	RandomStateGuard stateGuard{};
 
-	GIVEN("the default index source")
+	GIVEN("an unsigned integral default random source")
+	{
+		DefaultRandomSource<ub> source{};
+
+		THEN("generated values stay within the inclusive bounds")
+		{
+			for (ub draw{0}; draw < 100; ++draw)
+			{
+				ub result{source(0, 10)};
+				CHECK((result >= 0));
+				CHECK((result <= 10));
+			}
+		}
+
+		THEN("equal bounds return the only possible value")
+		{
+			CHECK((source(7, 7) == 7));
+		}
+
+		THEN("generation delegates to the shared random utility")
+		{
+			Random::setSeed(42UL);
+			ub expectedFirst{Random::get<ub>(0, 10)};
+			ub expectedSecond{Random::get<ub>(0, 10)};
+			Random::setSeed(42UL);
+
+			CHECK((source(0, 10) == expectedFirst));
+			CHECK((source(0, 10) == expectedSecond));
+		}
+	}
+
+	GIVEN("a signed integral default random source")
 	{
 		IRandomSource<std::size_t> &source{getDefaultRandomSource<std::size_t>()};
 
