@@ -169,8 +169,8 @@ jobs:
             sudo ./llvm.sh 24
             rm llvm.sh
             sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-            sudo apt update
-            sudo apt install --only-upgrade libstdc++6
+            sudo apt-get update
+            sudo apt-get install --only-upgrade libstdc++6
             sudo apt-get install clang++-24 -y
             sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-24 24
             sudo update-alternatives --set clang++ /usr/bin/clang++-24
