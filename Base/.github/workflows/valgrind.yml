@@ -20,6 +20,8 @@ on:
         '**.cmake',
         '**CMakePresets.json',
         '.github/workflows/valgrind.yml',
+        '.github/workflows/ci-image.yml',
+        '.github/docker/ci/**',
         'vcpkg.json',
       ]
   pull_request:
@@ -41,21 +43,40 @@ on:
         '**.cmake',
         '**CMakePresets.json',
         '.github/workflows/valgrind.yml',
+        '.github/workflows/ci-image.yml',
+        '.github/docker/ci/**',
         'vcpkg.json',
       ]
 
 jobs:
+  image:
+    name: CI toolchain image
+    uses: ./.github/workflows/ci-image.yml
+    permissions:
+      contents: read
+      packages: write
+
   test:
     name: Valgrind
+    needs: image
     runs-on: ubuntu-latest
+    container:
+      image: ${{ needs.image.outputs.image }}
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
     permissions:
       actions: read
       contents: read
+      packages: read
       security-events: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+
+      - name: Mark workspace as safe for git
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
       - name: Set up vcpkg
         uses: lukka/run-vcpkg@v11
@@ -65,100 +86,7 @@ jobs:
       - name: Set VCPKG_ROOT
         run: echo "VCPKG_ROOT=${{ runner.temp }}/vcpkg" >> "$GITHUB_ENV"
 
-      - name: Set up Cache Site
-        run: mkdir -p ./cache
-
-      - name: Set up Apt Cache Site
-        run: |
-          mkdir -p ./cache/apt-packages
-          mkdir -p ./cache/apt-lists
-
-      - name: Set up GCC Cache Site
-        run: |
-          mkdir -p ./cache/gcc-latest
-
-      - name: Cache Apt Packages
-        id: cache-apt-packages
-        uses: actions/cache@v5
-        with:
-          path: ./cache/apt-packages
-          key: ${{ runner.os }}-apt-packages-${{ hashFiles('makefileDependencies.sh') }}
-          restore-keys: |
-            ${{ runner.os }}-apt-packages-
-
-      - name: Cache Apt Package Lists
-        id: cache-apt-lists
-        uses: actions/cache@v5
-        with:
-          path: ./cache/apt-lists
-          key: ${{ runner.os }}-apt-lists-${{ hashFiles('makefileDependencies.sh') }}
-          restore-keys: |
-            ${{ runner.os }}-apt-lists-
-
-      - name: Cache GCC
-        id: cache-gcc-latest
-        uses: actions/cache@v5
-        with:
-          path: |
-            ./cache/gcc-latest
-          key: ${{ runner.os }}-gcc-latest-${{ hashFiles('makefileDependencies.sh') }}
-          restore-keys: |
-            ${{ runner.os }}-gcc-latest-
-
-      - name: Install Apt Packages From Cache
-        if: steps.cache-apt-packages.outputs.cache-hit == 'true'
-        run: sudo cp -r ./cache/apt-packages/apt/* /var/cache/apt
-
-      - name: Install Apt Lists From Cache
-        if: steps.cache-apt-lists.outputs.cache-hit == 'true'
-        run: sudo cp -r ./cache/apt-lists/lists/* /var/lib/apt/lists
-
-      - name: Install GCC From Cache
-        if: steps.cache-gcc-latest.outputs.cache-hit == 'true'
-        run: |
-          sudo mkdir -p /usr/local/gcc-latest
-          sudo cp -r ./cache/gcc-latest/* /usr/local/gcc-latest/
-          sudo update-alternatives --install /usr/bin/g++ g++ /usr/local/gcc-latest/bin/g++ 100
-          sudo update-alternatives --install /usr/bin/gcc gcc /usr/local/gcc-latest/bin/gcc 100
-          sudo update-alternatives --install /usr/bin/gcov gcov /usr/local/gcc-latest/bin/gcov 100
-
-      - name: Install dependencies
-        if: steps.cache-apt-packages.outputs.cache-hit != 'true' || steps.cache-apt-lists.outputs.cache-hit != 'true' || steps.cache-gcc-latest.outputs.cache-hit != 'true'
-        run: sudo bash $GITHUB_WORKSPACE/makefileDependencies.sh a
-
-      - name: Install Valgrind Dependencies
-        run: |
-          wget -qO llvm.sh https://apt.llvm.org/llvm.sh
-          sudo chmod +x llvm.sh
-          sudo ./llvm.sh 24
-          rm llvm.sh
-          sudo apt-get update
-          sudo apt-get install valgrind clang++-24 -y
-          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-24 24
-          sudo update-alternatives --set clang++ /usr/bin/clang++-24
-          pip3 install cmake --break-system-packages
-
       - name: Run Valgrind
         run: |
             cmake --preset gcc-valgrind
             cmake --build --preset valgrind
-
-      - name: Save Apt Packages Cache
-        run: |
-          sudo cp -r /var/cache/apt ./cache/apt-packages
-
-      - name: Save Apt Lists Cache
-        run: |
-          sudo cp -r /var/lib/apt/lists ./cache/apt-lists
-
-      - name: Find latest GCC
-        run: |
-          latest_gcc=$(find /usr/local -maxdepth 1 -type d -name 'gcc-*' | sort -V | tail -n1)
-          echo "LATEST_GCC=$latest_gcc" >> "$GITHUB_ENV"
-
-      - name: Save GCC Cache
-        run: |
-          sudo cp -r "$LATEST_GCC"/* ./cache/gcc-latest
-
-      - name: Give Read Access For Apt Folder
-        run: sudo chown -R $USER:$USER ./cache/apt-packages/apt/archives/lock ./cache/apt-packages/apt/archives/partial ./cache/apt-lists/lists/lock ./cache/apt-lists/lists/partial
