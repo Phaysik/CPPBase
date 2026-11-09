@@ -16,6 +16,7 @@
 #include <stdexcept>
 #include <string>
 #include <string_view>
+#include <system_error>
 
 #include "Core/attributeMacros.h"
 #include "Core/typedefs.h"
@@ -45,8 +46,10 @@ SCENARIO("Logger")
 
 	spdlog::drop_all();
 
-	bool fileRemoved{std::filesystem::remove(logFileName)};
-	REQUIRE(!fileRemoved);
+	// A stale file may remain when an earlier section aborted before scenario cleanup.
+	std::error_code removeError;
+	std::filesystem::remove(logFileName, removeError);
+	REQUIRE_FALSE(removeError);
 
 	bool loggerInitialized{Logger::initialize(loggerName, logFileName)};
 	REQUIRE(loggerInitialized);
@@ -72,8 +75,8 @@ SCENARIO("Logger")
 			// Clean up the second file
 			spdlog::drop_all();
 
-			bool secondFileRemoved{std::filesystem::remove(secondFile)};
-			REQUIRE(secondFileRemoved);
+			std::filesystem::remove(secondFile, removeError);
+			REQUIRE_FALSE(removeError);
 
 			bool loggerReinitialized{Logger::initialize(loggerName, logFileName)};
 			CHECK(loggerReinitialized);
@@ -144,9 +147,9 @@ SCENARIO("Logger")
 		THEN("works after file name changed")
 		{
 			std::string newFile{"logger_test_newfile.log"};
-			fileRemoved = std::filesystem::remove(newFile);
+			std::filesystem::remove(newFile, removeError);
 
-			REQUIRE(!fileRemoved);
+			REQUIRE_FALSE(removeError);
 
 			const bool setResult{Logger::setFileName(newFile)};
 			CHECK(setResult);
@@ -158,8 +161,8 @@ SCENARIO("Logger")
 			CHECK(contents.contains("written to new file"));
 
 			spdlog::drop_all();
-			fileRemoved = std::filesystem::remove(newFile);
-			REQUIRE(fileRemoved);
+			std::filesystem::remove(newFile, removeError);
+			REQUIRE_FALSE(removeError);
 
 			loggerInitialized = Logger::initialize(loggerName, logFileName);
 			REQUIRE(loggerInitialized);
@@ -171,8 +174,8 @@ SCENARIO("Logger")
 		THEN("works with both name and file changed")
 		{
 			std::string newFile{"logger_test_both.log"};
-			fileRemoved = std::filesystem::remove(newFile);
-			REQUIRE(!fileRemoved);
+			std::filesystem::remove(newFile, removeError);
+			REQUIRE_FALSE(removeError);
 
 			const bool setResult{Logger::setLoggerAndFileName("both_logger", newFile)};
 			CHECK(setResult);
@@ -184,8 +187,8 @@ SCENARIO("Logger")
 			CHECK(contents.contains("both changed"));
 
 			spdlog::drop_all();
-			fileRemoved = std::filesystem::remove(newFile);
-			REQUIRE(fileRemoved);
+			std::filesystem::remove(newFile, removeError);
+			REQUIRE_FALSE(removeError);
 
 			loggerInitialized = Logger::initialize(loggerName, logFileName);
 			REQUIRE(loggerInitialized);
@@ -667,9 +670,8 @@ SCENARIO("Logger")
 			CHECK_FALSE(loggerInitialized);
 
 			spdlog::drop(duplicateName);
-			fileRemoved = std::filesystem::remove(tempFile);
-
-			REQUIRE(fileRemoved);
+			std::filesystem::remove(tempFile, removeError);
+			REQUIRE_FALSE(removeError);
 		}
 	}
 
@@ -836,9 +838,8 @@ SCENARIO("Logger")
 
 	// Scenario-level cleanup
 	spdlog::drop_all();
-	fileRemoved = std::filesystem::remove(logFileName);
-
-	REQUIRE(fileRemoved);
+	std::filesystem::remove(logFileName, removeError);
+	REQUIRE_FALSE(removeError);
 }
 
 // NOLINTEND(misc-const-correctness,cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers,readability-function-cognitive-complexity,llvm-prefer-static-over-anonymous-namespace)
