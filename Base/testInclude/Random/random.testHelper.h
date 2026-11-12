@@ -37,27 +37,27 @@ namespace Project::Testing
 	struct SequenceRandom
 	{
 		public:
-			SequenceRandom(std::initializer_list<TypeValue> init) : values(init) {}
+			SequenceRandom(std::initializer_list<TypeValue> init) : mValues(init) {}
 
 			TypeValue operator()(TypeValue /*min*/, TypeValue /*max*/)
 			{
-				if (index >= values.size())
+				if (mCalls >= mValues.size())
 				{
 					throw std::out_of_range("SequenceRandom exhausted");
 				}
 
-				return values[index++];
+				return mValues[mCalls++];
 			}
 
 			ATTR_NODISCARD std::size_t calls() const noexcept
 			{
-				return index;
+				return mCalls;
 			}
 
 		public:
 			// NOLINTBEGIN(misc-non-private-member-variables-in-classes,cppcoreguidelines-non-private-member-variables-in-classes)
-			std::vector<TypeValue> values;
-			std::size_t index{0};
+			std::vector<TypeValue> mValues;
+			std::size_t mCalls{0};
 			// NOLINTEND(misc-non-private-member-variables-in-classes,cppcoreguidelines-non-private-member-variables-in-classes)
 	};
 } // namespace Project::Testing
