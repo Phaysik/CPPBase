@@ -13,12 +13,16 @@
 #include <utility>
 
 #include "Core/typedefs.h"
+#include "Utility/Random/random.testHelper.h"
 #include "Utility/Random/randomSourceInterface.h"
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
+using Project::Core::sb;
 using Project::Core::si;
+using Project::Core::ub;
+using Project::Testing::SequenceRandom;
 using Project::Utility::Random::CallableRandomSource;
 using Project::Utility::Random::IRandomSource;
 
@@ -142,6 +146,30 @@ SCENARIO("CallableRandomSource")
 			CHECK((source(0, 10) == 1));
 			CHECK((callable(0, 10) == 2));
 			CHECK((source(0, 10) == 3));
+		}
+	}
+
+	GIVEN("reference wrappers around shared unsigned and signed sequences")
+	{
+		SequenceRandom<ub> unsignedSequence{3, 9};
+		SequenceRandom<sb> signedSequence{-4, 6};
+		CallableRandomSource<ub, std::reference_wrapper<SequenceRandom<ub>>> unsignedSource{std::ref(unsignedSequence)};
+		CallableRandomSource<sb, std::reference_wrapper<SequenceRandom<sb>>> signedSource{std::ref(signedSequence)};
+
+		WHEN("generation is requested through the random source interface")
+		{
+			IRandomSource<ub> &unsignedInterface{unsignedSource};
+			IRandomSource<sb> &signedInterface{signedSource};
+			ub unsignedResult{unsignedInterface(0, 10)};
+			sb signedResult{signedInterface(-10, 10)};
+
+			THEN("the referenced sequences produce the results and advance in place")
+			{
+				CHECK((unsignedResult == 3));
+				CHECK((signedResult == -4));
+				CHECK((unsignedSequence.calls() == 1));
+				CHECK((signedSequence.calls() == 1));
+			}
 		}
 	}
 
